@@ -86,11 +86,11 @@ import dj_database_url
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'parcelhubpos',
-        'USER': 'root',
+        'NAME': 'parcelhubPOS',
+        'USER': 'ngcw',
         'PASSWORD': 'bakayar00',
         'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'PORT': '5432',
     }
 }
 db_from_env = dj_database_url.config(conn_max_age=500)
