@@ -1,0 +1,18 @@
+{% extends "header.html" %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+	<form class="searchform" action="/parcelhubPOS/zoneinternational/" method="get">
+		<div>Courier:<input type="text" name="courier" maxlength ="50" value="{{ formdata.courier }}"/></div>
+		<div>Country:<input type="text" name="country" maxlength ="50" value="{{ formdata.country }}"/></div>
+		<div>Document zone:<input type="number" name="zonedoc" maxlength ="25" value="{{ formdata.zonedoc }}"/></div>
+		<div>Merchandise zone:<input type="number" name="zonemer" maxlength ="25" value="{{ formdata.zonemer }}"/></div>
+        <input class="searchbutton" type="submit" value="Search"/> 
+    </form>
+	{% render_table zoneinternational %}
+	<form action="/parcelhubPOS/zoneinternational/editzoneinternational/?zoneinternationalid=">
+    	<input type="submit" value="Add" />
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

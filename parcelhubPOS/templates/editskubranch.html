@@ -1,0 +1,69 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+	<form method="post" action="">{% csrf_token %}
+	{% if errortext != '' %}
+   		{{ errortext }}
+   	{% endif %}
+		<table class="inputtable">
+		    <table class="inputtable">
+		    	
+		  		<tr>
+		  			<td>Branch:</td>
+		  			<td>{{ branch.name }}</td>
+		  		</tr>
+		  		<tr>
+		  			<td>SKU:</td>
+		  			<td>
+		  				<select name="skuselected" onChange="this.form.submit();">
+		  					{% for skuoption in sku_list %}
+		  						<option value="{{ skuoption.sku_code }}" {% if formdata.selectedsku == skuoption.sku_code %} selected {% endif %}>{{ skuoption.sku_code }}</option>
+		  					{% endfor %}
+		  				</select>
+					</td>
+		  		</tr>
+		  		<tr>
+		  			<td>Customer:</td>
+		  			<td>
+		  				<select name="customerselected" onChange="this.form.submit();">
+		  					<option value=""></option>
+		  					{% for customeroption in customer_list %}
+		  						<option value="{{ customeroption.id }}" {% if formdata.selectedcustomer == customeroption.id  %} selected {% endif %}>{{ customeroption.name }}</option>
+		  					{% endfor %}
+		  				</select>
+					</td>
+		  		</tr>
+		  		{% if formdata.corporate.0 %}
+		  		<tr>
+		  			<td>Corporate:</td>
+			  		<td><input name="{{ formdata.corporate.1 }}" value="{{ formdata.corporate.2 }}"/></td>
+			  		<td>Default:</td>
+			  		<td>{{ formdata.corporate.3 }}</td>
+		  		</tr>
+		  		{% endif %}
+		  		{% if formdata.walkinspecial.0 %}
+		  		<tr>
+		  			<td>Walk in special:</td>
+			  		<td><input name="{{ formdata.walkinspecial.1 }}" value="{{ formdata.walkinspecial.2 }}"/></td>
+			  		<td>Default:</td>
+			  		<td>{{ formdata.walkinspecial.3 }}</td>
+		  		</tr>
+		  		{% endif %}
+		  		{% if formdata.walkin.0 %}
+		  		<tr>
+		  			<td>Walk in:</td>
+			  		<td><input name="{{ formdata.walkin.1 }}" value="{{ formdata.walkin.2 }}"/></td>
+			  		<td>Default:</td>
+			  		<td>{{ formdata.walkin.3 }}</td>
+		  		</tr>
+		  		{% endif %}
+		  	</table>
+		  		
+
+	    </table>
+	    <input type="submit" name="save" value="Save" />
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

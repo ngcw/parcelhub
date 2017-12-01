@@ -1,0 +1,129 @@
+{% extends "header.html" %}
+
+{% block content %}
+	
+	<form action="" method="POST">{% csrf_token %}
+	<div id="invoice_container">
+		{{ invoice_form.non_field_errors }}
+		{% for hidden_field in invoice_form.hidden_fields %}
+		  {{ hidden_field.errors }}
+		  {{ hidden_field }}
+		{% endfor %}
+	
+		<table class="section" id="sectionleft">
+			{% if invoice %}
+			<tr><th>Branch.:</th><td>{{ invoice.branch.name }}</td></tr>
+		  	<tr><th>Invoice No.:</th><td>{{ invoice.invoiceno }}</td></tr>
+		  	{% endif %}
+		  	<tr>
+		  		<th><label for="{{ invoice_form.date.id_for_label }}">Date:</label></th>
+		  		<td>{{ invoice_form.invoice_date }}</td>
+		  		{% if invoice_form.invoice_date.errors %} <td>{{ invoice_form.invoice_date.errors }}</td> {% endif %}
+		  	</tr>
+		  	<tr>
+		  		<th><label for="{{ invoice_form.invoicetype.id_for_label }}">Type:</label></th>
+		  		<td>{{ invoice_form.invoicetype }}</td>
+		  		{% if invoice_form.invoicetype.errors %} <td>{{ invoice_form.invoicetype.errors }}</td> {% endif %}
+		  	</tr>
+		  	<tr>
+		  		<th><label for="{{ invoice_form.customer.id_for_label }}">Customer:</label></th>
+		  		<td>{{ invoice_form.customer }}</td>
+		  		{% if invoice_form.customer.errors %} <td>{{ invoice_form.customer.errors }}</td> {% endif %}
+		  	</tr>
+		  	<tr>
+		  		<th><label for="{{ invoice_form.remarks.id_for_label }}">Remarks:</label></th>
+		  		<td>{{ invoice_form.remarks }}</td>
+		  		{% if invoice_form.remarks.errors %} <td>{{ invoice_form.remarks.errors }}</td> {% endif %}
+		  	</tr>
+		</table>
+		<table class="section" id="sectionright">
+			<tr>
+	        	<th>Nr of items:</th><td><label id="itemcount">1</label></td>
+	        </tr>
+	        <tr>
+	        	<th>Sub-total:</th><td><label id="subtotal"></label></td>
+	        </tr>
+	        <tr><th>GST:</th><td><label id="gsttotal">{{ invoice_form.gst }}</label></td></tr>
+	        <tr>
+		  		<th><label for="{{ invoice_form.discount.id_for_label }}">Discount:</label></th>
+		  		<td>{{ invoice_form.discount }}</td>
+		  		<td>
+		  			<select name="discountoption" id="id_discountmode" oninput="UpdateTotal()">
+		  				<option value="RM" {% if invoice and invoice.discountmode == "RM" %} selected {% endif %}>RM</option>
+	  					<option value="%" {% if invoice and invoice.discountmode == "%" %} selected {% endif %}>%</option>
+		  			</select>
+		  		</td>
+		  		{% if invoice_form.discount.errors %} <td>{{ invoice_form.discount.errors }}</td> {% endif %}
+		  	</tr>
+	        <tr><th>Rounding:</th><td><label id="rounding"></label></td></tr>
+	        <tr><th>Total:</th><td><label id="total"></label></td></tr>
+	        <tr>
+		  		<th><label for="{{ invoice_form.payment.id_for_label }}">Payment:</label></th>
+		  		<td>{{ invoice_form.payment }}</td>
+		  		<td>{{ invoice_form.payment_type }}</td>
+		  		{% if invoice_form.payment.errors %} <td>{{ invoice_form.payment.errors }}</td> {% endif %}
+		  	</tr>
+	        <tr><th>Change:</th><td><label id="change"></label></td></tr>
+	    </table>
+	    </div>
+	    
+    <div id="invoiceitemheader">
+	    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()"/> 
+	    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()"/>
+	    <input type="submit" name="action" value="Print invoice" id="print_invoice_up" onClick="return validateInvoiceItem()"/>
+	    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
+	    <input type="submit" name="action" value="Print receipt" id="print_receipt_up" onClick="return validateInvoiceItem()"/>
+		    <h2>Invoice Items</h2>
+		    {{ invoice_item_formset.management_form }}
+		    <div class ="invoiceitem_container">
+		    {% for form in invoice_item_formset.forms %}
+	            {% if forloop.first %}
+	            	<div class="itemform_container">
+	            		<div class="counter_label">Nr.</div>
+	                {% for field in form.visible_fields %}
+						{% if field.label == "Height(mm)" or field.label == "Length(mm)" or field.label == "Width(mm)"%}
+						{% else %}
+		            		<div class="itemform_label">{{ field.label_tag }}</div>
+		            	{% endif %}
+		            		
+	                    
+	                {% endfor %}
+	                <div class="itemform_label"></div>
+	                </div>
+	            {% endif %}
+	            <div class="item">
+	            	<div class="counter_input"><label  class="counter">{{forloop.counter}}</label> </div>
+	            	{% for field in form %}
+						{% if field.label == "Height(mm)"%}
+							<div data-role="popup" class="item_input_dimensional" id={{field.auto_id}}_popup title="Dimensional weight">
+							Height:{{ field }}
+						{% elif field.label == "Length(mm)"%}
+							Length:{{ field }}
+						{% elif field.label == "Width(mm)" %}
+							Width:{{ field }}
+							</div>
+						{% else %}
+		            		<div class="item_input">{{ field }}</div>
+		            	{% endif %}
+		            		
+		    		{% endfor %}
+		    		<div style="" ><a class="delete" href="#" tabindex="-1"><button>Delete</button></a></div>
+		    	</div>
+
+		    {% endfor %}
+		    </div>
+		    <div id="invoicebottom">
+			    <div id="addanotheritem"><a id="add" href="#"><button>Add another item</button></a></div>
+			    
+			    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()"/> 
+			    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()"/>
+			    <input type="submit" name="action" value="Print invoice" id="print_invoice" onClick="return validateInvoiceItem()"/>
+			    <input type="submit" name="action" value="Print delivery order" id="print_do" onClick="return validateInvoiceItem()"/>
+			    <input type="submit" name="action" value="Print receipt" id="print_receipt" onClick="return validateInvoiceItem()"/>
+			    <div id="nrOfItem">Nr of items:<label id="itemcount1">1</label></div>
+	    	</div>
+	    </div>
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

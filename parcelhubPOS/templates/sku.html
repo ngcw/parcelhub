@@ -1,0 +1,38 @@
+{% extends "header.html" %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+	
+	<form class="searchform" action="/parcelhubPOS/sku/" method="get">
+		<div>SKU#:<input type="text" name="skucode" maxlength ="50" value="{{ formdata.skucode }}"/></div>
+		<div class="searchinput">Courier:<input type="text" name="courier" maxlength ="50" value="{{ formdata.courier }}"/></div>
+		<div class="searchinput">
+			<label for="producttypeselection">Product type:</label>
+			<select name="producttype" id="producttypeselection" >
+				<option value="" ></option>
+				{% for producttype in producttype_list %}
+					<option value="{{producttype.name}}" {% if producttype.name == formdata.producttype %} selected {% endif %}>{{producttype.name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+        <div class="searchinput">Weight:<input type="number" name="weight" step=0.001 value="{{ formdata.weight }}"/></div>
+        <div class="searchinput">
+			<label for="zonetypeselection">Zone type:</label>
+			<select name="zonetype" id="zonetypeselection" >
+				<option value="" ></option>
+				{% for zonetype in zonetype_list %}
+					<option value="{{zonetype.name}}" {% if zonetype.name == formdata.zonetype %} selected {% endif %}>{{zonetype.name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+        <div class="searchinput">Zone:<input type="text" name="zone" maxlength ="50" value="{{ formdata.zone }}"/></div>
+        <input class="searchbutton" type="submit" value="Search"/> 
+    </form>
+
+	{% render_table sku %}
+	<form action="/parcelhubPOS/sku/editsku/?skucode=">
+    	<input type="submit" value="Add" />
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

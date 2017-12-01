@@ -1,0 +1,45 @@
+{% extends "header.html" %}
+
+{% block content %}
+	
+	<form action="/parcelhubPOS/payment/editpayment/?paymentid={{ paymentid }}" method="POST">{% csrf_token %}
+	<div>Customer: {{ payment_form.customer }}</div>
+	<div>Payment type: {{ payment_form.payment_paymenttype }}</div>
+    <div id="paymentitemheader">
+		    <h2>Payment</h2>
+		    
+		    {{ payment_item_formset.management_form }}
+		    <div class ="paymentitem_container">
+		    {% for form in payment_item_formset.forms %}
+	            {% if forloop.first %}
+	            	<div class="paymentitemform_container">
+	            		<div class="counter_label">Nr.</div>
+	            			<div class="itemform_label">Invoice no:</div>
+	            			<div class="itemform_label">Total:</div>
+	            			<div class="itemform_label">Paid amount:</div>
+	            			<div class="itemform_label">Remaining:</div>
+		            		<div class="itemform_label">Amt to pay:</div>
+	                <div class="itemform_label"></div>
+	                </div>
+	            {% endif %}
+	            <div class="paymentitem">
+	            	<div class="counter_input"><label  class="counter">{{forloop.counter}}</label> </div>
+	            			<div class="item_input">{{ form.instance.invoice.invoiceno }}</div>
+	            			<div class="item_input">{{ form.instance.invoice.total }}</div>
+	            			<div class="item_input">{{ form.instance.invoice.payment }}</div>
+	            			<div class="item_input">{{ form.instance.remainder }}</div>
+		            		<div class="item_input">{{ form.paidamount }}</div>
+		            		<div class="item_input">{{ form.id }}</div>
+		    	</div>
+		    {% endfor %}
+		    </div>
+		    
+	    </div>
+	    <div id="paymentbottom">
+		    <input type="submit" name="action" value="Confirm"/> 
+		    <input type="submit" name="action" value="Cancel payment"/>
+    	</div>
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

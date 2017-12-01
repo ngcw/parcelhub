@@ -1,0 +1,19 @@
+{% extends "header.html" %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+	
+	<form class="searchform" action="/parcelhubPOS/user/" method="get">
+		<div>First name:<input type="text" name="firstname" maxlength ="50" value="{{ formdata.firstname }}"/></div>
+		<div>Last name:<input type="text" name="lastname" maxlength ="50" value="{{ formdata.lastname }}"/></div>
+		<div>Username:<input type="text" name="username" maxlength ="50" value="{{ formdata.username }}"/></div>
+		<div class="searchinput">Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
+        <input class="searchbutton" type="submit" value="Search"/> 
+    </form>
+	{% render_table userlist %}
+	<form action="/parcelhubPOS/user/adduser">
+    	<input type="submit" value="Add" />
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

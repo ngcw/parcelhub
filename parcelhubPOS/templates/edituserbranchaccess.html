@@ -1,0 +1,97 @@
+{% extends "header.html" %}
+
+{% block content %}
+	
+	<form method="post" action="">{% csrf_token %}
+		<table class="inputtable">
+	  		<tr>
+	  			<td>User:</td>
+	  			<td>{{ user.last_name }} {{ user.first_name }}</td>
+	  		</tr>
+	  		<tr>
+	  			<td>Branch:</td>
+	  			<td>
+	  				<select name="branchselected">
+	  					{% for branchoption in branchsel_list %}
+	  						<option value="{{ branchoption.id }}" {% if currentuserba and currentuserba.branch.id == branchoption.id %} selected {% endif %}>{{ branchoption.name }}</option>
+	  					{% endfor %}
+	  				</select>
+				</td>
+	  		</tr>
+	  		<tr>
+	  			<td>Master data:</td>
+	  			<td>
+	  				<select name="masterdata_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.masterdata_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+	  		<tr>
+	  			<td>Branch:</td>
+	  			<td>
+	  				<select name="branch_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.branch_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+	  		<tr>
+	  			<td>User:</td>
+	  			<td>
+	  				<select name="user_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.user_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+	  		<tr>
+	  			<td>SKU pricing:</td>
+	  			<td>
+	  				<select name="skupricing_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.skupricing_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+	  		<tr>
+	  			<td>Invoice data:</td>
+	  			<td>
+	  				<select name="transaction_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.transaction_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+	  		<tr>
+	  			<td>Customer account:</td>
+	  			<td>
+	  				<select name="custacc_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.custacc_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+	  		<tr>
+	  			<td>Report:</td>
+	  			<td>
+	  				<select name="report_auth">
+	  					{% for seloption in selectionoption %}
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.report_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					{% endfor %}
+	  				</select>
+	  			</td>
+	  		</tr>
+		</table>
+		<input type="hidden" name="next" value="{{ next }}">
+	    <input type="submit" value="Save" />
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

@@ -1,0 +1,19 @@
+{% extends "header.html" %}
+{% load render_table from django_tables2 %}
+{% load staticfiles %}
+{% block content %}
+	
+	<form class="searchform" action="/parcelhubPOS/customer/" method="get">
+		<div>Name:<input type="text" name="name" maxlength ="50" value="{{ formdata.name }}"/></div>
+		<div>Contact:<input type="text" name="contact" maxlength ="50" value="{{ formdata.contact }}"/></div>
+		<div>Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
+		<div>IC No:<input type="text" name="icno" maxlength ="50" value="{{ formdata.icno }}"/></div>
+        <input class="searchbutton" type="submit" value="Search"/> 
+    </form>
+	{% render_table customer %}
+	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">
+    	<input type="submit" value="Add" />
+	</form>
+{% endblock %}
+
+{% include 'footer.html' %}

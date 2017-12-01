@@ -1,0 +1,35 @@
+<!doctype html>
+
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+        <title>ParcelHub Invoicing</title>
+		<link rel="stylesheet" type="text/css" href="{% static 'style_login.css' %}" />
+	</head>
+	<body>
+		<div id='parent' align="center">
+			<h3><img src="/static/img/companylogo.png" alt="companylogo" title="companylogo" width="400" height="60"/></h3>
+		    <form method="post" action="/parcelhubPOS/" id='form_login'>
+		    	{% csrf_token %}
+		    	{% if match_error %}
+		        	<p>Your username or password is incorrect. Please try again.</p>
+				{% endif %}
+		        <table>
+		            <tr>
+		                <td>Username:</td>
+		                <td><input type="text" name="Username"/></td>
+		            </tr>
+		            <tr>
+		                <td>Password:</td>
+		                <td><input type="password" name="Password"/></td>
+		            </tr>
+		       </table>
+		
+		       <input type="hidden" name="next" value="/rates/" />
+		       <br/>
+		       <input type="submit" value="login" />
+		   </form>
+		</div>
+	</body>
+</html>
