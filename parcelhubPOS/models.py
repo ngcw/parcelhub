@@ -74,8 +74,6 @@ class ZoneDomestic(models.Model):
     postcode_end = models.CharField(max_length=25)
     zone = models.PositiveIntegerField()
 
-    def __str__(self):
-        return self.state + "-" + self.postcode_start + "-" +self.postcode_end
 
     class Meta:
         ordering = ['zone']
