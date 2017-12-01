@@ -146,7 +146,7 @@ STATIC_URL = '/parcelhubPOS/static/'
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 LOGIN_REDIRECT_URL = 'parcelhubPOS/login'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000000
