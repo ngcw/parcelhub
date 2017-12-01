@@ -1,6 +1,5 @@
 import django_tables2 as tables
 from .models import *
-from test.test_pprint import Unorderable
 
 deletelinkinvoice = '''<a href="/parcelhubPOS/invoice/deleteinvoice?dinvoiceid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this?')">Delete</a>'''
 editlinkinvoice = '''{% if record.createtimestamp >= deadlinetime or issuperuser %}
