@@ -14,7 +14,11 @@ from django.http import HttpResponse
 from .models import Invoice, InvoiceItem, SKU, Branch, Tax
 from decimal import Decimal
 from textwrap import wrap
-folder = os.path.dirname(reportlab.__file__) + os.sep + 'fonts'    
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_URL = '/parcelhubPOS/static/'
+
+folder = STATIC_ROOT + STATIC_URL + 'fonts'    
 ttfFile = os.path.join(folder, 'DejaVuSansMono.ttf')     
 pdfmetrics.registerFont(TTFont("DejaVuSansMono", ttfFile)) 
 ttfFilebold = os.path.join(folder, 'DejaVuSansMono-Bold.ttf')     
