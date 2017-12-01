@@ -144,7 +144,7 @@ STATIC_URL = '/parcelhubPOS/static/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, STATIC_URL),
+    os.path.join(PROJECT_ROOT, 'static'),
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 IMPORT_EXPORT_USE_TRANSACTIONS = True
