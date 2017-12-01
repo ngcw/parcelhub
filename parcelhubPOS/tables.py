@@ -172,11 +172,11 @@ class SKUBranchTable(tables.Table):
 deletelinkcustomer = '''<a href="/parcelhubPOS/customer/deletecustomer?dcustomerid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this?')">Delete</a>'''
 editlinkcustomer = '<a href="/parcelhubPOS/customer/editcustomer?customerid={{record.id}}">Edit</a>'
 customertypeimg = '''{% if record.customertype.iscorporate %}
-                        <img src="/static/img/company.png" alt="company" title="company" width="20" height="20"/>
+                        <img src="{% static '/img/company.png' %}" alt="company" title="company" width="20" height="20"/>
                     {% elif  record.customertype.iswalkinspecial %}
-                        <img src="/static/img/individual_special.png" alt="individual special" title="individual special" width="20" height="20"/>
+                        <img src="{% static '/img/individual_special.png' %}" alt="individual special" title="individual special" width="20" height="20"/>
                     {% else %}
-                        <img src="/static/img/individual.png" alt="individual" title="individual" width="20" height="20"/>
+                        <img src="{% static '/img/individual.png' %}" alt="individual" title="individual" width="20" height="20"/>
                     {% endif %}'''
 class CustomerTable(tables.Table):
     edit = tables.TemplateColumn(editlinkcustomer,

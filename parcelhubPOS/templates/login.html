@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<div id='parent' align="center">
-			<h3><img src="/static/img/companylogo.png" alt="companylogo" title="companylogo" width="400" height="60"/></h3>
+			<h3><img src="{% static '/img/companylogo.png' %}" alt="companylogo" title="companylogo" width="400" height="60"/></h3>
 		    <form method="post" action="/parcelhubPOS/" id='form_login'>
 		    	{% csrf_token %}
 		    	{% if match_error %}
