@@ -15,8 +15,7 @@ from .models import Invoice, InvoiceItem, SKU, Branch, Tax
 from decimal import Decimal
 from textwrap import wrap
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
-STATIC_URL = '/parcelhubPOS/static/'
+STATIC_URL = '/static/'
 
 folder = STATIC_ROOT + STATIC_URL + 'fonts'    
 ttfFile = os.path.join(folder, 'DejaVuSansMono.ttf')     
