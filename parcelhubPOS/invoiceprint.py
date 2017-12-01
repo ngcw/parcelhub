@@ -17,7 +17,7 @@ from textwrap import wrap
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
 
-folder = STATIC_ROOT + STATIC_URL + 'fonts'    
+folder = PROJECT_ROOT + STATIC_URL + 'fonts'    
 ttfFile = os.path.join(folder, 'DejaVuSansMono.ttf')     
 pdfmetrics.registerFont(TTFont("DejaVuSansMono", ttfFile)) 
 ttfFilebold = os.path.join(folder, 'DejaVuSansMono-Bold.ttf')     
