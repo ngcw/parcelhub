@@ -68,18 +68,15 @@
         
         {% block navbar %}
         	{% for menu in nav_bar %}
-        		{% ifequal menu.1|length 1 %}
-		        	<div><a href="{{ menu.1.0 }}">{{ menu.0|slice:"1:" }}</a></div>
-		        {% else %}
-		        	<div class="dropdown">
-		   				<button class="dropbtn" onclick="myFunction{{ menu.0.split|join:'_' }}()">{{ menu.0|slice:"1:" }}</button>
-		   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
-			        	{% for submenu in menu.1 %}
-			        		<a href="{{ submenu.1 }}">{{ submenu.0 }}</a>
-			        	{% endfor %}
-			        	</div>
-			        </div>
-		        {% endifequal %}
+
+	        	<div class="dropdown">
+	   				<button class="dropbtn" onclick="myFunction{{ menu.0.split|join:'_' }}()">{{ menu.0|slice:"1:" }}</button>
+	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
+		        	{% for submenu in menu.1 %}
+		        		<a href="{{ submenu.1 }}">{{ submenu.0 }}</a>
+		        	{% endfor %}
+		        	</div>
+		        </div>
 		    {% endfor %}
 		  {% endblock %}
 		  

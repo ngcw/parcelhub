@@ -36,9 +36,10 @@ def invoice(request):
 @login_required
 def retrieveInvoice(request):
     loggedusers = userselection(request)
-    menubar = navbar(request)
+    
     loguser = User.objects.get(id=request.session.get('userid'))
-    branchlist = branchselection(request)
+    branchselectlist = branchselection(request)
+    menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     invoice_list = Invoice.objects.filter(branch_id=branchid )
     formdata = {'invoicenumber':'',
@@ -90,7 +91,7 @@ def retrieveInvoice(request):
     context = {
                 'invoice': final_invoice_table,
                 'nav_bar' : sorted(menubar.items()),
-                'branchselection': branchlist,
+                'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'branchselectionaction': '/parcelhubPOS/invoice/',
                 'formdata' : formdata,

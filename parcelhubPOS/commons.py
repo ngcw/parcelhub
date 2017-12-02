@@ -15,7 +15,10 @@ def userselection(request):
     sessiondict = []
     if 'loggedusers' in request.session:
         sessiondict = request.session['loggedusers']
-    selectedbranch = request.session[CONST_branchid]
+    try:
+        selectedbranch = request.session[CONST_branchid]
+    except:
+        selectedbranch = ''
     if request.method == "POST":
         selecteduser = request.POST.get('userselection') 
         if selecteduser:
@@ -73,6 +76,8 @@ def navbar(request):
         if loguser.is_superuser or branchaccess.user_auth != 'n/a':
             menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
         
+        if len(menudict[CONST_masterdata]) == 0:
+            menudict.pop(CONST_masterdata)
         
         if loguser.is_superuser or branchaccess.custacc_auth != 'n/a':
             menudict[CONST_custacc] =[('Customer account','/parcelhubPOS/customer'),
