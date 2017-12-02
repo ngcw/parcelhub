@@ -68,7 +68,6 @@
         
         {% block navbar %}
         	{% for menu in nav_bar %}
-
 	        	<div class="dropdown">
 	   				<button class="dropbtn" onclick="myFunction{{ menu.0.split|join:'_' }}()">{{ menu.0|slice:"1:" }}</button>
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">

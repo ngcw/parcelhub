@@ -68,7 +68,7 @@ def navbar(request):
             menudict[CONST_masterdata].append(('Zone domestic','/parcelhubPOS/zonedomestic') )
             menudict[CONST_masterdata].append(('Zone international','/parcelhubPOS/zoneinternational') )
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
-            menudict[CONST_system] =['/parcelhubPOS/masterdata']
+            menudict[CONST_system] =[('Synchronize data','/parcelhubPOS/masterdata')]
         if loguser.is_superuser or branchaccess.skupricing_auth != 'n/a':
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))                            
         if loguser.is_superuser or branchaccess.branch_auth != 'n/a':
@@ -83,8 +83,8 @@ def navbar(request):
             menudict[CONST_custacc] =[('Customer account','/parcelhubPOS/customer'),
                                       ('Statement of account','/parcelhubPOS/statementofaccount'),
                                       ('Payment','/parcelhubPOS/payment/?custid=""')]
-        if loguser.is_superuser or branchaccess.report_auth != 'n/a':
-            menudict[CONST_report] =[('Customer report','/parcelhubPOS/custreport'),
-                                ('Vendor report','/parcelhubPOS/vendorreport'),
-                                ('Account report','/parcelhubPOS/accreport')]
+        #if loguser.is_superuser or branchaccess.report_auth != 'n/a':
+        #    menudict[CONST_report] =[('Customer report','/parcelhubPOS/custreport'),
+        #                        ('Vendor report','/parcelhubPOS/vendorreport'),
+        #                        ('Account report','/parcelhubPOS/accreport')]
     return menudict
