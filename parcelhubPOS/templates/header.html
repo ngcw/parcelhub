@@ -421,7 +421,8 @@
 	    	    var customersel = document.getElementById("id_customer");
 	    	    var selectedcust = customersel.options[customersel.selectedIndex].value;
 	    	    $.ajax({
-	                url:"/parcelhubPOS/autocompleteskudetail/?customerid="+selectedcust,
+	                url:"/parcelhubPOS/autocompleteskudetail/?customerid="+selectedcust
+	                										+"&sku_code="+value,
 	                type:"POST",
 	                data:mystring,
 	                dataType: "json",

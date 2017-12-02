@@ -310,7 +310,8 @@ def autocompleteskufield(request):
 @csrf_exempt
 def autocompleteskudetail(request):
     branchid = request.session.get(CONST_branchid)
-    skubranch_list = SKUBranch.objects.filter(branch_id = branchid )
+    skucode =request.GET.get('sku_code')
+    skubranch_list = SKUBranch.objects.filter(branch_id = branchid, sku__sku_code = skucode)
     results = []
     skucode_list = []
     iswalkinspecial = False;
@@ -325,9 +326,10 @@ def autocompleteskudetail(request):
                 skubranch_list = skubranch_list.filter(Q(customer__isnull=True) | Q(customer__name=customersel.name) )
         except:
             pass
-    for skubranch in skubranch_list:
-        sku_json = {}
+    skubranch = skubranch_list.first()
+    if skubranch:
         try:
+            sku_json = {}
             sku = skubranch.sku
             sku_json['skucode'] = sku.sku_code
             sku_json['couriervendor'] = sku.couriervendor.id
@@ -348,12 +350,13 @@ def autocompleteskudetail(request):
             sku_json['price'] = "%.2f" % pricewithgst
             sku_json['gst'] = "%.2f" % gst
             skucode_list.append(sku.sku_code)
-        except:
+            results.append(sku_json)
+        except: 
             pass
-        results.append(sku_json)
-    sku_list = SKU.objects.all().exclude(sku_code__in=skucode_list)
-    for sku in sku_list:
+    else:
         try:
+            sku = SKU.objects.get(sku_code = skucode)
+    
             sku_json = {}
             sku_json['skucode'] = sku.sku_code
             sku_json['couriervendor'] = sku.couriervendor.id
