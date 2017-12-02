@@ -647,15 +647,18 @@
 	                	for (i = 0; i < inputcount && duplicated == false; i++) { 
 	                		ctrackcodeid = "id_form-" + i + "-tracking_code"
 	                		cinputvalue = document.getElementById(ctrackcodeid).value.trim()
-	                		if( i != count)
+	                		if( cinputvalue )
 	                		{
-	                			
-	    	    				duplicated = value == cinputvalue
+		                		if( i != count && value)
+		                		{
+		                			
+		    	    				duplicated = value == cinputvalue
+		                		}
+		                		else
+	                			{
+	                				duplicated = cinputvalue == ''
+	                			}
 	                		}
-	                		else
-                			{
-                				duplicated = cinputvalue == ''
-                			}
 	                		
 	                	}
 	                	var dataobj = JSON.parse(data)

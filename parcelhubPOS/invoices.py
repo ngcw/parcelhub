@@ -316,13 +316,15 @@ def autocompleteskudetail(request):
     iswalkinspecial = False;
     iscorporate = False;
     customerid = request.GET.get('customerid') ;
-  
     if customerid:
-        customersel = Customer.objects.get(id=customerid)
-        if customersel:
-            iswalkinspecial = customersel.customertype.iswalkinspecial
-            iscorporate = customersel.customertype.iscorporate
-            skubranch_list = skubranch_list.filter(Q(customer__isnull=True) | Q(customer__name=customersel.name) )
+        try:
+            customersel = Customer.objects.get(id=customerid)
+            if customersel:
+                iswalkinspecial = customersel.customertype.iswalkinspecial
+                iscorporate = customersel.customertype.iscorporate
+                skubranch_list = skubranch_list.filter(Q(customer__isnull=True) | Q(customer__name=customersel.name) )
+        except:
+            pass
     for skubranch in skubranch_list:
         sku_json = {}
         try:
@@ -351,26 +353,29 @@ def autocompleteskudetail(request):
         results.append(sku_json)
     sku_list = SKU.objects.all().exclude(sku_code__in=skucode_list)
     for sku in sku_list:
-        sku_json = {}
-        sku_json['skucode'] = sku.sku_code
-        sku_json['couriervendor'] = sku.couriervendor.id
-        sku_json['zonetype'] = sku.zone_type.name
-        sku_json['producttype'] = sku.product_type.name
-        sku_json['zone'] = sku.zone
-        sku_json['tax'] = sku.tax_code.id
-        sku_json['description'] = sku.description
-        skuprice = 0.0
-        if iswalkinspecial:
-            skuprice = sku.walkin_special_price
-        elif iscorporate:
-            skuprice = sku.corporate_price
-        else:
-            skuprice = sku.walkin_price
-        gst = (skuprice * sku.tax_code.gst)
-        pricewithgst = skuprice + gst
-        sku_json['price'] = "%.2f" % pricewithgst
-        sku_json['gst'] = "%.2f" % gst
-        results.append(sku_json)
+        try:
+            sku_json = {}
+            sku_json['skucode'] = sku.sku_code
+            sku_json['couriervendor'] = sku.couriervendor.id
+            sku_json['zonetype'] = sku.zone_type.name
+            sku_json['producttype'] = sku.product_type.name
+            sku_json['zone'] = sku.zone
+            sku_json['tax'] = sku.tax_code.id
+            sku_json['description'] = sku.description
+            skuprice = 0.0
+            if iswalkinspecial:
+                skuprice = sku.walkin_special_price
+            elif iscorporate:
+                skuprice = sku.corporate_price
+            else:
+                skuprice = sku.walkin_price
+            gst = (skuprice * sku.tax_code.gst)
+            pricewithgst = skuprice + gst
+            sku_json['price'] = "%.2f" % pricewithgst
+            sku_json['gst'] = "%.2f" % gst
+            results.append(sku_json)
+        except:
+            pass
     data = json.dumps(results)
     return JsonResponse(data, safe=False)
 
