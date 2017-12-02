@@ -126,6 +126,7 @@ def editInvoice(request, invoiceid):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     invoiceid = request.GET.get('invoiceid')
+    
     title = 'New invoice'
     if invoiceid:
         title = "Edit invoice"
@@ -155,7 +156,10 @@ def editInvoice(request, invoiceid):
         invoice = None;
     
     invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'zone_type': 'Domestic', 'producttype':'Parcel'}])
-    if request.method == 'POST': # If the form has been submitted...
+    
+    #printing
+    
+    if request.method == 'POST':
         invoice_form = InvoiceForm(branchid, request.POST, instance=invoicequeryset) # A form bound to the POST data
         # Create a formset from the submitted data
         invoice_item_formset = InvoiceItemFormSet(request.POST, request.FILES)
@@ -208,16 +212,15 @@ def editInvoice(request, invoiceid):
             for item in itemstodelete:
                 item.delete()
             if request.POST['action'] == 'Confirm':
-                return HttpResponseRedirect("/parcelhubPOS/invoice") # Redirect to a 'success' page
+                return HttpResponseRedirect("/parcelhubPOS/invoice/editinvoice/?invoiceid=" + str( invoice_list.id ) ) # Redirect to a 'success' page
             elif request.POST['action'] == 'Confirm and new':
                 return HttpResponseRedirect("/parcelhubPOS/invoice/editinvoice/?")
             elif request.POST['action'] == 'Print invoice':
-                return invoice_pdf(request, invoice_list.id)
-            elif request.POST['action'] == 'Print delivery order':
-                return deliveryorder_pdf(request, invoice_list.id)
+                return invoice_pdf(request, invoice_list.id) 
             elif request.POST['action'] == 'Print receipt':
                 return invoice_thermal(request, invoice_list.id)
-
+            elif request.POST['action'] == 'Print delivery order':
+                return deliveryorder_pdf(request, invoice_list.id)
     # For CSRF protection
     # See http://docs.djangoproject.com/en/dev/ref/contrib/csrf/ 
     context = {'invoice_form': invoice_form,
@@ -230,9 +233,7 @@ def editInvoice(request, invoiceid):
                  'customerlist': customerlist,
                  'title': title
                  
-                }
-
-
+                 }
     return render(request, 'editinvoice.html', context)
 
 @login_required

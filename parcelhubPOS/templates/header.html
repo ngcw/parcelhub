@@ -573,13 +573,16 @@
     		}
     		function SetVisibility( id, show ) {
     			var selection = document.getElementById(id);
-    			if( show)
-   				{
-    				selection.style.display = ""; 
-   				}
-    			else
+    			if( selection )
     			{
-    				selection.style.display = "none"; 
+	    			if( show )
+	   				{
+	    				selection.style.display = ""; 
+	   				}
+	    			else
+	    			{
+	    				selection.style.display = "none"; 
+	    			}
     			}
     		}
     		function HideShowCashType() { 
@@ -759,6 +762,7 @@
 	    	    	}
 	    	    }
 	    	}
+
 	    	{% endif %}
 		  </script>
           {% block jsscript %}{% endblock %}

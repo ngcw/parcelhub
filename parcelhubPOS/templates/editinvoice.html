@@ -68,11 +68,13 @@
 	    </div>
 	    
     <div id="invoiceitemheader">
-	    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()"/> 
-	    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()"/>
-	    <input type="submit" name="action" value="Print invoice" id="print_invoice_up" onClick="return validateInvoiceItem()"/>
-	    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
-	    <input type="submit" name="action" value="Print receipt" id="print_receipt_up" onClick="return validateInvoiceItem()"/>
+	    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()" class="invoiceConfirm"/> 
+	    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()" class="invoiceConfirmNew"/>
+	    {% if invoice %}
+		    <input type="submit" name="action" value="Print invoice" id="print_invoice_up" onClick="return validateInvoiceItem()"/>
+		    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
+		    <input type="submit" name="action" value="Print receipt" id="print_receipt_up" onClick="return validateInvoiceItem()"/>
+		{% endif %}
 		    <h2>Invoice Items</h2>
 		    {{ invoice_item_formset.management_form }}
 		    <div class ="invoiceitem_container">
@@ -115,11 +117,13 @@
 		    <div id="invoicebottom">
 			    <div id="addanotheritem"><a id="add" href="#"><button>Add another item</button></a></div>
 			    
-			    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()"/> 
-			    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()"/>
-			    <input type="submit" name="action" value="Print invoice" id="print_invoice" onClick="return validateInvoiceItem()"/>
-			    <input type="submit" name="action" value="Print delivery order" id="print_do" onClick="return validateInvoiceItem()"/>
-			    <input type="submit" name="action" value="Print receipt" id="print_receipt" onClick="return validateInvoiceItem()"/>
+			    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()" class="invoiceConfirm"/> 
+			    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()" class="invoiceConfirmNew"/>
+			    {% if invoice %}
+				    <input type="submit" name="action" value="Print invoice" id="print_invoice" onClick="return validateInvoiceItem()"/>
+				    <input type="submit" name="action" value="Print delivery order" id="print_do" onClick="return validateInvoiceItem()"/>
+				    <input type="submit" name="action" value="Print receipt" id="print_receipt" onClick="return validateInvoiceItem()"/>
+			    {% endif %}
 			    <div id="nrOfItem">Nr of items:<label id="itemcount1">1</label></div>
 	    	</div>
 	    </div>
