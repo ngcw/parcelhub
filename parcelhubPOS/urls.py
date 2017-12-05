@@ -2,7 +2,6 @@ from django.conf.urls import url
 from . import views
 from django.contrib.auth.views import logout
 from django.conf.urls import handler404, handler500
-
 urlpatterns = [
     url(r'^$', views.loginuser, name='login'),          
     url(r'^logout/$', logout, {'next_page': '/parcelhubPOS/'}, name='logout'),
