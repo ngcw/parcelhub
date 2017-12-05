@@ -7,13 +7,13 @@ class UserExtend(models.Model):
     contact = models.CharField(max_length=25)
 
 class Branch(models.Model):
-    name = models.CharField(max_length=50)
-    owner = models.CharField(max_length=50)
-    contact = models.CharField(max_length=25)
-    email = models.EmailField(max_length=254)
-    address = models.CharField(max_length=254)
-    registrationno = models.CharField(max_length=50, verbose_name='Registration no')
-    gstno = models.CharField(max_length=50, verbose_name='GST no')
+    name = models.CharField(max_length=50, verbose_name='*Name' )
+    owner = models.CharField(max_length=50, verbose_name='*Owner')
+    contact = models.CharField(max_length=25, verbose_name='*Contact')
+    email = models.EmailField(max_length=254, verbose_name='*Email')
+    address = models.CharField(max_length=254, verbose_name='*Address')
+    registrationno = models.CharField(max_length=50, verbose_name='*Registration no')
+    gstno = models.CharField(max_length=50, verbose_name='*GST no')
     fax = models.CharField(max_length=25, blank=True, null=True)
     tollfree = models.CharField(max_length=25,verbose_name='Toll-free', blank=True, null=True)
     website = models.CharField(max_length=254, blank=True, null=True)
@@ -26,8 +26,8 @@ class Branch(models.Model):
         ordering = ['name']
 
 class UserBranchAccess(models.Model):
-    user = models.ForeignKey(User, blank=False, null=False,on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch, blank=False, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=False, null=False,on_delete=models.CASCADE, verbose_name='*User')
+    branch = models.ForeignKey(Branch, blank=False, null=False, on_delete=models.CASCADE, verbose_name='*Branch')
     masterdata_auth = models.CharField(max_length=20, verbose_name='Master data')
     branch_auth = models.CharField(max_length=20, verbose_name='Branch')
     user_auth = models.CharField(max_length=20, verbose_name='User')
@@ -46,7 +46,7 @@ class ZoneType(models.Model):
         ordering = ['name']   
 
 class ProductType(models.Model):
-    name = models.CharField(max_length=50, primary_key=True, unique=True) 
+    name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name') 
     isdocument = models.BooleanField()
     ismerchandise = models.BooleanField() 
     
@@ -57,9 +57,9 @@ class ProductType(models.Model):
         ordering = ['name'] 
         
 class CourierVendor(models.Model):
-    name = models.CharField(max_length=50)
-    zone_type = models.ForeignKey(ZoneType)
-    formula = models.CharField(max_length=254)
+    name = models.CharField(max_length=50, verbose_name='*Name')
+    zone_type = models.ForeignKey(ZoneType, verbose_name='*Zone type')
+    formula = models.CharField(max_length=254, verbose_name='*Formula')
     
     def __str__(self):
         return self.name
@@ -69,10 +69,10 @@ class CourierVendor(models.Model):
         #unique_together = ["user", "branch"]
 
 class ZoneDomestic(models.Model):
-    state = models.CharField(max_length=25)
-    postcode_start = models.CharField(max_length=25)
-    postcode_end = models.CharField(max_length=25)
-    zone = models.PositiveIntegerField()
+    state = models.CharField(max_length=25, verbose_name='*State')
+    postcode_start = models.CharField(max_length=25, verbose_name='*Postcode start')
+    postcode_end = models.CharField(max_length=25, verbose_name='*Postcode end')
+    zone = models.PositiveIntegerField(verbose_name='*Zone')
 
 
     class Meta:
@@ -80,10 +80,10 @@ class ZoneDomestic(models.Model):
         unique_together = ["state", "postcode_start", "postcode_end"]
         
 class ZoneInternational(models.Model):
-    couriervendor = models.ForeignKey(CourierVendor, on_delete=models.CASCADE, verbose_name='Courier')
-    country = models.CharField(max_length=50, unique=True)
-    zone_doc = models.PositiveIntegerField( verbose_name= 'Zone document' )
-    zone_mer = models.PositiveIntegerField( verbose_name= 'Zone merchandise' )
+    couriervendor = models.ForeignKey(CourierVendor, on_delete=models.CASCADE, verbose_name='*Courier')
+    country = models.CharField(max_length=50, unique=True, verbose_name='*Country')
+    zone_doc = models.PositiveIntegerField( verbose_name= '*Zone document' )
+    zone_mer = models.PositiveIntegerField( verbose_name= '*Zone merchandise' )
 
     def __str__(self):
         return self.country
@@ -93,8 +93,8 @@ class ZoneInternational(models.Model):
 
 
 class Tax(models.Model):
-    tax_code = models.CharField(max_length=25)
-    gst = models.DecimalField(max_digits=3, decimal_places=2)
+    tax_code = models.CharField(max_length=25, verbose_name='*Tax code')
+    gst = models.DecimalField(max_digits=3, decimal_places=2, verbose_name='*GST')
 
     def __str__(self):
         return self.tax_code
@@ -103,18 +103,18 @@ class Tax(models.Model):
         ordering = ['tax_code']
         
 class SKU(models.Model):
-    sku_code = models.CharField(max_length=20,  unique=True, verbose_name='SKU')
-    description = models.CharField(max_length=254)
-    couriervendor = models.ForeignKey(CourierVendor, on_delete=models.CASCADE, verbose_name='Courier')
-    product_type = models.ForeignKey(ProductType)
-    zone_type = models.ForeignKey(ZoneType)
-    zone = models.IntegerField()
-    weight_start = models.DecimalField(max_digits=30, decimal_places=3)
-    weight_end = models.DecimalField(max_digits=30, decimal_places=3)
-    tax_code = models.ForeignKey(Tax)
-    corporate_price = models.DecimalField(max_digits=30, decimal_places=2)
-    walkin_special_price = models.DecimalField(max_digits=30, decimal_places=2)
-    walkin_price = models.DecimalField(max_digits=30, decimal_places=2)
+    sku_code = models.CharField(max_length=20,  unique=True, verbose_name='*SKU')
+    description = models.CharField(max_length=254, verbose_name='*Description')
+    couriervendor = models.ForeignKey(CourierVendor, on_delete=models.CASCADE, verbose_name='*Courier')
+    product_type = models.ForeignKey(ProductType, verbose_name='*Product type')
+    zone_type = models.ForeignKey(ZoneType, verbose_name='*Zone type')
+    zone = models.IntegerField(verbose_name='*Zone')
+    weight_start = models.DecimalField(max_digits=30, decimal_places=3, verbose_name='*Weight start')
+    weight_end = models.DecimalField(max_digits=30, decimal_places=3, verbose_name='*Weight end')
+    tax_code = models.ForeignKey(Tax, verbose_name='*Tax code')
+    corporate_price = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='*Corporate price')
+    walkin_special_price = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='*Walk in special price')
+    walkin_price = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='*Walk in price')
     updatetimestamp = models.DateTimeField('master update time', auto_now=True)
 
     def __str__(self):
@@ -124,7 +124,7 @@ class SKU(models.Model):
         ordering = ['sku_code']
 
 class CustomerType(models.Model):
-    name = models.CharField(max_length=50, primary_key=True, unique=True)  
+    name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name')  
     iscorporate = models.BooleanField()
     iswalkinspecial = models.BooleanField()
     iswalkin = models.BooleanField()
@@ -135,12 +135,12 @@ class CustomerType(models.Model):
         ordering = ['name']   
              
 class Customer(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    contact = models.CharField(max_length=25)
-    fax = models.CharField(max_length=25)
-    email = models.EmailField(max_length=254)
-    identificationno = models.CharField(max_length=50, verbose_name='Registration/IC No')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='*Branch')
+    name = models.CharField(max_length=50, verbose_name='*Name')
+    contact = models.CharField(max_length=25, verbose_name='*Contact')
+    fax = models.CharField(max_length=25, blank=True, null=True)
+    email = models.EmailField(max_length=254, verbose_name='*Email')
+    identificationno = models.CharField(max_length=50, verbose_name='*Registration/IC No')
     customertype = models.ForeignKey(CustomerType, models.SET_NULL, blank=True, null=True, verbose_name='Type')
     addressline1 = models.CharField(max_length=254, verbose_name="Address line 1", blank=True, null=True)
     addressline2 = models.CharField(max_length=254, verbose_name="line 2", blank=True, null=True)
@@ -153,8 +153,8 @@ class Customer(models.Model):
         ordering = ['branch', 'name']
     
 class SKUBranch(models.Model):
-    sku = models.ForeignKey(SKU, on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    sku = models.ForeignKey(SKU, on_delete=models.CASCADE, verbose_name='*SKU')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='*Branch')
     customer = models.ForeignKey(Customer, models.SET_NULL, blank=True, null=True)
     corporate_override = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
     walkin_special_override = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
@@ -164,7 +164,7 @@ class SKUBranch(models.Model):
         unique_together = (("sku", "branch", "customer"),)
 
 class InvoiceType(models.Model):
-    name = models.CharField(max_length=50, primary_key=True, unique=True)  
+    name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name')  
     iscustomer = models.BooleanField()
     def __str__(self):
         return self.name
@@ -172,7 +172,7 @@ class InvoiceType(models.Model):
         ordering = ['name']
 
 class PaymentType(models.Model):
-    name = models.CharField(max_length=50, primary_key=True, unique=True)  
+    name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name')  
     def __str__(self):
         return self.name
     class Meta:
@@ -180,8 +180,8 @@ class PaymentType(models.Model):
 class Invoice(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     invoiceno = models.CharField(max_length=25, verbose_name='Invoice No.')
-    invoice_date = models.DateField(blank=True, null=True)
-    invoicetype =models.ForeignKey(InvoiceType, verbose_name='Type')
+    invoice_date = models.DateField(blank=True, null=True, verbose_name='*Invoice date')
+    invoicetype =models.ForeignKey(InvoiceType, verbose_name='*Type')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
     remarks = models.CharField(max_length=254,blank=True, null=True)
     subtotal = models.DecimalField(max_digits=30, decimal_places=2)
@@ -203,21 +203,21 @@ class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     tracking_code = models.CharField(max_length=100, verbose_name='Track code', blank=True, null=True)
     courier = models.ForeignKey(CourierVendor, models.SET_NULL, blank=True, null=True)
-    producttype = models.ForeignKey(ProductType, verbose_name='Product type')
-    skudescription = models.CharField(max_length=255, verbose_name='Description')
-    zone_type = models.ForeignKey(ZoneType)
-    zone = models.CharField(max_length=100)
-    weight = models.DecimalField(max_digits=25, decimal_places=3, verbose_name='Weight(kg)')
+    producttype = models.ForeignKey(ProductType, verbose_name='*Product type')
+    skudescription = models.CharField(max_length=255, verbose_name='*Description')
+    zone_type = models.ForeignKey(ZoneType, verbose_name='*Zone type')
+    zone = models.CharField(max_length=100, verbose_name='Zone',blank=True, null=True)
+    weight = models.DecimalField(max_digits=25, decimal_places=3, verbose_name='Weight(kg)',blank=True, null=True)
     dimension_weight = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True,  verbose_name='Dim wt(kg)')
     height = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Height(mm)')
     length = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Length(mm)')
     width = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Width(mm)')
-    sku = models.CharField(max_length=100)
+    sku = models.CharField(max_length=100, verbose_name='*SKU')
     gst = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='GST')
     price = models.DecimalField(max_digits=30, decimal_places=2)
     
 class Payment(models.Model):
-    customer = models.ForeignKey(Customer)
+    customer = models.ForeignKey(Customer, verbose_name='*Customer')
     total = models.DecimalField(max_digits=30, decimal_places=3,blank=True, null=True)
     payment_paymenttype = models.ForeignKey(PaymentType,blank=True, null=True, verbose_name="Payment method")
     createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
@@ -255,9 +255,9 @@ class AccountReport(models.Model):
     created_by = models.ForeignKey(User)
 
 class StatementOfAccount(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    datefrom = models.DateField('Date from')
-    dateto = models.DateField('Date to')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='*Customer')
+    datefrom = models.DateField('*Date from')
+    dateto = models.DateField('*Date to')
     totalamount = models.DecimalField(max_digits=30, decimal_places=2,verbose_name='Total amt', blank=True, null=True )
     paidamount = models.DecimalField(max_digits=30, decimal_places=2,verbose_name='Paid amt', blank=True, null=True)
     outstandindamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Outstanding amt', blank=True, null=True)

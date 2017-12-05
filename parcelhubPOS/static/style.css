@@ -245,10 +245,6 @@ button, input[type=submit], .link_button
 {
 	width: 70px;
 }
-.dimensioninput
-{
-	width:50px;
-}
  .item
 {
 	float:left;
@@ -296,7 +292,7 @@ button, input[type=submit], .link_button
 #nrOfItem
 {
 	display: inline-block;
-    margin-left: 550px;
+    margin-left: 670px;
 }
 .paymentitem
 {

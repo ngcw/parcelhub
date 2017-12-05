@@ -654,7 +654,7 @@
 	    	    var trackingcodeinput = [];
 	    	    var mystring = JSON.stringify(trackingcodeinput);
 	    	    $.ajax({
-	                url:"/parcelhubPOS/validatetrackingcode/?trackcode="+value+"&courier="+selectedcourier,
+	                url:"/parcelhubPOS/validatetrackingcode/?trackcode="+value+"&courier="+selectedcourier{% if invoice%}+"&invoiceid={{ invoice.id }}" {% endif %},
 	                type:"POST",
 	                data:mystring,
 	                dataType: "json",
@@ -701,7 +701,8 @@
 	    		var arr = document.getElementsByClassName('validateFieldTC');
 	    		var arrval = []
 	    		var rowduplicated = ''
-			    for(var i=0;i<arr.length && cansubmittc;i++){
+			    for(var i=0;i<arr.length && cansubmittc;i++)
+				{
 			    	var rowcount = i+1
 			        if(arrval.indexOf(arr[i].value) > -1 )
 			        {
@@ -709,7 +710,7 @@
 			        	rowduplicated = String(matchingrow) + " and " + String(rowcount)
 			        	cansubmittc = false;
 			       	}
-			        if( arr[i].style.backgroundColor = 'red')
+			        if( arr[i].style.backgroundColor == 'red')
 			        {
 			        	rowduplicated = String(rowcount)
 			        	cansubmittc = false;
@@ -718,15 +719,29 @@
 			    }
 	    		
 	    		var cansubmitweight = true;
+	    		var cansubmitzone = true;
 	    		var arr = document.getElementsByClassName('validateFieldWeight');
 	    		var rowempty = 0;
 			    for(var i=0;i<arr.length && cansubmitweight;i++){
-			    	
-			        if(arr[i].value.length == 0 )
+			    	var documentid = arr[i].id
+			    	var inputstr = documentid.split("-");
+		    	    var count = inputstr[1]
+		    	    var dimweightid = "id_form-" + count + "-dimension_weight";
+		    	    var dimweightelement = document.getElementById(dimweightid)
+		    	    var zonetypeid = "id_form-" + count + "-zone_type";
+		    	    var zonetypesel = document.getElementById(zonetypeid);
+		    	    var selectedzonetype = zonetypesel.options[zonetypesel.selectedIndex].value;
+		    	    var zoneid = "id_form-" + count + "-zone";
+		    	    var zoneelement = document.getElementById(zoneid)
+		    	    rowempty = i + 1;
+			        if(arr[i].value.length == 0 && dimweightelement.value.length == 0 && selectedzonetype !== 'Others')
 			        {
-			        	rowempty = i + 1;
 			        	cansubmitweight = false;
 			       	}
+		    	    if( zoneelement.value.length == 0 && selectedzonetype !== 'Others')
+		    	    	{
+		    	    	 cansubmitzone = false;
+		    	    	}
 			    }
 	    		var zonetypevalue = document.getElementById('id_invoicetype').value
 	    		var totalvalue = parseFloat(document.getElementById('total').innerHTML).toFixed(2)
@@ -746,11 +761,17 @@
 	    	      	alert("There are empty weight field at row number " + String(rowempty) +".");
 	    	      	return false;
 	    	  	}
-	    	    if( zonetypevalue == 'Cash' && payment < totalvalue)
+	    	    if( cansubmitzone == false)
+	    	    { 
+	    	      	alert("There are empty zone field at row number " + String(rowempty) +".");
+	    	      	return false;
+	    	  	}
+	    	    if( zonetypevalue == 'Cash' && parseFloat(payment) < parseFloat(totalvalue))
 	    		{
 	    	    	alert("Payment of RM " + payment + " is insufficient as total is RM " + totalvalue);
 	    	      	return false;
 	    		}
+	    	    alert('Invoice saved!')
 	    	  	return true;
 	    	}
 	    	function SetDescriptionAvailability(inputid)
@@ -767,6 +788,8 @@
 	    	    var price = document.getElementById(priceid)
 	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
 	    	    var dimweight = document.getElementById(dimweightid)
+	    	    var courierid = "id_form-" + count + "-courier";
+	    	    var couriersel = document.getElementById(courierid);
 	    	    if (selectedzonetype == 'Others')
 	    	    {
 	    	    	skudescription.readOnly = false;
@@ -783,7 +806,7 @@
 	    	    	{
 	    	    		dimweight.classList.remove('lastInput')
 	    	    	}
-	    	    	
+	    	    	couriersel.value = ''
 	    	    }
 	    	    else
 	    	    {
