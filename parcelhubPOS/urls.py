@@ -1,8 +1,11 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from . import views
 from django.contrib.auth.views import logout
 from django.conf.urls import handler404, handler500
+from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 urlpatterns = [
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.loginuser, name='login'),          
     url(r'^logout/$', logout, {'next_page': '/parcelhubPOS/'}, name='logout'),
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
@@ -58,3 +61,7 @@ urlpatterns = [
     url(r'^customer/editcustomer(?P<customerid>\w{0,50})/$', views.editcustomer, name='editcustomer'),
     url(r'^customer/deletecustomer(?P<dcustomerid>\w{0,50})/$', views.deletecustomer, name='deletecustomer'),
 ]
+
+# Change admin site title
+admin.site.site_header = _("Print pack ship Administration")
+admin.site.site_title = _("Print pack ship Admin")
