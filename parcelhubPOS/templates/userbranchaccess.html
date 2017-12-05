@@ -3,7 +3,6 @@
 
 {% block content %}
 	<div>User: {{ user.first_name}} {{ user.last_name}}</div> 
-	<div><a class="link_button" href="/parcelhubPOS/user/edituser?user_id={{ user.id }}">Edit</a></div>
 	{% render_table userbranchaccess %}
 	<div><a class="link_button" href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id=0_{{ user.id }}">Add</a></div>
 

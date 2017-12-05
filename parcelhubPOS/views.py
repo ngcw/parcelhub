@@ -38,7 +38,11 @@ def loginuser(request):
         if 'loggedusers' in request.session:
             sessiondict = request.session['loggedusers']
         loguser = authenticate(username=Submitted_User, password=Submitted_Pas)
+        
         if loguser is not None:
+            branchaccess = UserBranchAccess.objects.filter(user=loguser)
+            if branchaccess.count() == 0:
+                return render(request, CONST_loginhtml, {'branchaccess_error': '1'})
             login(request, loguser)
             request.session['userid'] = loguser.id 
             name = "%s %s"%(loguser.last_name, loguser.first_name )
@@ -59,7 +63,7 @@ def loginuser(request):
 # admin login method
 @login_required
 def dashboard(request):
-    loggedusers = User.objects.filter(id__in=request.session['loggedusers'])
+    loggedusers = userselection(request)
     loguser = User.objects.get(id=request.session.get('userid'))
     branchaccess = UserBranchAccess.objects.filter(user=loguser).first()
     if branchaccess or loguser.is_superuser:
@@ -81,7 +85,18 @@ def dashboard(request):
     else:
         return HttpResponse("No branch access configured for user")
     
-
-
+@login_required
+def masterdata(request):
+    loggedusers = userselection(request)
+    branchselectlist = branchselection(request)
+    menubar = navbar(request)
+    context = {
+                'nav_bar' : sorted(menubar.items()),
+                'branchselection': branchselectlist,
+                'loggedusers' : loggedusers,
+                'branchselectionaction': '/parcelhubPOS/masterdata/',
+                'title' : 'Master data'
+                }
+    return render(request, 'dashboard.html', context)
 
 

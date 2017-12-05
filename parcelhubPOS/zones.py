@@ -131,6 +131,7 @@ def zoneinternationallist(request):
 
 @login_required
 def editzoneinternational(request, zoneinternationalid):
+    loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     zoneinternationalid = request.GET.get('zoneinternationalid')

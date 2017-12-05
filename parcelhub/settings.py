@@ -75,7 +75,8 @@ TEMPLATES = [
         },
     },
 ]
-
+TEMPLATE_DIRS = ["/parcelhub/templates",
+                 os.path.join(BASE_DIR, 'parcelhubPOS/templates'),]
 
 WSGI_APPLICATION = 'parcelhub.wsgi.application'
 

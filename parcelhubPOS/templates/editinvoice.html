@@ -98,11 +98,11 @@
 	            	{% for field in form %}
 						{% if field.label == "Height(mm)"%}
 							<div data-role="popup" class="item_input_dimensional" id={{field.auto_id}}_popup title="Dimensional weight">
-							Height:{{ field }}
+								<label style="margin-right:10px;">Height:</label>{{ field }}
 						{% elif field.label == "Length(mm)"%}
-							Length:{{ field }}
+								<label style="margin-right:7px;">Length:</label>{{ field }}
 						{% elif field.label == "Width(mm)" %}
-							Width:{{ field }}
+								<label style="margin-right:15px;">Width:</label>{{ field }}
 							</div>
 						{% else %}
 		            		<div class="item_input">{{ field }}</div>

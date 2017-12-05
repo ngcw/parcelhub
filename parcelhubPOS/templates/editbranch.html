@@ -3,7 +3,7 @@
 {% block content %}
 	
 	<form method="post" action="">{% csrf_token %}
-		<table class="inputtable">
+		<table class="inputtable" id="branchinputtble">
 		    {{ formset }}
 	    </table>
 	    <input type="submit" value="Save" />

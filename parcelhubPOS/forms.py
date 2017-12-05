@@ -2,7 +2,7 @@ from django.forms import ModelForm, Textarea
 from django.contrib.auth.models import User
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
-from .models import SKU, Invoice, InvoiceItem, Payment, PaymentInvoice, Customer
+from .models import SKU, Invoice, InvoiceItem, Payment, PaymentInvoice, Customer, Branch
 from django.db.models import Q
 from django.forms.models import BaseModelFormSet
         
@@ -61,6 +61,13 @@ class SKUForm(forms.ModelForm):
             pass
         return cleaned_data
 
+class BranchForm(forms.ModelForm):
+    class Meta:
+        model = Branch
+        fields = ( "name", 'owner', 'contact', 'email', 'address', 'registrationno', 'gstno', 'payment_bank', 'payment_acc','fax', 'tollfree', 'website')
+        widgets = {
+            'address': Textarea(attrs={'cols': 33, 'rows': 4})
+        }
 class DateInput(forms.DateInput):
     input_type = 'date'
       
@@ -140,7 +147,7 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['weight'].widget.attrs\
         .update({
             'onchange': 'AutoCompleteSKU(this.id)',
-            'class': "validateFieldTC"
+            'class': "validateFieldWeight"
         })
         self.fields['dimension_weight'].widget.attrs\
         .update({
@@ -151,14 +158,17 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['height'].widget.attrs\
             .update({
                 'onchange': 'AutoCompleteWeight(this.id)',
+                'class': "dimensioninput",
             })
         self.fields['length'].widget.attrs\
             .update({
                 'onchange': 'AutoCompleteWeight(this.id)',
+                'class': "dimensioninput",
             })
         self.fields['width'].widget.attrs\
             .update({
                 'onchange': 'AutoCompleteWeight(this.id)',
+                'class': "dimensioninput",
                 
             })
 

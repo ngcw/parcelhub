@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^$', views.loginuser, name='login'),          
     url(r'^logout/$', logout, {'next_page': '/parcelhubPOS/'}, name='logout'),
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
+    url(r'^masterdata/$', views.masterdata, name='masterdata'),
     url(r'^invoice/$', views.invoice, name='invoice'),
     url(r'^invoice/editinvoice(?P<invoiceid>\w{0,50})/$', views.editInvoice, name='editinvoice'),
     url(r'^invoice/deleteinvoice(?P<dinvoiceid>\w{0,50})/$', views.deleteinvoice, name='deleteinvoice'),

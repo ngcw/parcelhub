@@ -72,7 +72,11 @@
 	   				<button class="dropbtn" onclick="myFunction{{ menu.0.split|join:'_' }}()">{{ menu.0|slice:"1:" }}</button>
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
 		        	{% for submenu in menu.1 %}
+		        		{% if submenu.0 == "New invoice" %}
+		        		<a href="{{ submenu.1 }}" target="_blank">{{ submenu.0 }}</a>
+		        		{% else %}
 		        		<a href="{{ submenu.1 }}">{{ submenu.0 }}</a>
+		        		{% endif %}
 		        	{% endfor %}
 		        	</div>
 		        </div>
@@ -140,12 +144,20 @@
 	    	});
 	    	{% if customerlist %}
 	    	$(document).ready(function() {
-	    	    $('#customerselection').select2();
+	    	    $('#customerselection').select2({ width: '150px' });
+	    	});
+	    	{% endif %}
+	    	{% if sku_list %}
+	    	$(document).ready(function() {
+	    	    $('#skuselection').select2({ width: '150px' });
+	    	});
+	    	$(document).ready(function() {
+	    	    $('#customerselection').select2({ width: '150px' });
 	    	});
 	    	{% endif %}
 	    	{% if invoice_form %}
 	    	$(document).ready(function() {
-	    	    $('#id_customer').select2();
+	    	    $('#id_customer').select2({ width: '150px' });
 	    	});
 	    	function CountItem()
 	    	{
@@ -212,13 +224,13 @@
     	         		
     	         		if($(row).find(".item_input_dimensional").length == 0)
     	         		{
-    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight">Height:<input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)">Length:<input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)">Width:<input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)"></div>'
+    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height:</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:7px;">Length:</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:15px;">Width:</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)"></div>'
 
         	            	row.innerHTML +=theElement
     	         		}
 					}
 					catch(err) {
-						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight">Height:<input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)">Length:<input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)">Width:<input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)"></div>'
+						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height:</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:7px;">Length:</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:15px;">Width:</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)"></div>'
 
 							row.innerHTML +=theElement
 					}
@@ -250,7 +262,7 @@
    	                	}
     	                
     	            });
-    	            
+
     	            
     	            // Add an event handler for the delete item/form link 
     	            $(row).find(".delete").click(function () {
@@ -289,7 +301,15 @@
 			        }
 			    })
 			}
-
+	    	$('body').on('keydown', '.ui-button', function (event) {
+	    	    var myself = this;
+	    	    if (event.keyCode === $.ui.keyCode.ENTER 
+	    	              && $(document.activeElement).hasClass('ui-button')) {
+	    	        $(myself).trigger('click');
+	    	        $(myself).blur();
+	    	        event.stopPropagation();
+	    	    }
+	    	}); 
 	    	$(function() {
 	    		$(document).on("keydown.autocomplete",".sku-autocomplete",function(e){
     			var selectedsku = document.activeElement.id;
@@ -677,16 +697,36 @@
 	    	
 	    	function validateInvoiceItem()
 	    	{
-	    		var cansubmit = true;
+	    		var cansubmittc = true;
 	    		var arr = document.getElementsByClassName('validateFieldTC');
 	    		var arrval = []
-			    for(var i=0;i<arr.length && cansubmit;i++){
-			    	
+	    		var rowduplicated = ''
+			    for(var i=0;i<arr.length && cansubmittc;i++){
+			    	var rowcount = i+1
 			        if(arrval.indexOf(arr[i].value) > -1 )
 			        {
-			        	cansubmit = false;
+			        	var matchingrow = arrval.indexOf(arr[i].value) + 1
+			        	rowduplicated = String(matchingrow) + " and " + String(rowcount)
+			        	cansubmittc = false;
 			       	}
+			        if( arr[i].style.backgroundColor = 'red')
+			        {
+			        	rowduplicated = String(rowcount)
+			        	cansubmittc = false;
+			        }
 			        arrval.push(arr[i].value)	
+			    }
+	    		
+	    		var cansubmitweight = true;
+	    		var arr = document.getElementsByClassName('validateFieldWeight');
+	    		var rowempty = 0;
+			    for(var i=0;i<arr.length && cansubmitweight;i++){
+			    	
+			        if(arr[i].value.length == 0 )
+			        {
+			        	rowempty = i + 1;
+			        	cansubmitweight = false;
+			       	}
 			    }
 	    		var zonetypevalue = document.getElementById('id_invoicetype').value
 	    		var totalvalue = parseFloat(document.getElementById('total').innerHTML).toFixed(2)
@@ -696,9 +736,14 @@
     			{
     				payment = parseFloat(paymentvalue).toFixed(2);
     			}
-	    	    if(cansubmit == false)
+	    	    if( cansubmittc == false)
 	    	    { 
-	    	      	alert("There are invalid field value.");
+	    	      	alert("There are duplicated tracking code field at row number " + rowduplicated + ".");
+	    	      	return false;
+	    	  	}
+	    	    if( cansubmitweight == false)
+	    	    { 
+	    	      	alert("There are empty weight field at row number " + String(rowempty) +".");
 	    	      	return false;
 	    	  	}
 	    	    if( zonetypevalue == 'Cash' && payment < totalvalue)

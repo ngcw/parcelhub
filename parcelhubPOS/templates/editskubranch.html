@@ -16,7 +16,7 @@
 		  		<tr>
 		  			<td>SKU:</td>
 		  			<td>
-		  				<select name="skuselected" onChange="this.form.submit();">
+		  				<select name="skuselected" onChange="this.form.submit();" id="skuselection" >
 		  					{% for skuoption in sku_list %}
 		  						<option value="{{ skuoption.sku_code }}" {% if formdata.selectedsku == skuoption.sku_code %} selected {% endif %}>{{ skuoption.sku_code }}</option>
 		  					{% endfor %}
@@ -26,7 +26,7 @@
 		  		<tr>
 		  			<td>Customer:</td>
 		  			<td>
-		  				<select name="customerselected" onChange="this.form.submit();">
+		  				<select name="customerselected" onChange="this.form.submit();" id="customerselection">
 		  					<option value=""></option>
 		  					{% for customeroption in customer_list %}
 		  						<option value="{{ customeroption.id }}" {% if formdata.selectedcustomer == customeroption.id  %} selected {% endif %}>{{ customeroption.name }}</option>

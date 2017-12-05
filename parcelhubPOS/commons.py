@@ -6,8 +6,8 @@ from django.contrib.auth import login
 CONST_branchid = 'branchid'
 CONST_username = 'Username'
 CONST_invoice = '1Invoice'
-CONST_masterdata = '2Master Data'
-CONST_custacc = '3Customer Account'
+CONST_masterdata = '3Master Data'
+CONST_custacc = '2Customer Account'
 CONST_report = '4Report'
 CONST_system = '5System'
 
@@ -48,6 +48,8 @@ def branchselection(request):
         selectedbranch = request.POST.get('branchselection') 
         if selectedbranch:
             request.session[CONST_branchid] = selectedbranch
+    
+    
     return allbranchaccess
     
 

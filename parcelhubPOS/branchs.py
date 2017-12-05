@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .tables import BranchTable
 from .commons import *
 from .models import Branch, UserBranchAccess
+from .forms import BranchForm
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 CONST_branchid = 'branchid'
@@ -37,28 +38,19 @@ def editbranch(request, ebranchid):
     title = "New branch"
     if ebranchid:
         title = 'Edit branch'
-    branchqueryset = Branch.objects.filter(id=ebranchid)
-    
-    branchFormSet = modelformset_factory(Branch, fields=('name', 
-                                                        'owner', 
-                                                        'contact', 
-                                                        'email', 
-                                                        'address',
-                                                        'registrationno',
-                                                        'gstno',
-                                                        'payment_bank',
-                                                        'payment_acc',
-                                                        'fax',
-                                                        'tollfree',
-                                                        'website'), max_num=1)
+    try:
+        branchqueryset = Branch.objects.get(id=ebranchid)
+    except:
+        branchqueryset = None
+    branchFormSet = BranchForm(instance=branchqueryset)
     if request.method == "POST":
-        formset = branchFormSet(request.POST, request.FILES,
-                             queryset=branchqueryset)
+        formset = BranchForm(request.POST, 
+                                instance=branchqueryset)
         if formset.is_valid():
             formset.save()
             return HttpResponseRedirect("/parcelhubPOS/branch")
     else:
-        formset = branchFormSet(queryset=branchqueryset)
+        formset = BranchForm(instance=branchqueryset)
     context = {
                 'formset': formset,
                 'headerselectiondisabled' : True,

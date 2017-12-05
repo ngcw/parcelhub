@@ -198,6 +198,10 @@ button, input[type=submit], .link_button
 {
 	border: 1px solid black;
 }
+.inputtable selection, #sectionleft selection
+{
+	width: 150px;
+}
 .invoiceitem_container
 {
 	border-spacing: 0px;
@@ -236,6 +240,14 @@ button, input[type=submit], .link_button
 .item_input_dimensional
 {
 	display: none;
+}
+.item_input_dimensional label
+{
+	width: 70px;
+}
+.dimensioninput
+{
+	width:50px;
 }
  .item
 {
@@ -305,4 +317,12 @@ button, input[type=submit], .link_button
 	margin-top: 10px;
 	display: block;
 	float: left;
+}
+.errorlist
+{
+	color: red;
+}
+#branchinputtble input
+{
+	width: 250px;
 }
