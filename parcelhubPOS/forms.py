@@ -153,7 +153,7 @@ class InvoiceItemForm(forms.ModelForm):
         .update({
             'onchange': 'AutoCompleteSKU(this.id)',
             'ondblclick': 'editDimensionalWeight(this.id)',
-            'class': 'lastInput'
+            
         })
         self.fields['height'].widget.attrs\
             .update({
@@ -188,7 +188,8 @@ class InvoiceItemForm(forms.ModelForm):
             })
         self.fields['skudescription'].widget.attrs\
             .update({
-                'readOnly': 'True'
+                'readOnly': 'True',
+                'class': 'lastInput'
             })
 class PaymentForm(forms.ModelForm):
     class Meta:
