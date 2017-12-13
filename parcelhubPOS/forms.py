@@ -102,7 +102,7 @@ class InvoiceItemForm(forms.ModelForm):
     #sku = forms.ModelChoiceField(queryset=SKU.objects.all())
     class Meta: 
         model = InvoiceItem
-        fields = ("tracking_code", 'zone_type', "producttype", 'sku', 'skudescription',"courier", 'zone', 'weight',"height", 'length', 'width',  "dimension_weight", 'price','gst')
+        fields = ("tracking_code", 'zone_type', "producttype", 'zone', 'weight',"height", 'length', 'width',  "dimension_weight", "courier", 'sku', 'skudescription', 'price','gst')
         exclude = ('id',)
         widgets = {'gst': forms.HiddenInput()}
  
@@ -151,7 +151,7 @@ class InvoiceItemForm(forms.ModelForm):
         })
         self.fields['dimension_weight'].widget.attrs\
         .update({
-            'oninput': 'AutoCompleteSKU(this.id)',
+            'onchange': 'AutoCompleteSKU(this.id)',
             'ondblclick': 'editDimensionalWeight(this.id)',
             'class': 'lastInput'
         })

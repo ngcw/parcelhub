@@ -39,9 +39,9 @@ def SKUlist(request):
             sku_list = sku_list.filter( couriervendor__name__icontains=submitted_courier)
         submitted_weight = request.GET.get('weight') 
         if submitted_weight:
-            submitted_weight = int('0' + submitted_weight ) 
+            submitted_weight = float( submitted_weight ) 
             formdata['weight'] = submitted_weight;
-            sku_list =  sku_list.filter(weight_start__lte=submitted_weight,weight_end__gt=submitted_weight )
+            sku_list =  sku_list.filter(weight_start__lte=submitted_weight,weight_end__gte=submitted_weight )
         submitted_zonetype = request.GET.get('zonetype') 
         if submitted_zonetype:
             formdata['zonetype'] = submitted_zonetype;

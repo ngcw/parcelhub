@@ -58,7 +58,7 @@
 	        <tr><th>Rounding:</th><td><label id="rounding"></label></td></tr>
 	        <tr><th>Total:</th><td><label id="total"></label></td></tr>
 	        <tr>
-		  		<th><label for="{{ invoice_form.payment.id_for_label }}">Payment:</label></th>
+		  		<th><label for="{{ invoice_form.payment.id_for_label }}" >Payment:</label></th>
 		  		<td>{{ invoice_form.payment }}</td>
 		  		<td>{{ invoice_form.payment_type }}</td>
 		  		{% if invoice_form.payment.errors %} <td>{{ invoice_form.payment.errors }}</td> {% endif %}

@@ -155,8 +155,8 @@ def editInvoice(request, invoiceid):
                                                                       'payment_type': 'Cash'}
                                    )
         invoice = None;
-    
-    invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'zone_type': 'Domestic', 'producttype':'Parcel'}])
+    defaultcourier = CourierVendor.objects.filter().first()
+    invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'zone_type': 'Domestic', 'producttype':'Parcel', 'courier': defaultcourier.id}])
     
     #printing
     
@@ -193,7 +193,7 @@ def editInvoice(request, invoiceid):
             invoice.discountmode = discountmode
             if discountmode == '%':
                 discount = ( discount / 100 ) * (subtotal + gsttotal)
-            invoice.total = round_to_05(subtotal + gsttotal - discount)
+            invoice.total = round_to_05(subtotal - discount)
             
             invoice.gst = gsttotal
             invoice_list = invoice_form.save()

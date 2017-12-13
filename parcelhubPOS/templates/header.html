@@ -403,7 +403,7 @@
 	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
 	    	    var dimweightinput = document.getElementById(dimweightid).value;
 	    	    var weightval = weightinput
-	    	    if( dimweightinput > weightinput)
+	    	    if( parseFloat(dimweightinput) > parseFloat(weightinput))
 	    	    {
 	    	    	weightval = dimweightinput
 	    	    }
@@ -569,12 +569,19 @@
     		  	document.getElementById('gsttotal').innerHTML = parseFloat(gst).toFixed(2);
     		  	document.getElementById('rounding').innerHTML = parseFloat(rounding).toFixed(2);
 				document.getElementById('total').innerHTML = parseFloat(finaltotal).toFixed(2);
+
+				{% if invoice %}
+					
+				{% else %}
+					document.getElementById("id_payment").value = parseFloat(finaltotal).toFixed(2)
+				{% endif %}
 				var change = '0.0';
 				if( payment )
 				{
 					change = parseFloat(payment) - finaltotal;
 				}
 				document.getElementById('change').innerHTML = parseFloat(change).toFixed(2);
+				
     		};
     		function SetParentVisibility( id, show ) {
     			var selection = document.getElementById(id);
@@ -629,10 +636,14 @@
 	                }
 	            });
 	    	};
+	    	function setFocusToTextBox(){
+	    	    document.getElementById("id_form-0-tracking_code").focus();
+	    	}
 	    	window.onload = function() {
 	    		  HideShowCashType();
 	    		  UpdateTotal();
 	    		  CountItem();
+	    		  setFocusToTextBox();
 	    		};
     		$(function() {
                 $(document).on('keydown', '.lastInput', function(e) {
