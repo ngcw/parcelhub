@@ -488,7 +488,7 @@
 	                contentType: "application/json",
 	                success: function(data){
 	                	var dataobj = JSON.parse(data)
-	                	if( dataobj[0] !== null && dataobj[0] != undefined )
+	                	if( dataobj[0] !== null && dataobj[0] != undefined && data.length == 1 )
                 		{
 	                		PopulateZone( count, 
          		 					      dataobj[0]['zone']); 
