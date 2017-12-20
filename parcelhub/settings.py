@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 INSTALLED_APPS = [
     'parcelhubPOS.apps.ParcelhubposConfig',
+    'parcelhubWeb.apps.ParcelhubwebConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,6 +88,16 @@ DATABASES = {
         'USER': 'ngcw',
         'PASSWORD': 'bakayar00',
         'HOST': '127.0.0.1',
+        'PORT': '5432',
+        'CONN_MAX_AGE': 500,
+    },
+  
+    'remote': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dd5rr9lejh7scj',
+        'USER': 'clrfmpcbsyagpe',
+        'PASSWORD': '4e3a445b90fa2a83fb3176f04508e8398f0dca737b649ca83d411a5aae3ca538',
+        'HOST': 'ec2-54-235-210-115.compute-1.amazonaws.com',
         'PORT': '5432',
         'CONN_MAX_AGE': 500,
     }
@@ -148,3 +159,4 @@ STATICFILES_DIRS = (
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 LOGIN_REDIRECT_URL = 'parcelhubPOS/login'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000000
+

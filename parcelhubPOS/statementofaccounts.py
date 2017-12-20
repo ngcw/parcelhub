@@ -82,7 +82,7 @@ def viewstatementofacc(request):
             invoicelist = invoicelist.filter(payment__gte=models.F('total'))
         
         user = User.objects.get(id = request.session.get('userid'))
-        statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user)
+        statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now())
             
         statementofacc.save()
         totalamt = 0.0;

@@ -1,7 +1,7 @@
 import django_tables2 as tables
 from .models import *
 
-deletelinkinvoice = '''<a href="/parcelhubPOS/invoice/deleteinvoice?dinvoiceid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this invoice?')">Delete</a>'''
+deletelinkinvoice = '''<a href="/parcelhubPOS/invoice/deleteinvoice?dinvoiceid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete invoice {{ record.invoiceno }}?')">Delete</a>'''
 editlinkinvoice = '''{% if record.createtimestamp >= deadlinetime or issuperuser %}
                     <a href="/parcelhubPOS/invoice/editinvoice?invoiceid={{record.id}}">Edit</a>
                     {% else%}
@@ -19,7 +19,7 @@ class InvoiceTable(tables.Table):
                  }
         empty_text = "There are no invoice matching the search criteria..."
 
-deletelinksku = '''<a href="/parcelhubPOS/sku/deletesku?dskucode={{record.sku_code}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this SKU?')">Delete</a>'''
+deletelinksku = '''<a href="/parcelhubPOS/sku/deletesku?dskucode={{record.sku_code}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete SKU {{ record.sku_code}}?')">Delete</a>'''
 editlinksku = '<a href="/parcelhubPOS/sku/editsku?skucode={{record.sku_code}}">Edit</a>'
 class SKUTable(tables.Table):
     edit = tables.TemplateColumn(editlinksku,
@@ -36,7 +36,7 @@ class SKUTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no SKU matching the search criteria..."
 
-deletelinkbranch = '''<a href="/parcelhubPOS/branch/deletebranch?dbranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this branch?')">Delete</a>'''
+deletelinkbranch = '''<a href="/parcelhubPOS/branch/deletebranch?dbranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete branch {{ record.name }}?')">Delete</a>'''
 editlinkbranch = '<a href="/parcelhubPOS/branch/editbranch?ebranchid={{record.id}}">Edit</a>'
 class BranchTable(tables.Table):
     edit = tables.TemplateColumn(editlinkbranch,
@@ -50,7 +50,7 @@ class BranchTable(tables.Table):
         sequence = ('name', 'owner', 'contact', 'email', 'address', 'registrationno', 'gstno','edit', 'delete')
         exclude = {'id', 'fax', 'tollfree', 'payment_bank', 'payment_acc', 'website'}
             
-deletelinkuser = '''<a href="/parcelhubPOS/user/deleteuser?duser_id={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>'''
+deletelinkuser = '''<a href="/parcelhubPOS/user/deleteuser?duser_id={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user {{ user.username}}?')">Delete</a>'''
 editlinkuser = '<a href="/parcelhubPOS/user/edituser/?user_id={{record.id}}">Edit</a>'
 editbranchaccesslinkuser = '<a href="/parcelhubPOS/user/userbranchaccess?user_id={{record.id}}">Grant access</a>'
 class UserTable(tables.Table):
@@ -69,7 +69,7 @@ class UserTable(tables.Table):
         empty_text = "There are no User matching the search criteria..."
         
 edituserbranchaccess = '''<a href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id={{record.id }}_{{ record.user.id }}">Edit</a>'''
-deleteuserbranchaccess = '''<a href="/parcelhubPOS/user/userbranchaccess/deleteuba?duserbranch_id={{record.id}}_{{ record.user.id }}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this user access?')">Delete</a>'''
+deleteuserbranchaccess = '''<a href="/parcelhubPOS/user/userbranchaccess/deleteuba?duserbranch_id={{record.id}}_{{ record.user.id }}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user access for {{ record.branch }}?')">Delete</a>'''
 class UserBranchAccessTable(tables.Table):
     edit = tables.TemplateColumn(edituserbranchaccess,
                                orderable = False)
@@ -87,7 +87,7 @@ class UserBranchAccessTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no assigned access to user"
         
-deletelinkvendor = '''<a href="/parcelhubPOS/vendor/deletevendor?dvendorid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this vendor?')">Delete</a>'''
+deletelinkvendor = '''<a href="/parcelhubPOS/vendor/deletevendor?dvendorid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete vendor {{ record.name }}?')">Delete</a>'''
 editlinkvendor = '<a href="/parcelhubPOS/vendor/editvendor?vendorid={{record.id}}">Edit</a>'
 class VendorTable(tables.Table):
     edit = tables.TemplateColumn(editlinkvendor,
@@ -102,7 +102,7 @@ class VendorTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Vendor matching the search criteria..."
         
-deletelinktax = '''<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this tax?')">Delete</a>'''
+deletelinktax = '''<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete tax {{record.tax_code}}?')">Delete</a>'''
 editlinktax = '<a href="/parcelhubPOS/tax/edittax?taxid={{record.id}}">Edit</a>'
 class TaxTable(tables.Table):
     edit = tables.TemplateColumn(editlinktax,
@@ -117,7 +117,7 @@ class TaxTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Tax matching the search criteria..."
         
-deletelinkzonedomestic = '''<a href="/parcelhubPOS/zonedomestic/deletezonedomestic?dzonedomesticid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this domestic zone?')">Delete</a>'''
+deletelinkzonedomestic = '''<a href="/parcelhubPOS/zonedomestic/deletezonedomestic?dzonedomesticid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete domestic zone for state {{ record.state }} from {{ record.postcode_start}} to {{ record.postcode_end}}?')">Delete</a>'''
 editlinkzonedomestic = '<a href="/parcelhubPOS/zonedomestic/editzonedomestic?zonedomesticid={{record.id}}">Edit</a>'
 class ZoneDomesticTable(tables.Table):
     edit = tables.TemplateColumn(editlinkzonedomestic,
@@ -132,7 +132,7 @@ class ZoneDomesticTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Zone matching the search criteria..."
 
-deletelinkzoneinternational = '''<a href="/parcelhubPOS/zoneinternational/deletezoneinternational?dzoneinternationalid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this international zone?')">Delete</a>'''
+deletelinkzoneinternational = '''<a href="/parcelhubPOS/zoneinternational/deletezoneinternational?dzoneinternationalid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete international zone for {{record.couriervendor}} at {{record.country}}?')">Delete</a>'''
 editlinkzoneinternational = '<a href="/parcelhubPOS/zoneinternational/editzoneinternational?zoneinternationalid={{record.id}}">Edit</a>'
 class ZoneInternationalTable(tables.Table):
     edit = tables.TemplateColumn(editlinkzoneinternational,
@@ -147,7 +147,7 @@ class ZoneInternationalTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Zone matching the search criteria..."
         
-deletelinkskubranch = '''<a href="/parcelhubPOS/skubranch/deleteskubranch?dskubranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this SKU pricing?')">Delete</a>'''
+deletelinkskubranch = '''<a href="/parcelhubPOS/skubranch/deleteskubranch?dskubranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete SKU pricing for {{ record.sku}}?')">Delete</a>'''
 editlinkskubranch = '<a href="/parcelhubPOS/skubranch/editskubranch?skubranchid={{record.id}}">Edit</a>'
 class SKUBranchTable(tables.Table):
     edit = tables.TemplateColumn(editlinkskubranch,
@@ -172,7 +172,7 @@ class SKUBranchTable(tables.Table):
         exclude = {'id', 'iswalkinspecial_override', 'iscorporate_override', 'iswalkin_override'}
         empty_text = "There are no SKU matching the search criteria..."
 
-deletelinkcustomer = '''<a href="/parcelhubPOS/customer/deletecustomer?dcustomerid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this customer?')">Delete</a>'''
+deletelinkcustomer = '''<a href="/parcelhubPOS/customer/deletecustomer?dcustomerid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete customer {{record.name}}?')">Delete</a>'''
 editlinkcustomer = '<a href="/parcelhubPOS/customer/editcustomer?customerid={{record.id}}">Edit</a>'
 customertypeimg = '''{% if record.customertype.iscorporate %}
                         <img src="/parcelhubPOS/static/img/company.png" alt="company" title="company" width="20" height="20"/>
@@ -197,7 +197,7 @@ class CustomerTable(tables.Table):
         exclude = {'id', 'customertype',}
         empty_text = "There are no Customer matching the search criteria..."
 
-deletelinkpayment = '''<a href="/parcelhubPOS/payment/deletepayment?dpaymentid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this payment?')">Delete</a>'''
+deletelinkpayment = '''<a href="/parcelhubPOS/payment/deletepayment?dpaymentid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete payment for {{record.customer}}?')">Delete</a>'''
 editlinkpayment = '<a href="/parcelhubPOS/payment/editpayment?paymentid={{record.id}}">Edit</a>'
 class PaymentTable(tables.Table):
     edit = tables.TemplateColumn(editlinkpayment,
@@ -212,7 +212,7 @@ class PaymentTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Payment matching the search criteria..."
         
-deletelinksoa = '''<a href="/parcelhubPOS/statementofaccount/deletesoa?dsoaid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete this statement of account?')">Delete</a>'''
+deletelinksoa = '''<a href="/parcelhubPOS/statementofaccount/deletesoa?dsoaid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete statement of account for {{record.customer}} from {{ record.datefrom}} to {{record.dateto}}?')">Delete</a>'''
 viewlinksoa = '<a href="/parcelhubPOS/statementofaccount/viewsoa?soaid={{record.id}}">View</a>'
 class StatementOfAccountTable(tables.Table):
     view = tables.TemplateColumn(viewlinksoa,

@@ -120,6 +120,10 @@
     		      return;
     		  }
     		});
+	    	function myFunction1Invoice()
+	    	{
+	    		window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=', '_blank');
+	    	}
 	    	$( ".disabledinput input" ).prop( "disabled", true ); //Disable
 	    	$('body').on('keydown', 'input, select, textarea, a, button', function(e) {
 	    	    var self = $(this)
@@ -224,13 +228,13 @@
     	         		
     	         		if($(row).find(".item_input_dimensional").length == 0)
     	         		{
-    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height:</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:7px;">Length:</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:15px;">Width:</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)"></div>'
+    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(mm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(mm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(mm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
 
         	            	row.innerHTML +=theElement
     	         		}
 					}
 					catch(err) {
-						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height:</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:7px;">Length:</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)"><label style="margin-right:15px;">Width:</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)"></div>'
+						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(mm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(mm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(mm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
 
 							row.innerHTML +=theElement
 					}

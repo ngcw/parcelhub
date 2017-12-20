@@ -1,11 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, render_to_response
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import Context, loader, RequestContext
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+from django.contrib.auth import authenticate
 from .models import *
 # Create your views here.
+
+CONST_username = 'Username'
+CONST_homehtml = 'home.html'
 
 # login POST request
 def loginuser(request):
     if request.method != "POST":
-        return render(request, CONST_loginhtml)
+        return render(request, CONST_homehtml)
     if CONST_username in request.POST:
         Submitted_User = request.POST[CONST_username] 
         Submitted_Pas = request.POST['Password']      
@@ -16,7 +25,7 @@ def loginuser(request):
             name = "%s %s"%(loguser.last_name, loguser.first_name )
             request.session[CONST_username] = name
             return dashboard(request)
-        return render(request, CONST_loginhtml, {'match_error': '1'})
+        return render(request, CONST_homehtml, {'match_error': '1'})
     
 
 # admin login method
@@ -25,7 +34,5 @@ def dashboard(request):
     loguser = User.objects.get(id=request.session.get('userid'))
 
     context = {
-                'nav_bar' : sorted(menubar.items()),
-                'branchselectionaction': '/parcelhubPOS/dashboard/'
                 }
     return render(request, 'dashboard.html', context)

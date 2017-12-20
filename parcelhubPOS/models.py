@@ -141,7 +141,7 @@ class Customer(models.Model):
     fax = models.CharField(max_length=25, blank=True, null=True)
     email = models.EmailField(max_length=254, verbose_name='*Email')
     identificationno = models.CharField(max_length=50, verbose_name='*Registration/IC No')
-    customertype = models.ForeignKey(CustomerType, models.SET_NULL, blank=True, null=True, verbose_name='Type')
+    customertype = models.ForeignKey(CustomerType, verbose_name='*Type')
     addressline1 = models.CharField(max_length=254, verbose_name="Address line 1", blank=True, null=True)
     addressline2 = models.CharField(max_length=254, verbose_name="line 2", blank=True, null=True)
     addressline3 = models.CharField(max_length=254, verbose_name="line 3", blank=True, null=True)
@@ -262,7 +262,7 @@ class StatementOfAccount(models.Model):
     paidamount = models.DecimalField(max_digits=30, decimal_places=2,verbose_name='Paid amt', blank=True, null=True)
     outstandindamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Outstanding amt', blank=True, null=True)
     created_by = models.ForeignKey(User)
-    createtimestamp = models.DateTimeField('create timestamp', default=timezone.now())
+    createtimestamp = models.DateTimeField('create timestamp')
     
     def get_month(self):
         return self.createtimestamp.month
