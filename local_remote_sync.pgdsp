@@ -1,0 +1,372 @@
+<data_sync_project>
+  <connection_options source_server_name="PostgreSQL">
+    <source_connection_options host="127.0.0.1" port="5432" login="ngcw" password="^OGS^&gt;'YZJBH" database="parcelhubPOS" client_encoding="">
+      <ssh_secure secure="false" port="22" authentication_mode="0"/>
+      <http_tunnel tunneling="false" url="">
+        <http_proxy_server use_proxy="false" port="8080"/>
+        <http_authentication/>
+      </http_tunnel>
+    </source_connection_options>
+    <target_connection_options host="ec2-54-235-210-115.compute-1.amazonaws.com" port="5432" login="clrfmpcbsyagpe" password="K/VK^:RLK?JAJ/[YJOF@J_[ZJZFOKOZHK*VHH/V@JZ&amp;@_JC\^_FOJZ_ZKJRA^_F@J_RLJ:GYK?GY_:O[^:VKH`~~" database="dd5rr9lejh7scj" client_encoding="">
+      <ssh_secure secure="false" port="22" authentication_mode="0"/>
+      <http_tunnel tunneling="false" url="">
+        <http_proxy_server use_proxy="false" port="8080"/>
+        <http_authentication/>
+      </http_tunnel>
+    </target_connection_options>
+  </connection_options>
+  <data_comparison_pairs>
+    <pair source_name="public.auth_group" target_name="public.auth_group">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="name" target="name" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.auth_group_permissions" target_name="public.auth_group_permissions">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="group_id" target="group_id" is_comparison_key="false"/>
+        <field_mapping source="permission_id" target="permission_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.auth_permission" target_name="public.auth_permission">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="name" target="name" is_comparison_key="false"/>
+        <field_mapping source="content_type_id" target="content_type_id" is_comparison_key="false"/>
+        <field_mapping source="codename" target="codename" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.auth_user" target_name="public.auth_user">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="password" target="password" is_comparison_key="false"/>
+        <field_mapping source="last_login" target="last_login" is_comparison_key="false"/>
+        <field_mapping source="is_superuser" target="is_superuser" is_comparison_key="false"/>
+        <field_mapping source="username" target="username" is_comparison_key="false"/>
+        <field_mapping source="first_name" target="first_name" is_comparison_key="false"/>
+        <field_mapping source="last_name" target="last_name" is_comparison_key="false"/>
+        <field_mapping source="email" target="email" is_comparison_key="false"/>
+        <field_mapping source="is_staff" target="is_staff" is_comparison_key="false"/>
+        <field_mapping source="is_active" target="is_active" is_comparison_key="false"/>
+        <field_mapping source="date_joined" target="date_joined" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.auth_user_groups" target_name="public.auth_user_groups">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="user_id" target="user_id" is_comparison_key="false"/>
+        <field_mapping source="group_id" target="group_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.auth_user_user_permissions" target_name="public.auth_user_user_permissions">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="user_id" target="user_id" is_comparison_key="false"/>
+        <field_mapping source="permission_id" target="permission_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.django_admin_log" target_name="public.django_admin_log">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="action_time" target="action_time" is_comparison_key="false"/>
+        <field_mapping source="object_id" target="object_id" is_comparison_key="false"/>
+        <field_mapping source="object_repr" target="object_repr" is_comparison_key="false"/>
+        <field_mapping source="action_flag" target="action_flag" is_comparison_key="false"/>
+        <field_mapping source="change_message" target="change_message" is_comparison_key="false"/>
+        <field_mapping source="content_type_id" target="content_type_id" is_comparison_key="false"/>
+        <field_mapping source="user_id" target="user_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.django_content_type" target_name="public.django_content_type">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="app_label" target="app_label" is_comparison_key="false"/>
+        <field_mapping source="model" target="model" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.django_migrations" target_name="public.django_migrations">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="app" target="app" is_comparison_key="false"/>
+        <field_mapping source="name" target="name" is_comparison_key="false"/>
+        <field_mapping source="applied" target="applied" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.django_session" target_name="public.django_session">
+      <mappings>
+        <field_mapping source="session_key" target="session_key" is_comparison_key="true"/>
+        <field_mapping source="session_data" target="session_data" is_comparison_key="false"/>
+        <field_mapping source="expire_date" target="expire_date" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_accountreport" target_name="public.parcelhubPOS_accountreport">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="datefrom" target="datefrom" is_comparison_key="false"/>
+        <field_mapping source="dateto" target="dateto" is_comparison_key="false"/>
+        <field_mapping source="createtimestamp" target="createtimestamp" is_comparison_key="false"/>
+        <field_mapping source="branch_id" target="branch_id" is_comparison_key="false"/>
+        <field_mapping source="created_by_id" target="created_by_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_branch" target_name="public.parcelhubPOS_branch">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="name" target="name" is_comparison_key="false"/>
+        <field_mapping source="owner" target="owner" is_comparison_key="false"/>
+        <field_mapping source="contact" target="contact" is_comparison_key="false"/>
+        <field_mapping source="email" target="email" is_comparison_key="false"/>
+        <field_mapping source="address" target="address" is_comparison_key="false"/>
+        <field_mapping source="registrationno" target="registrationno" is_comparison_key="false"/>
+        <field_mapping source="gstno" target="gstno" is_comparison_key="false"/>
+        <field_mapping source="fax" target="fax" is_comparison_key="false"/>
+        <field_mapping source="tollfree" target="tollfree" is_comparison_key="false"/>
+        <field_mapping source="website" target="website" is_comparison_key="false"/>
+        <field_mapping source="payment_bank" target="payment_bank" is_comparison_key="false"/>
+        <field_mapping source="payment_acc" target="payment_acc" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_cashupreport" target_name="public.parcelhubPOS_cashupreport">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="datefrom" target="datefrom" is_comparison_key="false"/>
+        <field_mapping source="dateto" target="dateto" is_comparison_key="false"/>
+        <field_mapping source="cashremaining" target="cashremaining" is_comparison_key="false"/>
+        <field_mapping source="createtimestamp" target="createtimestamp" is_comparison_key="false"/>
+        <field_mapping source="branch_id" target="branch_id" is_comparison_key="false"/>
+        <field_mapping source="created_by_id" target="created_by_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_couriervendor" target_name="public.parcelhubPOS_couriervendor">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="name" target="name" is_comparison_key="false"/>
+        <field_mapping source="formula" target="formula" is_comparison_key="false"/>
+        <field_mapping source="zone_type_id" target="zone_type_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_customer" target_name="public.parcelhubPOS_customer">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="name" target="name" is_comparison_key="false"/>
+        <field_mapping source="contact" target="contact" is_comparison_key="false"/>
+        <field_mapping source="fax" target="fax" is_comparison_key="false"/>
+        <field_mapping source="email" target="email" is_comparison_key="false"/>
+        <field_mapping source="identificationno" target="identificationno" is_comparison_key="false"/>
+        <field_mapping source="branch_id" target="branch_id" is_comparison_key="false"/>
+        <field_mapping source="customertype_id" target="customertype_id" is_comparison_key="false"/>
+        <field_mapping source="addressline1" target="addressline1" is_comparison_key="false"/>
+        <field_mapping source="addressline2" target="addressline2" is_comparison_key="false"/>
+        <field_mapping source="addressline3" target="addressline3" is_comparison_key="false"/>
+        <field_mapping source="addressline4" target="addressline4" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_customertype" target_name="public.parcelhubPOS_customertype">
+      <mappings>
+        <field_mapping source="name" target="name" is_comparison_key="true"/>
+        <field_mapping source="iscorporate" target="iscorporate" is_comparison_key="false"/>
+        <field_mapping source="iswalkinspecial" target="iswalkinspecial" is_comparison_key="false"/>
+        <field_mapping source="iswalkin" target="iswalkin" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_invoice" target_name="public.parcelhubPOS_invoice">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="invoiceno" target="invoiceno" is_comparison_key="false"/>
+        <field_mapping source="invoice_date" target="invoice_date" is_comparison_key="false"/>
+        <field_mapping source="remarks" target="remarks" is_comparison_key="false"/>
+        <field_mapping source="subtotal" target="subtotal" is_comparison_key="false"/>
+        <field_mapping source="discount" target="discount" is_comparison_key="false"/>
+        <field_mapping source="discountmode" target="discountmode" is_comparison_key="false"/>
+        <field_mapping source="gst" target="gst" is_comparison_key="false"/>
+        <field_mapping source="total" target="total" is_comparison_key="false"/>
+        <field_mapping source="payment" target="payment" is_comparison_key="false"/>
+        <field_mapping source="createtimestamp" target="createtimestamp" is_comparison_key="false"/>
+        <field_mapping source="updatetimestamp" target="updatetimestamp" is_comparison_key="false"/>
+        <field_mapping source="branch_id" target="branch_id" is_comparison_key="false"/>
+        <field_mapping source="created_by_id" target="created_by_id" is_comparison_key="false"/>
+        <field_mapping source="customer_id" target="customer_id" is_comparison_key="false"/>
+        <field_mapping source="invoicetype_id" target="invoicetype_id" is_comparison_key="false"/>
+        <field_mapping source="payment_type_id" target="payment_type_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_invoiceitem" target_name="public.parcelhubPOS_invoiceitem">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="tracking_code" target="tracking_code" is_comparison_key="false"/>
+        <field_mapping source="skudescription" target="skudescription" is_comparison_key="false"/>
+        <field_mapping source="zone" target="zone" is_comparison_key="false"/>
+        <field_mapping source="weight" target="weight" is_comparison_key="false"/>
+        <field_mapping source="dimension_weight" target="dimension_weight" is_comparison_key="false"/>
+        <field_mapping source="height" target="height" is_comparison_key="false"/>
+        <field_mapping source="length" target="length" is_comparison_key="false"/>
+        <field_mapping source="width" target="width" is_comparison_key="false"/>
+        <field_mapping source="sku" target="sku" is_comparison_key="false"/>
+        <field_mapping source="gst" target="gst" is_comparison_key="false"/>
+        <field_mapping source="price" target="price" is_comparison_key="false"/>
+        <field_mapping source="courier_id" target="courier_id" is_comparison_key="false"/>
+        <field_mapping source="invoice_id" target="invoice_id" is_comparison_key="false"/>
+        <field_mapping source="producttype_id" target="producttype_id" is_comparison_key="false"/>
+        <field_mapping source="zone_type_id" target="zone_type_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_invoicetype" target_name="public.parcelhubPOS_invoicetype">
+      <mappings>
+        <field_mapping source="name" target="name" is_comparison_key="true"/>
+        <field_mapping source="iscustomer" target="iscustomer" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_payment" target_name="public.parcelhubPOS_payment">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="total" target="total" is_comparison_key="false"/>
+        <field_mapping source="createtimestamp" target="createtimestamp" is_comparison_key="false"/>
+        <field_mapping source="updatetimestamp" target="updatetimestamp" is_comparison_key="false"/>
+        <field_mapping source="created_by_id" target="created_by_id" is_comparison_key="false"/>
+        <field_mapping source="customer_id" target="customer_id" is_comparison_key="false"/>
+        <field_mapping source="payment_paymenttype_id" target="payment_paymenttype_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_paymentinvoice" target_name="public.parcelhubPOS_paymentinvoice">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="prevamount" target="prevamount" is_comparison_key="false"/>
+        <field_mapping source="paidamount" target="paidamount" is_comparison_key="false"/>
+        <field_mapping source="invoice_id" target="invoice_id" is_comparison_key="false"/>
+        <field_mapping source="payment_id" target="payment_id" is_comparison_key="false"/>
+        <field_mapping source="remainder" target="remainder" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_paymenttype" target_name="public.parcelhubPOS_paymenttype">
+      <mappings>
+        <field_mapping source="name" target="name" is_comparison_key="true"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_producttype" target_name="public.parcelhubPOS_producttype">
+      <mappings>
+        <field_mapping source="name" target="name" is_comparison_key="true"/>
+        <field_mapping source="isdocument" target="isdocument" is_comparison_key="false"/>
+        <field_mapping source="ismerchandise" target="ismerchandise" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_sku" target_name="public.parcelhubPOS_sku">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="sku_code" target="sku_code" is_comparison_key="false"/>
+        <field_mapping source="description" target="description" is_comparison_key="false"/>
+        <field_mapping source="zone" target="zone" is_comparison_key="false"/>
+        <field_mapping source="weight_start" target="weight_start" is_comparison_key="false"/>
+        <field_mapping source="weight_end" target="weight_end" is_comparison_key="false"/>
+        <field_mapping source="corporate_price" target="corporate_price" is_comparison_key="false"/>
+        <field_mapping source="walkin_special_price" target="walkin_special_price" is_comparison_key="false"/>
+        <field_mapping source="walkin_price" target="walkin_price" is_comparison_key="false"/>
+        <field_mapping source="updatetimestamp" target="updatetimestamp" is_comparison_key="false"/>
+        <field_mapping source="couriervendor_id" target="couriervendor_id" is_comparison_key="false"/>
+        <field_mapping source="product_type_id" target="product_type_id" is_comparison_key="false"/>
+        <field_mapping source="tax_code_id" target="tax_code_id" is_comparison_key="false"/>
+        <field_mapping source="zone_type_id" target="zone_type_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_skubranch" target_name="public.parcelhubPOS_skubranch">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="corporate_override" target="corporate_override" is_comparison_key="false"/>
+        <field_mapping source="walkin_special_override" target="walkin_special_override" is_comparison_key="false"/>
+        <field_mapping source="walkin_override" target="walkin_override" is_comparison_key="false"/>
+        <field_mapping source="updatetimestamp" target="updatetimestamp" is_comparison_key="false"/>
+        <field_mapping source="branch_id" target="branch_id" is_comparison_key="false"/>
+        <field_mapping source="customer_id" target="customer_id" is_comparison_key="false"/>
+        <field_mapping source="sku_id" target="sku_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_statementofaccount" target_name="public.parcelhubPOS_statementofaccount">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="datefrom" target="datefrom" is_comparison_key="false"/>
+        <field_mapping source="dateto" target="dateto" is_comparison_key="false"/>
+        <field_mapping source="totalamount" target="totalamount" is_comparison_key="false"/>
+        <field_mapping source="paidamount" target="paidamount" is_comparison_key="false"/>
+        <field_mapping source="outstandindamount" target="outstandindamount" is_comparison_key="false"/>
+        <field_mapping source="createtimestamp" target="createtimestamp" is_comparison_key="false"/>
+        <field_mapping source="created_by_id" target="created_by_id" is_comparison_key="false"/>
+        <field_mapping source="customer_id" target="customer_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_statementofaccountinvoice" target_name="public.parcelhubPOS_statementofaccountinvoice">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="invoice_id" target="invoice_id" is_comparison_key="false"/>
+        <field_mapping source="soa_id" target="soa_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_tax" target_name="public.parcelhubPOS_tax">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="tax_code" target="tax_code" is_comparison_key="false"/>
+        <field_mapping source="gst" target="gst" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_userbranchaccess" target_name="public.parcelhubPOS_userbranchaccess">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="masterdata_auth" target="masterdata_auth" is_comparison_key="false"/>
+        <field_mapping source="branch_auth" target="branch_auth" is_comparison_key="false"/>
+        <field_mapping source="user_auth" target="user_auth" is_comparison_key="false"/>
+        <field_mapping source="skupricing_auth" target="skupricing_auth" is_comparison_key="false"/>
+        <field_mapping source="transaction_auth" target="transaction_auth" is_comparison_key="false"/>
+        <field_mapping source="custacc_auth" target="custacc_auth" is_comparison_key="false"/>
+        <field_mapping source="report_auth" target="report_auth" is_comparison_key="false"/>
+        <field_mapping source="branch_id" target="branch_id" is_comparison_key="false"/>
+        <field_mapping source="user_id" target="user_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_userextend" target_name="public.parcelhubPOS_userextend">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="contact" target="contact" is_comparison_key="false"/>
+        <field_mapping source="user_id" target="user_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_vendorreport" target_name="public.parcelhubPOS_vendorreport">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="datefrom" target="datefrom" is_comparison_key="false"/>
+        <field_mapping source="dateto" target="dateto" is_comparison_key="false"/>
+        <field_mapping source="itemcount" target="itemcount" is_comparison_key="false"/>
+        <field_mapping source="createtimestamp" target="createtimestamp" is_comparison_key="false"/>
+        <field_mapping source="created_by_id" target="created_by_id" is_comparison_key="false"/>
+        <field_mapping source="vendor_id" target="vendor_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_zonedomestic" target_name="public.parcelhubPOS_zonedomestic">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="state" target="state" is_comparison_key="false"/>
+        <field_mapping source="postcode_start" target="postcode_start" is_comparison_key="false"/>
+        <field_mapping source="postcode_end" target="postcode_end" is_comparison_key="false"/>
+        <field_mapping source="zone" target="zone" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_zoneinternational" target_name="public.parcelhubPOS_zoneinternational">
+      <mappings>
+        <field_mapping source="id" target="id" is_comparison_key="true"/>
+        <field_mapping source="country" target="country" is_comparison_key="false"/>
+        <field_mapping source="zone_doc" target="zone_doc" is_comparison_key="false"/>
+        <field_mapping source="zone_mer" target="zone_mer" is_comparison_key="false"/>
+        <field_mapping source="couriervendor_id" target="couriervendor_id" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+    <pair source_name="public.parcelhubPOS_zonetype" target_name="public.parcelhubPOS_zonetype">
+      <mappings>
+        <field_mapping source="name" target="name" is_comparison_key="true"/>
+        <field_mapping source="isother" target="isother" is_comparison_key="false"/>
+      </mappings>
+    </pair>
+  </data_comparison_pairs>
+  <options write_sync_into_database="true"/>
+  <before_transfer_script/>
+  <after_transfer_script/>
+  <before_transfer_each_table_script/>
+  <after_transfer_each_table_script/>
+</data_sync_project>
