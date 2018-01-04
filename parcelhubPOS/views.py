@@ -80,9 +80,9 @@ def dashboard(request):
                     'nav_bar' : sorted(menubar.items()),
                     'branchselection': branchlist,
                     'loggedusers' : loggedusers,
-                    'branchselectionaction': '/parcelhubPOS/dashboard/'
+                    'branchselectionaction': '/parcelhubPOS/invoice/'
                     }
-        return render(request, 'dashboard.html', context)
+        return HttpResponseRedirect('/parcelhubPOS/invoice/')#render(request, 'dashboard.html', context)
     else:
         return HttpResponse("No branch access configured for user")
     
