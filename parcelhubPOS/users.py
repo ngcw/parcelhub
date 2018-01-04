@@ -20,6 +20,8 @@ def userlist(request):
     loggedusers = userselection(request)
     branchlist = branchselection(request)
     menubar = navbar(request)
+    branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     user_list = User.objects.all()
     formdata = {'firstname':'',
                 'lastname':'',
@@ -51,7 +53,9 @@ def userlist(request):
                 'branchselection': branchlist,
                 'loggedusers' : loggedusers,
                 'formdata' :formdata,
-                'title': "User"
+                'title': "User",
+                'isedit' : branchaccess.user_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'user.html', context)
 
@@ -74,8 +78,10 @@ def edituser(request, user_id):
         formset = UserFormSet(request.POST, request.FILES,
                              queryset=userqueryset)
         if formset.is_valid():
+            name = request.POST['form-0-username'] 
+            msg = 'User "%s" have been updated successfully.' % name
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/user")
+            return HttpResponseRedirect("/parcelhubPOS/user/?msg=%s" % msg)
     else:
         formset = UserFormSet(queryset=userqueryset)
     context = {
@@ -127,8 +133,10 @@ def adduser(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'New user successfully created!')
-            return HttpResponseRedirect("/parcelhubPOS/user")
+            name = request.POST['form-0-username'] 
+            msg = 'User "%s" have been created successfully.' % name
+            formset.save()
+            return HttpResponseRedirect("/parcelhubPOS/user/?msg=%s" % msg)
         else:
             messages.error(request, 'Please correct the error below.')
     else:
@@ -147,9 +155,10 @@ def adduser(request):
 def deleteuser(request, duser_id ):
     duser_id = request.GET.get('duser_id')
     user = User.objects.filter(id = duser_id )
+    msg = 'User "%s" have been deleted successfully.' % user.first().name
     if user:
         user.delete()
-    return userlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/user/?msg=%s" % msg)
 
 @login_required
 def userbranchaccess( request, user_id):
@@ -159,6 +168,7 @@ def userbranchaccess( request, user_id):
     user_id = request.GET.get('user_id')
     #return HttpResponse(user_id)
     branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     selected_user = User.objects.get(id=user_id)
     branchaccesslevel = UserBranchAccess.objects.filter(user__id = user_id)
     final_branchaccesslevel_table = UserBranchAccessTable(branchaccesslevel)
@@ -171,7 +181,9 @@ def userbranchaccess( request, user_id):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
                 'loggedusers' : loggedusers,
-                'title': "User branch access"
+                'title': "User branch access",
+                'isedit' : branchaccess.user_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'userbranchaccess.html', context)
 
@@ -237,6 +249,12 @@ def edituserbranchaccess(request, userbranch_id):
                                                report_auth = submitted_report )
         
             userbainstance.save()
+        branch = Branch.objects.get(id= submitted_branchid)
+        if title == 'New user access':
+            msg = 'User branch access for user "%s" and branch "%s" have been created successfully.' %(userselected.username, branch.name )
+        else:
+            msg = 'User branch access for user "%s" and branch "%s" have been updated successfully.' %(userselected.username, branch.name )
+        nextpage = nextpage + '&msg=' + msg
         return HttpResponseRedirect(nextpage)        
 
     next = '/parcelhubPOS/user/userbranchaccess?user_id='+ user_id
@@ -251,7 +269,8 @@ def edituserbranchaccess(request, userbranch_id):
                 'currentuserba' : userbainstance,
                 'branchsel_list' : branchsel_list,
                 'selectionoption' : selectionoption,
-                'title': title
+                'title': title,
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'edituserbranchaccess.html', context)
 
@@ -263,7 +282,8 @@ def deleteuserbranchaccess(request, duserbranch_id ):
     userbranch_id = ubalist[0]
     user_id = ubalist[1]
     uba = UserBranchAccess.objects.filter(id = userbranch_id )
+    msg = 'User branch access for user "%s" and branch "%s" have been deleted successfully.' %(uba.first().user.username, uba.first().branch.name )
     if uba:
         uba.delete()
-    nextpage = "/parcelhubPOS/user/userbranchaccess?user_id="+ user_id
+    nextpage = "/parcelhubPOS/user/userbranchaccess?user_id="+ user_id + '&msg=' + msg
     return HttpResponseRedirect(nextpage)

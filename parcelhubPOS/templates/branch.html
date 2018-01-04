@@ -2,11 +2,21 @@
 {% load render_table from django_tables2 %}
 
 {% block content %}
-	
-	{% render_table branch %}
+	{% if isedit %}
 	<form action="/parcelhubPOS/branch/editbranch/?branchid=">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
+	{% render_table branch %}
+	{% if isedit %}
+	<form action="/parcelhubPOS/branch/editbranch/?branchid=">
+    	<input type="submit" value="Add" />
+	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

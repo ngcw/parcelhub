@@ -8,7 +8,12 @@
 		<div>Date:<input type="date" name="date" maxlength ="50" value="{{ formdata.date }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
+    {% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	{% render_table statementofacc %}
+	{% if isedit %}
 	<h4>Generate new statement:</h4>
 	<form class="searchform" action="/parcelhubPOS/statementofaccount/viewsoa/?soaid=">
 		<div>
@@ -31,6 +36,7 @@
 		</div>
     	<input type="submit" value="Generate statement" id="generatestatement"/>
 	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'fo

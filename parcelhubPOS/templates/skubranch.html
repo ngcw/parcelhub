@@ -9,10 +9,21 @@
 		<div>Customer:<input type="text" name="customername" maxlength ="50" value="{{ formdata.customername }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
+    {% if isedit %}
+    <form action="/parcelhubPOS/skubranch/editskubranch/?skubranchid=">
+    	<input type="submit" value="Add" />
+	</form>
+	{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	{% render_table skubranch %}
+	{% if isedit %}
 	<form action="/parcelhubPOS/skubranch/editskubranch/?skubranchid=">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

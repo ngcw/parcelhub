@@ -1,15 +1,14 @@
 {% extends "header.html" %}
-
 {% block content %}
-	
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	<form method="post" action="">{% csrf_token %}
 		<table class="inputtable">
 		    {{ formset }}
-
 	    </table>
-	    <input type="submit" value="Save" onClick="return enableBranch()"/>
+	    <input type="submit" value="Save" />
 	</form>
-	
 {% endblock %}
-
 {% include 'footer.html' %}

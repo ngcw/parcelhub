@@ -17,7 +17,7 @@ def branchlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branch_list = Branch.objects.all()
-    
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     final_branch_table = BranchTable(branch_list)
     RequestConfig(request, paginate={'per_page': 25}).configure(final_branch_table)
     context = {
@@ -25,7 +25,9 @@ def branchlist(request):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'title': 'Branch'
+                'title': 'Branch',
+                'isedit' : branchaccess.branch_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'branch.html', context)
 
@@ -47,8 +49,13 @@ def editbranch(request, ebranchid):
         formset = BranchForm(request.POST, 
                                 instance=branchqueryset)
         if formset.is_valid():
+            branchname = request.POST['name'] 
+            if title == 'New branch':
+                msg = 'Branch "%s" have been created successfully.' % branchname
+            else:
+                msg = 'Branch "%s" have been updated successfully.' % branchname
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/branch")
+            return HttpResponseRedirect("/parcelhubPOS/branch/?msg=%s" % msg)
     else:
         formset = BranchForm(instance=branchqueryset)
     context = {
@@ -66,10 +73,10 @@ def deletebranch(request, dbranchid ):
     dbranchid = request.GET.get('dbranchid')
     branch = Branch.objects.filter(id = dbranchid )
     currentbranchid = request.session.get(CONST_branchid)
-    
+    msg = 'Branch "%s" have been deleted successfully.' % branch.first().name
     if branch:
         branch.delete()
     if currentbranchid == dbranchid:
         nextselectedbranch = UserBranchAccess.objects.filter(user__id=request.session.get('userid')).first()
         request.session[CONST_branchid] = nextselectedbranch.branch.id
-    return branchlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/branch/?msg=%s" % msg)

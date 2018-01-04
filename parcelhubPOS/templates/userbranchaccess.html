@@ -3,8 +3,14 @@
 
 {% block content %}
 	<div>User: {{ user.first_name}} {{ user.last_name}}</div> 
+	
+	{% if isedit %}<div><a class="link_button" href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id=0_{{ user.id }}">Add</a></div>{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	{% render_table userbranchaccess %}
-	<div><a class="link_button" href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id=0_{{ user.id }}">Add</a></div>
+	{% if isedit %}<div><a class="link_button" href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id=0_{{ user.id }}">Add</a></div>{% endif %}
 
 {% endblock %}
 

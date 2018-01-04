@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import SKUBranchTable
 from .commons import *
-from .models import SKUBranch, SKU, Customer
+from .models import SKUBranch, SKU, Customer, UserBranchAccess
 from django.http import HttpResponseRedirect
 CONST_branchid = 'branchid'
 #method to retrieve skuoverride list
@@ -15,6 +15,7 @@ def skubranchlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     skubranch_list = SKUBranch.objects.filter(branch__id=branchid)
     formdata = {'skucode':'',
                 'branchname':'',
@@ -42,7 +43,9 @@ def skubranchlist(request):
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
-                'title': 'SKU per branch'
+                'title': 'SKU per branch',
+                'isedit' : branchaccess.skupricing_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
             }
     return render(request, 'skubranch.html', context)
 
@@ -120,9 +123,19 @@ def editskubranch(request, skubranchid):
                 errortext = 'SKU pricing for SKU(' + skucodeselected + ')' + customererror + ' already exist.'
                 
             else:
+                sku_code = request.POST['skuselected'] 
+                try:
+                    customernamemsg = ' and customer "' + customerselected.name + '"'
+                except:
+                    customernamemsg = ''
+                if title == 'New SKU branch':
+                    msg = 'SKU override for "%s"%s have been created successfully.' % (sku_code, customernamemsg )
+                else:
+                    msg = 'SKU override for "%s"%s have been updated successfully.' % (sku_code, customernamemsg )
                 skubranch.save()
-                return HttpResponseRedirect("/parcelhubPOS/skubranch")#
+                return HttpResponseRedirect("/parcelhubPOS/skubranch/?msg=%s" % msg)#
     skucodeselected = skuselected.sku_code
+    isgstinclusive = skuselected.is_gst_inclusive
     try:
         customeridselected = customerselected.id
     except:
@@ -147,7 +160,8 @@ def editskubranch(request, skubranchid):
                 'walkinspecial':[iswalkinspecial, 'walkinspecial', wsoverride, walkinspecialvalue], 
                 'walkin':[iswalkin, 'walkin',woverride, walkinvalue],
                 'selectedsku' : skucodeselected,
-                'selectedcustomer' : customeridselected
+                'selectedcustomer' : customeridselected,
+                'isgstinclusive' : isgstinclusive
                  }
     context = {
                 'headerselectiondisabled' : True,
@@ -167,6 +181,7 @@ def editskubranch(request, skubranchid):
 def deleteskubranch(request, dskubranchid ):
     dskubranchid = request.GET.get('dskubranchid')
     skubranch = SKUBranch.objects.filter(id = dskubranchid )
+    msg = 'SKU override for "%s" and customer "%s" have been deleted successfully.' % (skubranch.first().sku.sku_code, skubranch.first().customer.name )
     if skubranch:
         skubranch.delete()
-    return skubranchlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/skubranch/?msg=%s" % msg)

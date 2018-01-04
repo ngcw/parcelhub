@@ -1,8 +1,8 @@
 from .models import *
 from .tables import InvoiceTable
 from .commons import *
-from .forms import InvoiceForm, InvoiceItemForm
-from datetime import timedelta 
+from .forms import InvoiceForm, InvoiceItemForm, CustomerForm
+from datetime import timedelta, datetime
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -17,6 +17,7 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from .invoiceprint import *
+from io import StringIO
 @login_required
 def invoice(request):
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -36,11 +37,16 @@ def invoice(request):
 @login_required
 def retrieveInvoice(request):
     loggedusers = userselection(request)
-    
+    try: 
+        globalparameter = GlobalParameter.objects.filter().first()
+        deadlinedatetime = datetime.combine(globalparameter.invoice_lockin_date, datetime.min.time())
+    except:
+        deadlinedatetime = timezone.now() - timedelta(days=1); 
     loguser = User.objects.get(id=request.session.get('userid'))
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     invoice_list = Invoice.objects.filter(branch_id=branchid )
     formdata = {'invoicenumber':'',
                 'fromdate':'',
@@ -95,9 +101,11 @@ def retrieveInvoice(request):
                 'loggedusers' : loggedusers,
                 'branchselectionaction': '/parcelhubPOS/invoice/',
                 'formdata' : formdata,
-                'deadlinetime': timezone.now() - timedelta(days=1),
+                'deadlinetime': deadlinedatetime,
                 'issuperuser' : loguser.is_superuser,
-                'title' : 'Invoice'
+                'title' : 'Invoice',
+                'isedit' : branchaccess.transaction_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'invoice.html', context)
 
@@ -212,14 +220,13 @@ def editInvoice(request, invoiceid):
             itemstodelete = InvoiceItem.objects.filter(invoice__id=invoice_list.id).exclude(tracking_code__in=trackingcodes)
             for item in itemstodelete:
                 item.delete()
-            if request.POST['action'] == 'Confirm':
-                return HttpResponseRedirect("/parcelhubPOS/invoice/editinvoice/?invoiceid=" + str( invoice_list.id ) ) # Redirect to a 'success' page
-            elif request.POST['action'] == 'Confirm and new':
-                return HttpResponseRedirect("/parcelhubPOS/invoice/editinvoice/?")
-            elif request.POST['action'] == 'Print invoice':
-                return invoice_pdf(request, invoice_list.id) 
-            elif request.POST['action'] == 'Print receipt':
-                return invoice_thermal(request, invoice_list.id)
+            if request.POST['action'] == 'Confirm' or request.POST['action'] == 'Confirm and new':
+                if invoice_list.invoicetype.name == 'Cash':
+                    invoiceprint = invoice_thermal(request, invoice_list.id)
+                else:
+                    invoiceprint = invoice_pdf(request, invoice_list.id) 
+                return HttpResponse(invoiceprint, content_type='application/pdf')#HttpResponseRedirect("/parcelhubPOS/invoice/editinvoice/?invoiceid=" + str( invoice_list.id ) ) # Redirect to a 'success' page
+
             elif request.POST['action'] == 'Print delivery order':
                 return deliveryorder_pdf(request, invoice_list.id)
     # For CSRF protection
@@ -232,18 +239,41 @@ def editInvoice(request, invoiceid):
                  'branchselection': branchselectlist,
                  'invoice': invoice,
                  'customerlist': customerlist,
-                 'title': title
+                 'invoicetitle': title
                  
                  }
     return render(request, 'editinvoice.html', context)
+
+def CustomerCreatePopup(request):
+    branchid = request.session.get(CONST_branchid)
+    form = CustomerForm(request.POST or None, initial={'branch': branchid})
+
+    if form.is_valid():
+        instance = form.save()
+
+        ## Change the value of the "#id_author". This is the element id in the form
+        
+        return HttpResponse('<script>opener.closePopup(window, "%s", "%s", "#id_customer");</script>' % (instance.pk, instance))
+    
+    return render(request, "addcustomer.html", {"form" : form})
+
+@csrf_exempt
+def get_customer_id(request):
+    if request.is_ajax():
+        customer_name = request.GET['form-0-name']
+        customer_id = Customer.objects.get(name = customer_name).id
+        data = {'customer_id':customer_id,}
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    return HttpResponse("/")
 
 @login_required
 def deleteinvoice(request, dinvoiceid ):
     dinvoiceid = request.GET.get('dinvoiceid')
     invoice = Invoice.objects.filter(id = dinvoiceid )
+    msg = 'Invoice "%s" have been deleted successfully.' % invoice.first().invoiceno
     if invoice:
         invoice.delete()
-    return HttpResponseRedirect("/parcelhubPOS/invoice")
+    return HttpResponseRedirect("/parcelhubPOS/invoice/?msg=%s" %msg)
 
 def getskulist(request):
     branchid = request.session.get(CONST_branchid)
@@ -347,8 +377,13 @@ def autocompleteskudetail(request):
                 skuprice = sku.corporate_price
             else:
                 skuprice = sku.walkin_price
-            gst = (skuprice * sku.tax_code.gst)
-            pricewithgst = skuprice + gst
+            gstpercentage = (sku.tax_code.gst / 100 )
+            if sku.is_gst_inclusive:
+                gst = skuprice - (skuprice/(1+gstpercentage))
+                pricewithgst = skuprice
+            else:
+                gst = (skuprice * gstpercentage)
+                pricewithgst = skuprice + gst
             sku_json['price'] = "%.2f" % pricewithgst
             sku_json['gst'] = "%.2f" % gst
             skucode_list.append(sku.sku_code)
@@ -374,8 +409,13 @@ def autocompleteskudetail(request):
                 skuprice = sku.corporate_price
             else:
                 skuprice = sku.walkin_price
-            gst = (skuprice * sku.tax_code.gst)
-            pricewithgst = skuprice + gst
+            gstpercentage = (sku.tax_code.gst / 100 )
+            if sku.is_gst_inclusive:
+                gst = skuprice - (skuprice/(1+gstpercentage))
+                pricewithgst = skuprice
+            else:
+                gst = (skuprice * gstpercentage)
+                pricewithgst = skuprice + gst
             sku_json['price'] = "%.2f" % pricewithgst
             sku_json['gst'] = "%.2f" % gst
             results.append(sku_json)
@@ -463,13 +503,16 @@ def validatetrackingcode(request):
     if 'invoiceid' in request.GET:
         invoiceid = request.GET.get('invoiceid')
         invoicesel = Invoice.objects.get(id=invoiceid)
-    if trackingcode and courier != '':
-        try:
-            invoiceitem = InvoiceItem.objects.filter(tracking_code=trackingcode).exclude(invoice = invoicesel)
-            if invoiceitem:
-                trackingcode_json['trackcode'] = True;
-        except:
-            pass
+    if courier != '':
+        if trackingcode:
+            try:
+                invoiceitem = InvoiceItem.objects.filter(tracking_code=trackingcode).exclude(invoice = invoicesel)
+                if invoiceitem:
+                    trackingcode_json['trackcode'] = True;
+            except:
+                pass
+        else:
+            trackingcode_json['trackcode'] = True;
     results.append(trackingcode_json)
     data = json.dumps(results)
     return JsonResponse(data, safe=False)

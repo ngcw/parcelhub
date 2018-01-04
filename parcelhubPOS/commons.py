@@ -59,10 +59,11 @@ def navbar(request):
     sel_branch = Branch.objects.filter(id=branchid)
     branchaccess = UserBranchAccess.objects.filter(user=loguser, branch=sel_branch).first()
     menudict = {}
-    if branchaccess or loguser.is_superuser:
+    if loguser.is_superuser or branchaccess:
         if loguser.is_superuser or branchaccess.transaction_auth != 'n/a' :
-            menudict[CONST_invoice] =[('Invoice list','/parcelhubPOS/invoice'),
-                                      ('New invoice','/parcelhubPOS/invoice/editinvoice/?invoiceid=')]
+            menudict[CONST_invoice] =[('Invoice list','/parcelhubPOS/invoice')]
+            if loguser.is_superuser or branchaccess.transaction_auth == 'edit':
+                menudict[CONST_invoice].append(('New invoice','/parcelhubPOS/invoice/editinvoice/?invoiceid='))
         menudict[CONST_masterdata] = []
         if loguser.is_superuser or branchaccess.masterdata_auth != 'n/a':
             menudict[CONST_masterdata].append(('Vendor','/parcelhubPOS/vendor'))
@@ -70,7 +71,7 @@ def navbar(request):
             menudict[CONST_masterdata].append(('Zone domestic','/parcelhubPOS/zonedomestic') )
             menudict[CONST_masterdata].append(('Zone international','/parcelhubPOS/zoneinternational') )
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
-            menudict[CONST_system] =[('Synchronize data','/parcelhubPOS/masterdata')]
+            menudict[CONST_system] =[('Global parameters','/parcelhubPOS/globalparameter')]
         if loguser.is_superuser or branchaccess.skupricing_auth != 'n/a':
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))                            
         if loguser.is_superuser or branchaccess.branch_auth != 'n/a':

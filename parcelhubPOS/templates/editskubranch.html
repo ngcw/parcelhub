@@ -34,6 +34,11 @@
 		  				</select>
 					</td>
 		  		</tr>
+				<tr>
+		  			<td>GST inclusive:</td>
+		  			<td><input type="checkbox" disabled="disabled" {% if formdata.isgstinclusive %} checked {% endif %}/>
+					</td>
+		  		</tr>
 		  		{% if formdata.corporate.0 %}
 		  		<tr>
 		  			<td>Corporate:</td>

@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import StatementOfAccountTable
 from .commons import *
-from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer
+from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer, UserBranchAccess
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import HttpResponseRedirect, HttpResponse
@@ -33,6 +33,7 @@ def statementofacclist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     customerlist = Customer.objects.filter(branch__id=branchid)
     statementofacc_list = StatementOfAccount.objects.filter(customer__branch__id=branchid)
     formdata = {'customerinput':'',
@@ -58,7 +59,9 @@ def statementofacclist(request):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'customerlist':customerlist,
-                'title': "Statement of account"
+                'title': "Statement of account",
+                'isedit' : branchaccess.custacc_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'statementofaccount.html', context)
 
@@ -119,7 +122,7 @@ def statementofacc_pdf(request, statementofacc):
     center = totalwidth / 2.0
     
     customer = statementofacc.customer
-    addresstxt = customer.address
+    addresstxt = customer.addressline1 + customer.addressline2 + customer.addressline3 + customer.addressline4
     addresstokenize = addresstxt.split(',')
     addressline = len(addresstokenize);
     
@@ -398,6 +401,7 @@ def calculate_soabalance(soaitem):
 def deletestatementofacc(request, dsoaid ):
     dsoaid = request.GET.get('dsoaid')
     statementofacc = StatementOfAccount.objects.filter(id = dsoaid )
+    msg = 'Statement of account for customer "%s" from %s to %s have been deleted successfully.' % (statementofacc.first().customer.name, str(statementofacc.first().datefrom), str(statementofacc.first().dateto) )
     if statementofacc:
         statementofacc.delete()
-    return statementofacclist(request)
+    return HttpResponseRedirect("/parcelhubPOS/statementofaccount/?msg=%s" % msg)

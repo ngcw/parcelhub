@@ -1,0 +1,41 @@
+body
+{
+	width: 100%;
+	height: 100%;
+	background-color: #c0c0c0;
+	padding-right:5px;
+	padding:0px;
+}
+h2
+{
+	margin-top: 8px;
+    margin-bottom: 8px;
+}
+input[type=submit]
+{
+    background-color: #2C2B62; /* Blue */
+    border: none;
+    color: white;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.inputtable tr th
+{
+	vertical-align: top;
+	text-align: right;
+}
+.inputtable tr
+{
+	border: 1px solid black;
+}
+.inputtable selection, #sectionleft selection
+{
+	width: 150px;
+}

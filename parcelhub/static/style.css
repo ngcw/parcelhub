@@ -4,6 +4,18 @@ body
 	height: 100%;
 	background-color: #c0c0c0;
 	padding-right:5px;
+	padding:0px;
+}
+
+#content h2
+{
+	margin-top: 8px;
+    margin-bottom: 8px;
+}
+#invoice_container h2
+{
+	margin-top: 20px;
+    margin-bottom: 8px;
 }
 input:focus, select:focus, textarea:focus {
   background: lightgreen;
@@ -13,6 +25,7 @@ select
 	width: 100px;
 	height: 21px;
 }
+
 .header1 button
 {
 	margin-right: 15px;
@@ -47,6 +60,7 @@ button, input[type=submit], .link_button
 	overflow: hidden;
 	margin-bottom: 5px;
 	min-width: 850px;
+	z-index:2;
 }
 #headerimg
 {
@@ -78,6 +92,7 @@ button, input[type=submit], .link_button
     font-family: Arial;
     width: 99%;
     min-width: 850px;
+    z-index:3
 }
 
 .container a {
@@ -96,6 +111,7 @@ button, input[type=submit], .link_button
     float: left;
     overflow: hidden;
     background-color: #2C2B62;
+    z-index:2;
 }
 
 .dropdown .dropbtn {
@@ -105,12 +121,13 @@ button, input[type=submit], .link_button
     color: white;
     padding: 14px 14px;
     background-color: inherit;
-    
+    z-index:2;
     margin: 0px;
 }
 
 .container a:hover, .dropdown:hover .dropbtn {
     background-color: #5DBCD2;
+    z-index:2;
 }
 
 .dropdown-content {
@@ -118,7 +135,7 @@ button, input[type=submit], .link_button
     position: absolute;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index:2;
 }
 
 .dropdown-content a {
@@ -128,20 +145,33 @@ button, input[type=submit], .link_button
     text-decoration: none;
     display: block;
     text-align: left;
+    z-index:2;
 }
 
 .dropdown-content a:hover {
     background-color: #5DBCD2;
+    z-index:2;
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
+    z-index:2;
 }
-
+#header
+{
+	position: fixed;
+	width: 100%;
+	z-index:2;
+	background-color: #c0c0c0;
+	margin-top: -10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 #content
 {
 	display: block;
 	margin-top: 10px;
+	padding-top:80px;
 }
 .searchform
 {
@@ -207,13 +237,17 @@ button, input[type=submit], .link_button
 	border-spacing: 0px;
 	border-collapse: collapse;
 	display: block;
-	min-width: 1400px;
+	min-width: 1450px;
+	max-width: 1450px;
 }
 
 .item input, .item selection
 {
 	width: 95px;
-	
+}
+.skudescription
+{
+	width: 150px !important;
 }
 .itemform_container
 {
@@ -237,6 +271,18 @@ button, input[type=submit], .link_button
 	display: inline;
 	width: 100px;
 }
+.itemform_label_description
+{
+	float: left;
+	display: inline;
+	width: 150px;
+}
+.item_input_description
+{
+	float: left;
+	display: inline;
+	width: 150px;
+}
 .item_input_dimensional
 {
 	display: none;
@@ -258,6 +304,7 @@ button, input[type=submit], .link_button
 {
 	text-align: right;
 }
+
 .section
 {
 	float: left;
@@ -266,10 +313,27 @@ button, input[type=submit], .link_button
 {
 	margin-left: 100px;
 }
-#invoice_container, #invoiceitemheader
+#invoice_container
 {
 	display: block;
 	clear: both;
+	position: fixed;
+	min-width: 1450px;
+	height: 280px;
+	background-color: #c0c0c0;
+	z-index:1;
+	margin-top:-20px;
+}
+#invoiceitemheader
+{
+	display: block;
+	clear: both;
+	position: relative;
+	padding-top:250px;
+}
+#invoicesubmit
+{
+	clear:both;
 }
 #generatestatement
 {
@@ -284,6 +348,8 @@ button, input[type=submit], .link_button
 	margin-top: 15px;
 	display: block;
 	float: left;
+	min-width: 1450px;
+	max-width: 1450px;
 }
 #addanotheritem
 {
@@ -291,8 +357,8 @@ button, input[type=submit], .link_button
 }
 #nrOfItem
 {
-	display: inline-block;
-    margin-left: 760px;
+	display: none;
+    margin-left: 810px;
 }
 .paymentitem
 {
@@ -325,4 +391,21 @@ button, input[type=submit], .link_button
 .dimensioninput
 {
 	width: 130px;
+}
+.statusspacing
+{
+	margin-top: 5px;
+}
+.statusmsg
+{
+	padding:5px;
+	border: 1px solid grey;
+	border-radius: 5px;
+	width: auto;
+	display: table-cell;
+	font-size: 15px;
+}
+#add_cust_button
+{
+	vertical-align: bottom
 }

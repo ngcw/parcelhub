@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import TaxTable
 from .commons import *
-from .models import Tax
+from .models import Tax, UserBranchAccess
 from django.http import HttpResponseRedirect
 CONST_branchid = 'branchid'
 #method to retrieve Courier tax list
@@ -13,6 +13,8 @@ CONST_branchid = 'branchid'
 def taxlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     menubar = navbar(request)
     tax_list = Tax.objects.all()
     formdata = {'taxcode':''}
@@ -31,7 +33,9 @@ def taxlist(request):
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
-                'title': "Tax"
+                'title': "Tax",
+                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'tax.html', context)
 
@@ -51,8 +55,13 @@ def edittax(request, taxid):
         formset = TaxFormSet(request.POST, request.FILES,
                              queryset=taxqueryset)
         if formset.is_valid():
+            tax_code_name = request.POST['form-0-tax_code'] 
+            if title == 'New tax':
+                msg = 'Tax "%s" have been created successfully.' % tax_code_name
+            else:
+                msg = 'Tax "%s" have been updated successfully.' % tax_code_name
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/tax")
+            return HttpResponseRedirect("/parcelhubPOS/tax/?msg=%s" % msg)
     else:
         formset = TaxFormSet(queryset=taxqueryset)
     
@@ -70,6 +79,7 @@ def edittax(request, taxid):
 def deletetax(request, dtaxid ):
     dtaxid = request.GET.get('dtaxid')
     tax = Tax.objects.filter(id = dtaxid )
+    msg = 'Tax "%s" have been deleted successfully.' % tax.first().tax_code
     if tax:
         tax.delete()
-    return taxlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/tax/?msg=%s" % msg)

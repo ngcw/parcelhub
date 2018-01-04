@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from .models import *
+from .forms import GlobalParameterForm
 
 from .tables import *
 from .skus import *
@@ -86,17 +87,34 @@ def dashboard(request):
         return HttpResponse("No branch access configured for user")
     
 @login_required
-def masterdata(request):
+def globalparameter(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     menubar = navbar(request)
+    
+    title = "Update global parameter"
+
+    gpqueryset = GlobalParameter.objects.filter().first()
+    
+    if request.method == "POST":
+        formset = GlobalParameterForm(request.POST, request.FILES,
+                             instance=gpqueryset)
+        if formset.is_valid():
+            msg = 'Global parameter for invoice lock in date have been updated successfully.'
+            formset.save()
+            return HttpResponseRedirect("/parcelhubPOS/globalparameter/?msg=%s" % msg)
+    else:
+        formset = GlobalParameterForm(instance=gpqueryset)
+    
     context = {
+                'formset': formset,
+                'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'branchselectionaction': '/parcelhubPOS/masterdata/',
-                'title' : 'Master data'
+                'title' : title,
+                'statusmsg' : request.GET.get('msg'),
                 }
-    return render(request, 'dashboard.html', context)
+    return render(request, 'globalparameter.html', context)
 
 

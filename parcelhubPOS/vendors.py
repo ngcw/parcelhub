@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import VendorTable
 from .commons import *
-from .models import CourierVendor, ZoneType
+from .models import CourierVendor, ZoneType, UserBranchAccess
 from django.http import HttpResponseRedirect
 
 CONST_branchid = 'branchid'
@@ -15,6 +15,8 @@ def vendorlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     menubar = navbar(request)
+    branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     vendor_list = CourierVendor.objects.all()
     zonetype_list = ZoneType.objects.all()
     formdata = {'name':'',
@@ -40,7 +42,9 @@ def vendorlist(request):
                 'loggedusers' : loggedusers,
                 'zonetype_list' : zonetype_list,
                 'formdata' : formdata,
-                'title': "Courier vendor"
+                'title': "Courier vendor",
+                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'vendor.html', context)
 
@@ -60,8 +64,13 @@ def editvendor(request, vendorid):
         formset = VendorFormSet(request.POST, request.FILES,
                              queryset=vendorqueryset)
         if formset.is_valid():
+            name = request.POST['form-0-name'] 
+            if title == 'New vendor':
+                msg = 'Courier vendor "%s" have been created successfully.' % name
+            else:
+                msg = 'Courier vendor "%s" have been updated successfully.' % name
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/vendor")
+            return HttpResponseRedirect("/parcelhubPOS/vendor/?msg=%s" % msg)
     else:
         formset = VendorFormSet(queryset=vendorqueryset)
     
@@ -79,6 +88,7 @@ def editvendor(request, vendorid):
 def deletevendor(request, dvendorid ):
     dvendorid = request.GET.get('dvendorid')
     vendor = CourierVendor.objects.filter(id = dvendorid )
+    msg = 'Tax "%s" have been deleted successfully.' % vendor.first().name
     if vendor:
         vendor.delete()
-    return vendorlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/vendor/?msg=%s" % msg)

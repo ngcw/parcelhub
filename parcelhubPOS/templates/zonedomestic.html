@@ -9,10 +9,21 @@
 		<div>Zone:<input type="number" name="zone" maxlength ="25" value="{{ formdata.zone }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
+    {% if isedit %}
+    <form action="/parcelhubPOS/zonedomestic/editzonedomestic/?zonedomesticid=">
+    	<input type="submit" value="Add" />
+	</form>
+    {% endif %}
+    {% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	{% render_table zonedomestic %}
+	{% if isedit %}
 	<form action="/parcelhubPOS/zonedomestic/editzonedomestic/?zonedomesticid=">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

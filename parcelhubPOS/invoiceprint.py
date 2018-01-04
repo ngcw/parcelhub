@@ -9,7 +9,7 @@ from django.db.models import Sum
 import os  
 import reportlab
 import ctypes
-from io import BytesIO
+from io import BytesIO, StringIO
 from django.http import HttpResponse
 from .models import Invoice, InvoiceItem, SKU, Branch, Tax
 from decimal import Decimal
@@ -236,7 +236,7 @@ def invoice_pdf(request, invoiceid):
     gstwidth = p.stringWidth(gst, CONST_font, 10)
     p.drawString(end - gstwidth, 123, gst)
     p.drawString(310, 108, 'Rounding')
-    roundingvalue = (float(invoice.total) - (float(invoice.subtotal) + float(invoice.gst) - float(invoice.discount)))
+    roundingvalue = (float(invoice.total) - (float(invoice.subtotal) - float(invoice.discount)))
     rounding = "%.2f" % roundingvalue
     roundingwidth = p.stringWidth(rounding, CONST_font, 10)
     p.drawString(end - roundingwidth, 108, rounding)
@@ -258,13 +258,11 @@ def invoice_pdf(request, invoiceid):
     pagenumstr = str(pagenum)+ '/' + str(len(finaldict))
     p.drawString(560, 10, pagenumstr)
     p.showPage()
-    p.save()
 
     # Get the value of the BytesIO buffer and write it to the response.
-    pdf = buffer.getvalue()
+    pdf = p.getpdfdata()
     buffer.close()
-    response.write(pdf)
-    return response
+    return pdf
 
 
 CONST_fontr = 'DejaVuSansMono'
@@ -319,7 +317,7 @@ def invoice_thermal(request, invoiceid):
         tax = sku.tax_code
         gsttitletxt = ''
         if tax:
-            gstvalue = tax.gst * 100
+            gstvalue = tax.gst
             gstvaluetxt =  "%.0f" % gstvalue
             gsttitletxt = tax.tax_code + ' @ ' + gstvaluetxt + '%'
         if gsttitletxt != '' and gsttitletxt not in gstsummary:
@@ -415,7 +413,7 @@ def invoice_thermal(request, invoiceid):
     try:
         tax = Tax.objects.get(gst__gt = Decimal('0.00'))
         if tax:
-            gstvalue = tax.gst * 100
+            gstvalue = tax.gst
             gstvaluetxt =  "%.0f" % gstvalue
             gsttitletxt = 'GST' + '@' + gstvaluetxt + '%'
     except:
@@ -470,7 +468,7 @@ def invoice_thermal(request, invoiceid):
     changewidth = p.stringWidth(changetxt, CONST_fontr, 9)
     p.drawString( totalwidth - marginleft - changewidth, changey, changetxt )
     p.drawString( totalwidth - currencymargin, changey, 'RM' )
-    btmmargin = 20;
+    btmmargin = 10;
     
     # Payment
     p.setStrokeColorRGB(0.5, 0.5, 0.5 )
@@ -479,24 +477,23 @@ def invoice_thermal(request, invoiceid):
     
     
     p.setFont(CONST_fontrbold, 8)
-    p.drawString(marginleft, btmmargin + ( (len(gstsummary) + 2) * linespace ), "GST Summary:              Amount(RM)             Tax(RM)")   
+    p.drawString(marginleft, btmmargin + ( (len(gstsummary)+2) * linespace ), "GST Summary:              Amount(RM)             Tax(RM)")   
     gstcount = 0;
-    for key, value in gstsummary.items():
+    for key, value in sorted(gstsummary.items()):
         p.drawCentredString(marginleft + 30, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), key)
         amount = '%.2f' %(value[0])
         amount = '%.2f' %(value[1])
         p.drawCentredString(marginleft + 150, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), amount)
         p.drawCentredString(marginleft + 250, btmmargin + ( (len(gstsummary) + 1- gstcount ) * linespace ), amount)
+        gstcount = gstcount + 1;
     # thank you 
     p.drawCentredString(center, btmmargin, 'Thank you')
     p.showPage()
-    p.save()
 
     # Get the value of the BytesIO buffer and write it to the response.
-    pdf = buffer.getvalue()
+    pdf = p.getpdfdata()
     buffer.close()
-    response.write(pdf)
-    return response
+    return pdf
 
 def deliveryorder_pdf(request, invoiceid):
     # Create the HttpResponse object with the appropriate PDF headers.

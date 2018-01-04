@@ -11,10 +11,21 @@
         <div class="searchinput">Customer:<input type="text" name="customer" maxlength ="50" value="{{ formdata.customer }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
-	{% render_table invoice %}
-	<form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
+    {% if isedit %}
+    <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
+	{% render_table invoice %}
+	{% if isedit %}
+    <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
+    	<input type="submit" value="Add" />
+	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

@@ -94,7 +94,7 @@ class ZoneInternational(models.Model):
 
 class Tax(models.Model):
     tax_code = models.CharField(max_length=25, verbose_name='*Tax code')
-    gst = models.DecimalField(max_digits=3, decimal_places=2, verbose_name='*GST')
+    gst = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='*GST(%)')
 
     def __str__(self):
         return self.tax_code
@@ -109,9 +109,10 @@ class SKU(models.Model):
     product_type = models.ForeignKey(ProductType, verbose_name='*Product type')
     zone_type = models.ForeignKey(ZoneType, verbose_name='*Zone type')
     zone = models.IntegerField(verbose_name='*Zone')
-    weight_start = models.DecimalField(max_digits=30, decimal_places=3, verbose_name='*Weight start')
-    weight_end = models.DecimalField(max_digits=30, decimal_places=3, verbose_name='*Weight end')
+    weight_start = models.DecimalField(max_digits=30, decimal_places=3, verbose_name='*Weight start(kg)')
+    weight_end = models.DecimalField(max_digits=30, decimal_places=3, verbose_name='*Weight end(kg)')
     tax_code = models.ForeignKey(Tax, verbose_name='*Tax code')
+    is_gst_inclusive = models.BooleanField('GST inclusive', default=False)
     corporate_price = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='*Corporate price')
     walkin_special_price = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='*Walk in special price')
     walkin_price = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='*Walk in price')
@@ -271,3 +272,6 @@ class StatementOfAccount(models.Model):
 class StatementOfAccountInvoice(models.Model):
     soa = models.ForeignKey(StatementOfAccount, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+
+class GlobalParameter(models.Model):
+    invoice_lockin_date = models.DateField('*Invoice lock in date' )

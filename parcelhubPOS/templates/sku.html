@@ -28,11 +28,21 @@
         <div class="searchinput">Zone:<input type="text" name="zone" maxlength ="50" value="{{ formdata.zone }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
-
-	{% render_table sku %}
+    {% if isedit %}
 	<form action="/parcelhubPOS/sku/editsku/?skucode=">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
+	{% render_table sku %}
+	{% if isedit %}
+	<form action="/parcelhubPOS/sku/editsku/?skucode=">
+    	<input type="submit" value="Add" />
+	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

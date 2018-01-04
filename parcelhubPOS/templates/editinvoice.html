@@ -2,8 +2,9 @@
 
 {% block content %}
 	
-	<form action="" method="POST">{% csrf_token %}
+	<form action="" method="POST" target='_blank' id="editinvoiceform">{% csrf_token %}
 	<div id="invoice_container">
+		<h2>{{ invoicetitle }}</h2>
 		{{ invoice_form.non_field_errors }}
 		{% for hidden_field in invoice_form.hidden_fields %}
 		  {{ hidden_field.errors }}
@@ -27,7 +28,11 @@
 		  	</tr>
 		  	<tr>
 		  		<th><label for="{{ invoice_form.customer.id_for_label }}">Customer:</label></th>
-		  		<td>{{ invoice_form.customer }}</td>
+		  		<td>{{ invoice_form.customer }}
+		  		<a href="/parcelhubPOS/customer/create" id="add_customer" onclick="return showAddPopup(this);">
+					<img src="/static/img/add_button.png" alt="Add customer" width="20" height="20" border="0" id="add_cust_button" title="Add customer">
+				</a>
+				</td>
 		  		{% if invoice_form.customer.errors %} <td>{{ invoice_form.customer.errors }}</td> {% endif %}
 		  	</tr>
 		  	<tr>
@@ -35,11 +40,13 @@
 		  		<td>{{ invoice_form.remarks }}</td>
 		  		{% if invoice_form.remarks.errors %} <td>{{ invoice_form.remarks.errors }}</td> {% endif %}
 		  	</tr>
-		</table>
-		<table class="section" id="sectionright">
-			<tr>
-	        	<th>Nr of items:</th><td><label id="itemcount">1</label></td>
+		  	<tr>
+	        	<th >Nr of items:</th><td><label id="itemcount">1</label></td>
 	        </tr>
+		</table>
+		<div>
+		</div>
+		<table class="section" id="sectionright">
 	        <tr>
 	        	<th>Sub-total:</th><td><label id="subtotal"></label></td>
 	        </tr>
@@ -65,16 +72,19 @@
 		  	</tr>
 	        <tr><th>Change:</th><td><label id="change"></label></td></tr>
 	    </table>
+	    <div id="invoicesubmit">
+	    	<a href="/parcelhubPOS/invoice/editinvoice/?" id="newInvoicePage" ></a>
+		    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()" class="invoiceConfirm"/> 
+		    <input type="submit" name="action" value="Confirm and new" onClick="return validateAndNew()" class="invoiceConfirmNew"/>
+		    {% if invoice %}
+			    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
+			{% endif %}
 	    </div>
+	   
+	</div>
 	    
     <div id="invoiceitemheader">
-	    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()" class="invoiceConfirm"/> 
-	    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()" class="invoiceConfirmNew"/>
-	    {% if invoice %}
-		    <input type="submit" name="action" value="Print invoice" id="print_invoice_up" onClick="return validateInvoiceItem()"/>
-		    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
-		    <input type="submit" name="action" value="Print receipt" id="print_receipt_up" onClick="return validateInvoiceItem()"/>
-		{% endif %}
+	    
 		    <h2>Invoice Items</h2>
 		    {{ invoice_item_formset.management_form }}
 		    <div class ="invoiceitem_container">
@@ -84,6 +94,8 @@
 	            		<div class="counter_label">Nr.</div>
 	                {% for field in form.visible_fields %}
 						{% if field.label == "Height(mm)" or field.label == "Length(mm)" or field.label == "Width(mm)"%}
+						{% elif field.label == "*Description" %}
+							<div class="itemform_label_description">{{ field.label_tag }}</div>
 						{% else %}
 		            		<div class="itemform_label">{{ field.label_tag }}</div>
 		            	{% endif %}
@@ -104,6 +116,8 @@
 						{% elif field.label == "Width(mm)" %}
 								<label style="margin-right:15px;">Width(mm):</label>{{ field }}
 							</div>
+						{% elif field.label == "*Description" %}
+							<div class="item_input_description">{{ field }}</div>
 						{% else %}
 		            		<div class="item_input">{{ field }}</div>
 		            	{% endif %}
@@ -118,13 +132,11 @@
 			    <div id="addanotheritem"><a id="add" href="#"><button>Add another item</button></a></div>
 			    
 			    <input type="submit" name="action" value="Confirm" onClick="return validateInvoiceItem()" class="invoiceConfirm"/> 
-			    <input type="submit" name="action" value="Confirm and new" onClick="return validateInvoiceItem()" class="invoiceConfirmNew"/>
+			    <input type="submit" name="action" value="Confirm and new" onClick="return validateAndNew()" class="invoiceConfirmNew"/>
 			    {% if invoice %}
-				    <input type="submit" name="action" value="Print invoice" id="print_invoice" onClick="return validateInvoiceItem()"/>
 				    <input type="submit" name="action" value="Print delivery order" id="print_do" onClick="return validateInvoiceItem()"/>
-				    <input type="submit" name="action" value="Print receipt" id="print_receipt" onClick="return validateInvoiceItem()"/>
 			    {% endif %}
-			    <div id="nrOfItem">Nr of items:<label id="itemcount1">1</label></div>
+			    <div id="nrOfItem">Nr of items:<label id="itemcount1">1</label></div> 
 	    	</div>
 	    </div>
 	</form>

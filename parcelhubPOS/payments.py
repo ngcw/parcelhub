@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import PaymentTable
 from .commons import *
-from .models import Payment, ZoneType, Customer, Invoice, PaymentInvoice
+from .models import Payment, ZoneType, Customer, Invoice, PaymentInvoice, UserBranchAccess
 from django.http import HttpResponseRedirect
 from django.db import models
 from .forms import PaymentForm, PaymentInvoiceForm
@@ -25,6 +25,7 @@ def paymentlist(request, custid):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     custid = request.GET.get('custid')
     customerlist = Customer.objects.filter(branch__id=branchid)
     try:
@@ -53,7 +54,9 @@ def paymentlist(request, custid):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'customerlist':customerlist,
-                'title': 'Payment'
+                'title': 'Payment',
+                'isedit' : branchaccess.custacc_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'payment.html', context)
 
@@ -80,9 +83,9 @@ def editpayment(request, paymentid):
         selectedcustomer =  Customer.objects.get(id=customerid)
         invoicetopay = Invoice.objects.filter(customer__id = customerid)
         if date_from:
-            invoicetopay = invoicetopay.filter(invoice__date__gte = date_from)
+            invoicetopay = invoicetopay.filter(invoice_date__gte = date_from)
         if date_to:
-            invoicetopay = invoicetopay.filter(invoice__date__lte = date_to)
+            invoicetopay = invoicetopay.filter(invoice_date__lte = date_to)
         if paymentoption == 'Unpaid':
             invoicetopay = invoicetopay.filter(payment__lt=models.F('total'))
         paymentqueryset = Payment(customer=selectedcustomer, created_by=user, updatetimestamp=timezone.now() );
@@ -139,8 +142,13 @@ def editpayment(request, paymentid):
                     total = total + paidamount 
                     paymentinvoice.save()
                 payment.total = total;
+                customername = request.POST['customer'] 
+                if title == 'New payment':
+                    msg = 'Payment for "%s" have been created successfully.' % customername
+                else:
+                    msg = 'Payment for "%s" have been updated successfully.' % customername
                 payment.save()
-                return HttpResponseRedirect('/parcelhubPOS/payment?custid=""')
+                return HttpResponseRedirect('/parcelhubPOS/payment?custid=""&msg=%s' %msg)
         elif request.POST['action'] == 'Cancel payment':
             return HttpResponseRedirect("/parcelhubPOS/statementofaccount/deletesoa?dsoaid=%s"% paymentqueryset.id)
     context = {'payment_form': payment_form,
@@ -159,6 +167,7 @@ def deletepayment(request, dpaymentid ):
     dpaymentid = request.GET.get('dpaymentid')
     payment = Payment.objects.filter(id = dpaymentid )
     paymentinvoice = PaymentInvoice.objects.filter(payment = payment)
+    msg = 'Payment for customer "%s" have been deleted successfully.' % payment.first().customer.name
     for paymentinv in paymentinvoice:
         invoice = paymentinv.invoice
         paymentamt = 0;
@@ -172,4 +181,4 @@ def deletepayment(request, dpaymentid ):
         invoice.save()
     if payment:
         payment.delete()
-    return HttpResponseRedirect('/parcelhubPOS/payment?custid=""')
+    return HttpResponseRedirect('/parcelhubPOS/payment?custid=""&msg=%s' %msg)

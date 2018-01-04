@@ -18,7 +18,8 @@
     </head>
 
     <body>
-		<div class="headercontainer">
+    	<div id="header">
+    	<div class="headercontainer">
 			<div class="header">Logged as: </div>
 			<div class="header2">
 				<form action='{{ branchselectionaction }}' method="post" >
@@ -86,8 +87,11 @@
 		  <div  id="headerimg"><img src="{% static '/img/companylogo.png' %}" alt="print pack ship sdn bhd" title="Print Pack Ship Sdn Bhd" width="350" height="42"/>	</div>
 		  <div id="emptyspace"> </div>
 		  </div>
+    	</div>
+		
 		  <div id="content">
 		  	<h2>{{ title }}</h2>
+		  	   
 		       {% block content %}{% endblock %}
 		  </div>
 		  <script>
@@ -120,10 +124,12 @@
     		      return;
     		  }
     		});
+	    	{% if isedit %}
 	    	function myFunction1Invoice()
 	    	{
 	    		window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=', '_blank');
 	    	}
+	    	{% endif %}
 	    	$( ".disabledinput input" ).prop( "disabled", true ); //Disable
 	    	$('body').on('keydown', 'input, select, textarea, a, button', function(e) {
 	    	    var self = $(this)
@@ -203,6 +209,7 @@
 	    	        else {
 	    	            alert("You have to enter at least one invoice item!");
 	    	        }
+	    	        UpdateTotal()
 	    	        return false;
 	    	    }
 				
@@ -572,13 +579,21 @@
     		  	document.getElementById('subtotal').innerHTML = parseFloat(subtotalfinal).toFixed(2);
     		  	document.getElementById('gsttotal').innerHTML = parseFloat(gst).toFixed(2);
     		  	document.getElementById('rounding').innerHTML = parseFloat(rounding).toFixed(2);
+    		  	
+    		  	{% if invoice %}
+				
+				{% else %}
+				if ( document.getElementById('total').innerHTML  != parseFloat(finaltotal).toFixed(2))
+				{
+					document.getElementById("id_payment").value = parseFloat(finaltotal).toFixed(2)
+					payment = finaltotal
+				}
+					
+				{% endif %}
+				
 				document.getElementById('total').innerHTML = parseFloat(finaltotal).toFixed(2);
 
-				{% if invoice %}
-					
-				{% else %}
-					document.getElementById("id_payment").value = parseFloat(finaltotal).toFixed(2)
-				{% endif %}
+				
 				var change = '0.0';
 				if( payment )
 				{
@@ -629,19 +644,17 @@
 	                		SetParentVisibility( 'id_customer', dataobj[0]['invoicetype']); 
 	                		SetParentVisibility( 'id_payment', dataobj[0]['invoicetype'] == false); 
 	                		SetParentVisibility( 'change', dataobj[0]['invoicetype'] == false); 
-	                		SetVisibility( 'print_invoice', dataobj[0]['invoicetype'] );
 	                		SetVisibility( 'print_do', dataobj[0]['invoicetype'] );
-	                		SetVisibility( 'print_receipt', dataobj[0]['invoicetype'] == false);
-	                		SetVisibility( 'print_invoice_up', dataobj[0]['invoicetype'] );
 	                		SetVisibility( 'print_do_up', dataobj[0]['invoicetype'] );
-	                		SetVisibility( 'print_receipt_up', dataobj[0]['invoicetype'] == false);
                 		}
            		 		
 	                }
 	            });
 	    	};
 	    	function setFocusToTextBox(){
-	    	    document.getElementById("id_form-0-tracking_code").focus();
+	    		var inputid = "id_form-0-tracking_code"
+	    	    document.getElementById(inputid).focus();
+	    	    ValidateTrackingCode(inputid)
 	    	}
 	    	window.onload = function() {
 	    		  HideShowCashType();
@@ -789,6 +802,16 @@
 	    	    alert('Invoice saved!')
 	    	  	return true;
 	    	}
+	    	function validateAndNew()
+	    	{
+	    		var validated = validateInvoiceItem()
+	    		if( validated )
+    			{
+    				document.getElementById("newInvoicePage").click();
+    			}
+	    		return validated
+	    		
+	    	}
 	    	function SetDescriptionAvailability(inputid)
 	    	{
 	    		var value = document.getElementById(inputid).value.trim();
@@ -841,7 +864,32 @@
 	    	    	}
 	    	    }
 	    	}
+	    	function showAddPopup(triggeringLink) {
+	    	    var name = triggeringLink.id.replace(/^add_/, '');
+	    	    href = triggeringLink.href;
+	    	    var win = window.open(href, name, 'height=700,width=600,resizable=yes,scrollbars=yes');
+	    	    win.focus();
+	    	    return false;
+	    	}
+	    	function closePopup(win, newID, newRepr, id) {
+	    		
+	    	    $(id).append('<option value=' + newID + ' >' + newRepr + '</option>')
+	    	    win.close();
+	    	    var newOption = new Option(newRepr, newID, true, true);
+	    	    $(id).select2().append(newOption)
+	    	    $(id).select2().val(newID);
+	    	    $(id).select2().trigger('change')
+	    	}
 
+	    	{% endif %}
+	    	{% if iscustomer %}
+	    	window.onload = function () {
+	    	    document.getElementById('id_form-0-branch').disabled=true;
+	    	}
+	    	function enableBranch() {
+	    		document.getElementById('id_form-0-branch').disabled=false;
+	    		return true;
+	    	}
 	    	{% endif %}
 		  </script>
           {% block jsscript %}{% endblock %}

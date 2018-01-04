@@ -1,11 +1,15 @@
 import django_tables2 as tables
 from .models import *
 
-deletelinkinvoice = '''<a href="/parcelhubPOS/invoice/deleteinvoice?dinvoiceid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete invoice {{ record.invoiceno }}?')">Delete</a>'''
-editlinkinvoice = '''{% if record.createtimestamp >= deadlinetime or issuperuser %}
+deletelinkinvoice = '''{% if record.createtimestamp.date >= deadlinetime.date and  record.createtimestamp.time >= deadlinetime.time and isedit %}
+                        <a href="/parcelhubPOS/invoice/deleteinvoice?dinvoiceid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete invoice {{ record.invoiceno }}?')">Delete</a>
+                        {% else %}
+                        <span title={% if isedit %}"Invoice is already within lock in period"{% else %}"Unauthorized action"{% endif %}>Delete</span>
+                        {% endif %}'''
+editlinkinvoice = '''{% if record.createtimestamp.date >= deadlinetime.date and  record.createtimestamp.time >= deadlinetime.time and isedit %}
                     <a href="/parcelhubPOS/invoice/editinvoice?invoiceid={{record.id}}">Edit</a>
-                    {% else%}
-                    Edit
+                    {% else %}
+                    <span title={% if isedit %}"Invoice is already within lock in period"{% else %}"Unauthorized action"{% endif %}>Edit</span>
                     {% endif %}'''
 class InvoiceTable(tables.Table):
     edit = tables.TemplateColumn(editlinkinvoice,
@@ -19,8 +23,14 @@ class InvoiceTable(tables.Table):
                  }
         empty_text = "There are no invoice matching the search criteria..."
 
-deletelinksku = '''<a href="/parcelhubPOS/sku/deletesku?dskucode={{record.sku_code}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete SKU {{ record.sku_code}}?')">Delete</a>'''
-editlinksku = '<a href="/parcelhubPOS/sku/editsku?skucode={{record.sku_code}}">Edit</a>'
+deletelinksku = '''{% if isedit %}
+                    <a href="/parcelhubPOS/sku/deletesku?dskucode={{record.sku_code}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete SKU {{ record.sku_code}}?')">Delete</a>
+                    {% else%}
+                    <span title="Unauthorized action">Delete</span>
+                    {% endif %}'''
+editlinksku = '''{% if isedit %}<a href="/parcelhubPOS/sku/editsku?skucode={{record.sku_code}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class SKUTable(tables.Table):
     edit = tables.TemplateColumn(editlinksku,
                                 orderable = False)
@@ -31,13 +41,18 @@ class SKUTable(tables.Table):
         attrs = {'class': 'paleblue'
                  }
         sequence = ('sku_code', 'description', 'couriervendor', 'product_type', 'zone_type',
-                       'zone', 'weight_start', 'weight_end', 'tax_code', 'corporate_price',
-                       'walkin_special_price', 'walkin_price','edit', 'delete')
+                       'zone', 'weight_start', 'weight_end', 'tax_code', 'is_gst_inclusive', 'corporate_price',
+                       'walkin_special_price', 'walkin_price','updatetimestamp','edit', 'delete')
         exclude = {'id'}
         empty_text = "There are no SKU matching the search criteria..."
 
-deletelinkbranch = '''<a href="/parcelhubPOS/branch/deletebranch?dbranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete branch {{ record.name }}?')">Delete</a>'''
-editlinkbranch = '<a href="/parcelhubPOS/branch/editbranch?ebranchid={{record.id}}">Edit</a>'
+deletelinkbranch = '''{% if isedit %}<a href="/parcelhubPOS/branch/deletebranch?dbranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete branch {{ record.name }}?')">Delete</a>
+                    {% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkbranch = '''{% if isedit %}<a href="/parcelhubPOS/branch/editbranch?ebranchid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class BranchTable(tables.Table):
     edit = tables.TemplateColumn(editlinkbranch,
                                       orderable=False)
@@ -50,9 +65,15 @@ class BranchTable(tables.Table):
         sequence = ('name', 'owner', 'contact', 'email', 'address', 'registrationno', 'gstno','edit', 'delete')
         exclude = {'id', 'fax', 'tollfree', 'payment_bank', 'payment_acc', 'website'}
             
-deletelinkuser = '''<a href="/parcelhubPOS/user/deleteuser?duser_id={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user {{ user.username}}?')">Delete</a>'''
-editlinkuser = '<a href="/parcelhubPOS/user/edituser/?user_id={{record.id}}">Edit</a>'
-editbranchaccesslinkuser = '<a href="/parcelhubPOS/user/userbranchaccess?user_id={{record.id}}">Grant access</a>'
+deletelinkuser = '''{% if isedit %}<a href="/parcelhubPOS/user/deleteuser?duser_id={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user {{ user.username}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkuser = '''{% if isedit %}<a href="/parcelhubPOS/user/edituser/?user_id={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
+editbranchaccesslinkuser = '''{% if isedit %}<a href="/parcelhubPOS/user/userbranchaccess?user_id={{record.id}}">Grant access</a>{% else%}
+                    <span title="Unauthorized action">Grant access</span>
+                    {% endif %}'''
 class UserTable(tables.Table):
     edit = tables.TemplateColumn(editlinkuser,
                                     orderable = False)
@@ -68,8 +89,12 @@ class UserTable(tables.Table):
         sequence = ('username', 'first_name', 'last_name', 'email', 'contact' ,'last_login', 'date_joined','edit', 'grant_access','delete')
         empty_text = "There are no User matching the search criteria..."
         
-edituserbranchaccess = '''<a href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id={{record.id }}_{{ record.user.id }}">Edit</a>'''
-deleteuserbranchaccess = '''<a href="/parcelhubPOS/user/userbranchaccess/deleteuba?duserbranch_id={{record.id}}_{{ record.user.id }}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user access for {{ record.branch }}?')">Delete</a>'''
+edituserbranchaccess = '''{% if isedit %}<a href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id={{record.id }}_{{ record.user.id }}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
+deleteuserbranchaccess = '''{% if isedit %}<a href="/parcelhubPOS/user/userbranchaccess/deleteuba?duserbranch_id={{record.id}}_{{ record.user.id }}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user access for {{ record.branch }}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
 class UserBranchAccessTable(tables.Table):
     edit = tables.TemplateColumn(edituserbranchaccess,
                                orderable = False)
@@ -87,8 +112,12 @@ class UserBranchAccessTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no assigned access to user"
         
-deletelinkvendor = '''<a href="/parcelhubPOS/vendor/deletevendor?dvendorid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete vendor {{ record.name }}?')">Delete</a>'''
-editlinkvendor = '<a href="/parcelhubPOS/vendor/editvendor?vendorid={{record.id}}">Edit</a>'
+deletelinkvendor = '''{% if isedit %}<a href="/parcelhubPOS/vendor/deletevendor?dvendorid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete vendor {{ record.name }}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkvendor = '''{% if isedit %}<a href="/parcelhubPOS/vendor/editvendor?vendorid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class VendorTable(tables.Table):
     edit = tables.TemplateColumn(editlinkvendor,
                                       orderable = False)
@@ -102,8 +131,12 @@ class VendorTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Vendor matching the search criteria..."
         
-deletelinktax = '''<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete tax {{record.tax_code}}?')">Delete</a>'''
-editlinktax = '<a href="/parcelhubPOS/tax/edittax?taxid={{record.id}}">Edit</a>'
+deletelinktax = '''{% if isedit %}<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete tax {{record.tax_code}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinktax = '''{% if isedit %}<a href="/parcelhubPOS/tax/edittax?taxid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class TaxTable(tables.Table):
     edit = tables.TemplateColumn(editlinktax,
                                       orderable = False)
@@ -117,8 +150,12 @@ class TaxTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Tax matching the search criteria..."
         
-deletelinkzonedomestic = '''<a href="/parcelhubPOS/zonedomestic/deletezonedomestic?dzonedomesticid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete domestic zone for state {{ record.state }} from {{ record.postcode_start}} to {{ record.postcode_end}}?')">Delete</a>'''
-editlinkzonedomestic = '<a href="/parcelhubPOS/zonedomestic/editzonedomestic?zonedomesticid={{record.id}}">Edit</a>'
+deletelinkzonedomestic = '''{% if isedit %}<a href="/parcelhubPOS/zonedomestic/deletezonedomestic?dzonedomesticid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete domestic zone for state {{ record.state }} from {{ record.postcode_start}} to {{ record.postcode_end}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkzonedomestic = '''{% if isedit %}<a href="/parcelhubPOS/zonedomestic/editzonedomestic?zonedomesticid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class ZoneDomesticTable(tables.Table):
     edit = tables.TemplateColumn(editlinkzonedomestic,
                                       orderable = False)
@@ -132,8 +169,12 @@ class ZoneDomesticTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Zone matching the search criteria..."
 
-deletelinkzoneinternational = '''<a href="/parcelhubPOS/zoneinternational/deletezoneinternational?dzoneinternationalid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete international zone for {{record.couriervendor}} at {{record.country}}?')">Delete</a>'''
-editlinkzoneinternational = '<a href="/parcelhubPOS/zoneinternational/editzoneinternational?zoneinternationalid={{record.id}}">Edit</a>'
+deletelinkzoneinternational = '''{% if isedit %}<a href="/parcelhubPOS/zoneinternational/deletezoneinternational?dzoneinternationalid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete international zone for {{record.couriervendor}} at {{record.country}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkzoneinternational = '''{% if isedit %}<a href="/parcelhubPOS/zoneinternational/editzoneinternational?zoneinternationalid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class ZoneInternationalTable(tables.Table):
     edit = tables.TemplateColumn(editlinkzoneinternational,
                                       orderable = False)
@@ -147,8 +188,12 @@ class ZoneInternationalTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Zone matching the search criteria..."
         
-deletelinkskubranch = '''<a href="/parcelhubPOS/skubranch/deleteskubranch?dskubranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete SKU pricing for {{ record.sku}}?')">Delete</a>'''
-editlinkskubranch = '<a href="/parcelhubPOS/skubranch/editskubranch?skubranchid={{record.id}}">Edit</a>'
+deletelinkskubranch = '''{% if isedit %}<a href="/parcelhubPOS/skubranch/deleteskubranch?dskubranchid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete SKU pricing for {{ record.sku}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkskubranch = '''{% if isedit %}<a href="/parcelhubPOS/skubranch/editskubranch?skubranchid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class SKUBranchTable(tables.Table):
     edit = tables.TemplateColumn(editlinkskubranch,
                                            orderable = False)
@@ -159,6 +204,7 @@ class SKUBranchTable(tables.Table):
     zone = tables.Column(accessor='sku.zone')
     weight_start = tables.Column(accessor='sku.weight_start')
     weight_end = tables.Column(accessor='sku.weight_end')
+    GST_inclusive = tables.Column(accessor='sku.is_gst_inclusive')
     master_last_update = tables.Column(accessor='sku.updatetimestamp')
     delete = tables.TemplateColumn( deletelinkskubranch,
                                     orderable = False );
@@ -166,20 +212,24 @@ class SKUBranchTable(tables.Table):
         model = SKUBranch
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('sku', 'branch', 'customer', 'vendor', 'zone', 'weight_start', 'weight_end',
+        sequence = ('sku', 'branch', 'customer', 'vendor', 'zone', 'weight_start', 'weight_end', 'GST_inclusive',
                     'walkin_price', 'walkin_override','walkin_special_price', 'walkin_special_override', 'corporate_price', 'corporate_override',
                     'master_last_update','updatetimestamp','edit','delete')
         exclude = {'id', 'iswalkinspecial_override', 'iscorporate_override', 'iswalkin_override'}
         empty_text = "There are no SKU matching the search criteria..."
 
-deletelinkcustomer = '''<a href="/parcelhubPOS/customer/deletecustomer?dcustomerid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete customer {{record.name}}?')">Delete</a>'''
-editlinkcustomer = '<a href="/parcelhubPOS/customer/editcustomer?customerid={{record.id}}">Edit</a>'
+deletelinkcustomer = '''{% if isedit %}<a href="/parcelhubPOS/customer/deletecustomer?dcustomerid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete customer {{record.name}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkcustomer = '''{% if isedit %}<a href="/parcelhubPOS/customer/editcustomer?customerid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 customertypeimg = '''{% if record.customertype.iscorporate %}
-                        <img src="/parcelhubPOS/static/img/company.png" alt="company" title="company" width="20" height="20"/>
+                        <img src="/static/img/company.png" alt="company" title="company" width="20" height="20"/>
                     {% elif  record.customertype.iswalkinspecial %}
-                        <img src="/parcelhubPOS/static/img/individual_special.png" alt="individual special" title="individual special" width="20" height="20"/>
+                        <img src="/static/img/individual_special.png" alt="individual special" title="individual special" width="20" height="20"/>
                     {% else %}
-                        <img src="/parcelhubPOS/static/img/individual.png" alt="individual" title="individual" width="20" height="20"/>
+                        <img src="/static/img/individual.png" alt="individual" title="individual" width="20" height="20"/>
                     {% endif %}'''
 class CustomerTable(tables.Table):
     edit = tables.TemplateColumn(editlinkcustomer,
@@ -194,11 +244,15 @@ class CustomerTable(tables.Table):
         attrs = {'class': 'paleblue'
                  }
         sequence = ('type', 'name', 'contact','email', 'fax', 'identificationno', "addressline1","addressline2", "addressline3","addressline4",'edit', 'delete')
-        exclude = {'id', 'customertype',}
+        exclude = {'id', 'customertype', 'branch'}
         empty_text = "There are no Customer matching the search criteria..."
 
-deletelinkpayment = '''<a href="/parcelhubPOS/payment/deletepayment?dpaymentid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete payment for {{record.customer}}?')">Delete</a>'''
-editlinkpayment = '<a href="/parcelhubPOS/payment/editpayment?paymentid={{record.id}}">Edit</a>'
+deletelinkpayment = '''{% if isedit %}<a href="/parcelhubPOS/payment/deletepayment?dpaymentid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete payment for {{record.customer}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
+editlinkpayment = '''{% if isedit %}<a href="/parcelhubPOS/payment/editpayment?paymentid={{record.id}}">Edit</a>{% else%}
+                    <span title="Unauthorized action">Edit</span>
+                    {% endif %}'''
 class PaymentTable(tables.Table):
     edit = tables.TemplateColumn(editlinkpayment,
                                       orderable = False)
@@ -212,7 +266,9 @@ class PaymentTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no Payment matching the search criteria..."
         
-deletelinksoa = '''<a href="/parcelhubPOS/statementofaccount/deletesoa?dsoaid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete statement of account for {{record.customer}} from {{ record.datefrom}} to {{record.dateto}}?')">Delete</a>'''
+deletelinksoa = '''{% if isedit %}<a href="/parcelhubPOS/statementofaccount/deletesoa?dsoaid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete statement of account for {{record.customer}} from {{ record.datefrom}} to {{record.dateto}}?')">Delete</a>{% else%}
+                        <span title="Unauthorized action">Delete</span>
+                        {% endif %}'''
 viewlinksoa = '<a href="/parcelhubPOS/statementofaccount/viewsoa?soaid={{record.id}}">View</a>'
 class StatementOfAccountTable(tables.Table):
     view = tables.TemplateColumn(viewlinksoa,

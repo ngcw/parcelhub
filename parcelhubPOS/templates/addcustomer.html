@@ -1,0 +1,35 @@
+<!doctype html>
+
+{% load static %}
+<html>
+	<head>
+    	<meta charset="utf-8">
+        <title>ParcelHub Invoicing</title>
+		<link rel="stylesheet" type="text/css" href="{% static 'addcustomer.css' %}"/>
+    </head>
+
+    <body>
+	<div class = "container">
+		<h2>New customer</h2>
+		<form method = 'POST' action= '' enctype = "multipart/form-data" novalidate id = "customer-form">{% csrf_token %}
+			<table class="inputtable">
+			{{ form }}
+	
+		    </table>
+			<input type="submit" value = "Submit" onClick="return enableBranch()"/>
+		</form>
+	</div>
+	<script>
+	window.onload = function () {
+	    document.getElementById('id_branch').disabled=true;
+	}
+	function enableBranch(win, newID, newRepr, id) {
+		
+		document.getElementById('id_branch').disabled=false;
+		return true;
+	}
+	</script>
+		
+	</body>
+</html>
+

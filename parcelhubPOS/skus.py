@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import SKUTable
 from .commons import *
-from .models import SKU, ZoneType, ProductType
+from .models import SKU, ZoneType, ProductType, UserBranchAccess
 from .forms import SKUForm
 from django.http import HttpResponseRedirect
 CONST_branchid = 'branchid'
@@ -15,6 +15,8 @@ def SKUlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     menubar = navbar(request)
+    branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     sku_list = SKU.objects.all()
     zonetype_list = ZoneType.objects.all()
     producttype_list = ProductType.objects.all()
@@ -63,7 +65,9 @@ def SKUlist(request):
                 'zonetype_list' :zonetype_list,
                 'producttype_list' : producttype_list,
                 'formdata': formdata,
-                'title': "SKU"
+                'title': "SKU",
+                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'sku.html', context)
 
@@ -86,8 +90,13 @@ def editSKU(request, skucode):
     if request.method == "POST":
         formset = SKUForm(request.POST, instance=skuqueryset)
         if formset.is_valid():
+            sku_code = request.POST['sku_code'] 
+            if title == 'New SKU':
+                msg = 'SKU "%s" have been created successfully.' % sku_code
+            else:
+                msg = 'SKU "%s" have been updated successfully.' % sku_code
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/sku")
+            return HttpResponseRedirect("/parcelhubPOS/sku/?msg=%s" % msg)
     else:
         formset = SKUForm(instance=skuqueryset)
     
@@ -105,7 +114,8 @@ def editSKU(request, skucode):
 def deleteSKU(request, dskucode ):
     dskucode = request.GET.get('dskucode')
     sku = SKU.objects.filter(sku_code = dskucode )
+    msg = 'SKU "%s" have been deleted successfully.' % sku.first().sku_code
     if sku:
         sku.delete()
-    return SKUlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/sku/?msg=%s" % msg)
 

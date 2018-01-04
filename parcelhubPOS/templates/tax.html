@@ -7,10 +7,21 @@
 		<div>Tax code:<input type="text" name="taxcode" maxlength ="50" value="{{ formdata.taxcode }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
+    {% if isedit %}
+    <form action="/parcelhubPOS/tax/edittax/?taxid=">
+    	<input type="submit" value="Add" />
+	</form>
+	{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	{% render_table tax %}
+	{% if isedit %}
 	<form action="/parcelhubPOS/tax/edittax/?taxid=">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

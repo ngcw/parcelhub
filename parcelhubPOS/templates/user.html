@@ -10,10 +10,21 @@
 		<div class="searchinput">Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
+    {% if isedit %}
+    <form action="/parcelhubPOS/user/adduser">
+    	<input type="submit" value="Add" />
+	</form>
+	{% endif %}
+	{% if statusmsg %}
+	<div class="statusspacing"></div>
+   	<div class="statusmsg">{{ statusmsg }}</div>
+    {% endif %}
 	{% render_table userlist %}
+	{% if isedit %}
 	<form action="/parcelhubPOS/user/adduser">
     	<input type="submit" value="Add" />
 	</form>
+	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

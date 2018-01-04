@@ -2,10 +2,10 @@ from django.forms import ModelForm, Textarea
 from django.contrib.auth.models import User
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
-from .models import SKU, Invoice, InvoiceItem, Payment, PaymentInvoice, Customer, Branch
+from .models import SKU, Invoice, InvoiceItem, Payment, PaymentInvoice, Customer, Branch, GlobalParameter
 from django.db.models import Q
 from django.forms.models import BaseModelFormSet
-        
+
 class UserCreateForm(UserCreationForm):
     class Meta:
         model = User
@@ -23,7 +23,7 @@ class SKUForm(forms.ModelForm):
     class Meta:
         model = SKU
         fields = ('sku_code', 'description', 'couriervendor', 'product_type', 'zone_type',
-                  'zone', 'weight_start', 'weight_end', 'tax_code', 'corporate_price',
+                  'zone', 'weight_start', 'weight_end', 'tax_code', 'is_gst_inclusive','corporate_price',
                   'walkin_special_price', 'walkin_price')
     def __init__(self, *args, **kwargs):
         super(SKUForm, self).__init__(*args, **kwargs)
@@ -70,7 +70,14 @@ class BranchForm(forms.ModelForm):
         }
 class DateInput(forms.DateInput):
     input_type = 'date'
-      
+
+class GlobalParameterForm(forms.ModelForm):
+    class Meta:
+        model = GlobalParameter
+        fields = ( "invoice_lockin_date",)
+        widgets = {
+            "invoice_lockin_date": DateInput(),
+        }    
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
@@ -189,7 +196,7 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['skudescription'].widget.attrs\
             .update({
                 'readOnly': 'True',
-                'class': 'lastInput'
+                'class': 'lastInput skudescription'
             })
 class PaymentForm(forms.ModelForm):
     class Meta:
@@ -207,3 +214,14 @@ class PaymentInvoiceForm(forms.ModelForm):
         model = PaymentInvoice
         fields = ('paidamount',)
         exclude = ('previousamount',)
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ('branch', 'name', 'contact', 'email', 'fax', 'customertype', 'identificationno', 'addressline1', 'addressline2', 'addressline3', 'addressline4',)
+        exclude = ('id',)
+    def __init__(self, *args, **kwargs):
+        super(CustomerForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['branch'].widget.attrs['readonly'] = True

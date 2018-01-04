@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import ZoneDomesticTable, ZoneInternationalTable
 from .commons import *
-from .models import ZoneDomestic, ZoneInternational
+from .models import ZoneDomestic, ZoneInternational, UserBranchAccess, CourierVendor
 from django.http import HttpResponseRedirect
 CONST_branchid = 'branchid'
 #method to retrieve Courier zonedomestic list
@@ -14,6 +14,8 @@ def zonedomesticlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     menubar = navbar(request)
+    branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     zonedomestic_list = ZoneDomestic.objects.all()
     formdata = {'state':'',
                 'postcode':'',
@@ -43,7 +45,9 @@ def zonedomesticlist(request):
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
-                'title': 'Domestic zone'
+                'title': 'Domestic zone',
+                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'zonedomestic.html', context)
 
@@ -63,8 +67,13 @@ def editzonedomestic(request, zonedomesticid):
         formset = ZoneDomesticFormSet(request.POST, request.FILES,
                              queryset=zonedomesticqueryset)
         if formset.is_valid():
+            zone_state = request.POST['form-0-state'] 
+            if title == 'New domestic zone':
+                msg = 'Zone "%s" have been created successfully.' % zone_state
+            else:
+                msg = 'Zone "%s" have been updated successfully.' % zone_state
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/zonedomestic")
+            return HttpResponseRedirect("/parcelhubPOS/zonedomestic/?msg=%s" % msg)
     else:
         formset = ZoneDomesticFormSet(queryset=zonedomesticqueryset)
     
@@ -82,15 +91,18 @@ def editzonedomestic(request, zonedomesticid):
 def deletezonedomestic(request, dzonedomesticid ):
     dzonedomesticid = request.GET.get('dzonedomesticid')
     zonedomestic = ZoneDomestic.objects.filter(id = dzonedomesticid )
+    msg = 'Zone "%s" have been deleted successfully.' % zonedomestic.first().state
     if zonedomestic:
         zonedomestic.delete()
-    return zonedomesticlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/zonedomestic/?msg=%s" % msg)
 
 @login_required
 def zoneinternationallist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     menubar = navbar(request)
+    branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     zoneinternational_list = ZoneInternational.objects.all()
     formdata = {'country':'',
                 'zonedoc':'',
@@ -125,7 +137,9 @@ def zoneinternationallist(request):
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
-                'title': "International zone"
+                'title': "International zone",
+                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'zoneinternational.html', context)
 
@@ -145,8 +159,14 @@ def editzoneinternational(request, zoneinternationalid):
         formset = ZoneInternationalFormSet(request.POST, request.FILES,
                              queryset=zoneinternationalqueryset)
         if formset.is_valid():
+            vendorid = request.POST['form-0-couriervendor'] 
+            courier = CourierVendor.objects.get(id=vendorid)
+            if title == 'New international zone':
+                msg = 'Zone for courier "%s" and country "%s" have been created successfully.' % (courier.name, request.POST['form-0-country'] )
+            else:
+                msg = 'Zone for courier "%s" and country "%s" have been updated successfully.' % (courier.name, request.POST['form-0-country'] )
             formset.save()
-            return HttpResponseRedirect("/parcelhubPOS/zoneinternational")
+            return HttpResponseRedirect("/parcelhubPOS/zoneinternational/?msg=%s" % msg)
     else:
         formset = ZoneInternationalFormSet(queryset=zoneinternationalqueryset)
     
@@ -164,6 +184,7 @@ def editzoneinternational(request, zoneinternationalid):
 def deletezoneinternational(request, dzoneinternationalid ):
     dzoneinternationalid = request.GET.get('dzoneinternationalid')
     zoneinternational = ZoneInternational.objects.filter(id = dzoneinternationalid )
+    msg = 'Zone for courier "%s" and country "%s" have been deleted successfully.' % (zoneinternational.first().couriervendor.name, zoneinternational.first().country )
     if zoneinternational:
         zoneinternational.delete()
-    return zoneinternationallist(request)
+    return HttpResponseRedirect("/parcelhubPOS/zoneinternational/?msg=%s" % msg)

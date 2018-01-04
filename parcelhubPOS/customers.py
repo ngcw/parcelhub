@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from .tables import CustomerTable
 from .commons import *
-from .models import Customer
+from .models import Customer, UserBranchAccess
 
 
 CONST_branchid = 'branchid'
@@ -17,6 +17,7 @@ def customerlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
+    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     customer_list = Customer.objects.filter(branch__id=branchid)
     formdata = {'name':'',
                 'contact':'',
@@ -50,7 +51,9 @@ def customerlist(request):
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
-                'title' : 'Customer'
+                'title' : 'Customer',
+                'isedit' : branchaccess.custacc_auth == 'edit',
+                'statusmsg' : request.GET.get('msg'),
             }
     return render(request, 'customer.html', context)
 
@@ -73,9 +76,14 @@ def editcustomer(request, customerid):
                                    queryset=customerqueryset,
                                    initial=[{'branch': branchid}])
         if formset.is_valid():
+            customername = request.POST['form-0-name'] 
+            if title == 'New customer':
+                msg = 'Customer "%s" have been created successfully.' % customername
+            else:
+                msg = 'Customer "%s" have been updated successfully.' % customername
             formset.save()
 
-            return HttpResponseRedirect("/parcelhubPOS/customer")#customerlist(request)
+            return HttpResponseRedirect("/parcelhubPOS/customer/?msg=%s" % msg)#customerlist(request)
     else:
         formset = CustomerFormSet(queryset=customerqueryset,
                                    initial=[{'branch': branchid}])
@@ -86,6 +94,7 @@ def editcustomer(request, customerid):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
+                'iscustomer' : True,
                 }
     return render(request, 'editcustomer.html', context)
 
@@ -93,6 +102,7 @@ def editcustomer(request, customerid):
 def deletecustomer(request, dcustomerid ):
     dcustomerid = request.GET.get('dcustomerid')
     customer = Customer.objects.filter(id = dcustomerid )
+    msg = 'Customer "%s" have been deleted successfully.' % customer.first().name
     if customer:
         customer.delete()
-    return customerlist(request)
+    return HttpResponseRedirect("/parcelhubPOS/customer/?msg=%s" % msg)
