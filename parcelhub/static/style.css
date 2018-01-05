@@ -239,6 +239,7 @@ button, input[type=submit], .link_button
 	display: block;
 	min-width: 1450px;
 	max-width: 1450px;
+	margin-top: 55px;
 }
 
 .item input, .item selection
@@ -249,10 +250,7 @@ button, input[type=submit], .link_button
 {
 	width: 150px !important;
 }
-.itemform_container
-{
-	height: 10px;
-}
+
 .counter_label, .counter_input
 {
 	float: left;
@@ -324,12 +322,29 @@ button, input[type=submit], .link_button
 	z-index:1;
 	margin-top:-20px;
 }
+.invoice_fix_item
+{
+	display: block;
+	position: fixed;
+	background-color: #c0c0c0;
+	width: 100%;
+}
+
 #invoiceitemheader
 {
 	display: block;
 	clear: both;
 	position: relative;
 	padding-top:250px;
+}
+.itemform_container
+{
+	height: 20px;
+	margin-top: -20px;
+}
+.itemcontainer
+{
+	margin-top: 35px;
 }
 #invoicesubmit
 {
@@ -409,3 +424,4 @@ button, input[type=submit], .link_button
 {
 	vertical-align: bottom
 }
+

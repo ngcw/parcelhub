@@ -85,12 +85,13 @@
 	    
     <div id="invoiceitemheader">
 	    
-		    <h2>Invoice Items</h2>
+		    <h2 class="invoice_fix_item">Invoice Items</h2>
+		    
 		    {{ invoice_item_formset.management_form }}
-		    <div class ="invoiceitem_container">
+		    <div class ="invoiceitem_container" >
 		    {% for form in invoice_item_formset.forms %}
 	            {% if forloop.first %}
-	            	<div class="itemform_container">
+	            	<div class="itemform_container invoice_fix_item">
 	            		<div class="counter_label">Nr.</div>
 	                {% for field in form.visible_fields %}
 						{% if field.label == "Height(mm)" or field.label == "Length(mm)" or field.label == "Width(mm)"%}
@@ -103,28 +104,31 @@
 	                    
 	                {% endfor %}
 	                <div class="itemform_label"></div>
-	                </div>
+	               </div>
 	            {% endif %}
-	            <div class="item">
-	            	<div class="counter_input"><label  class="counter">{{forloop.counter}}</label> </div>
-	            	{% for field in form %}
-						{% if field.label == "Height(mm)"%}
-							<div data-role="popup" class="item_input_dimensional" id={{field.auto_id}}_popup title="Dimensional weight">
-								<label style="margin-right:10px;">Height(mm):</label>{{ field }}
-						{% elif field.label == "Length(mm)"%}
-								<label style="margin-right:7px;">Length(mm):</label>{{ field }}
-						{% elif field.label == "Width(mm)" %}
-								<label style="margin-right:15px;">Width(mm):</label>{{ field }}
-							</div>
-						{% elif field.label == "*Description" %}
-							<div class="item_input_description">{{ field }}</div>
-						{% else %}
-		            		<div class="item_input">{{ field }}</div>
-		            	{% endif %}
-		            		
-		    		{% endfor %}
-		    		<div style="" ><a class="delete" href="#" tabindex="-1"><button>Delete</button></a></div>
-		    	</div>
+	            <div class="itemcontainer">
+	            	<div class="item">
+		            	<div class="counter_input"><label  class="counter">{{forloop.counter}}</label> </div>
+		            	{% for field in form %}
+							{% if field.label == "Height(mm)"%}
+								<div data-role="popup" class="item_input_dimensional" id={{field.auto_id}}_popup title="Dimensional weight">
+									<label style="margin-right:10px;">Height(mm):</label>{{ field }}
+							{% elif field.label == "Length(mm)"%}
+									<label style="margin-right:7px;">Length(mm):</label>{{ field }}
+							{% elif field.label == "Width(mm)" %}
+									<label style="margin-right:15px;">Width(mm):</label>{{ field }}
+								</div>
+							{% elif field.label == "*Description" %}
+								<div class="item_input_description">{{ field }}</div>
+							{% else %}
+			            		<div class="item_input">{{ field }}</div>
+			            	{% endif %}
+			            		
+			    		{% endfor %}
+			    		<div style="" ><a class="delete" href="#" tabindex="-1"><button>Delete</button></a></div>
+		    		</div>
+	            </div>
+	            
 
 		    {% endfor %}
 		    </div>
