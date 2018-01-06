@@ -317,7 +317,7 @@ button, input[type=submit], .link_button
 	clear: both;
 	position: fixed;
 	min-width: 1450px;
-	height: 280px;
+	height: 290px;
 	background-color: #c0c0c0;
 	z-index:1;
 	margin-top:-20px;
@@ -335,7 +335,7 @@ button, input[type=submit], .link_button
 	display: block;
 	clear: both;
 	position: relative;
-	padding-top:250px;
+	padding-top:260px;
 }
 .itemform_container
 {
