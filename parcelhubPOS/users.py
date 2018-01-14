@@ -158,9 +158,8 @@ def adduser(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            name = request.POST['form-0-username'] 
+            name = request.POST['username'] 
             msg = 'User "%s" have been created successfully.' % name
-            formset.save()
             return HttpResponseRedirect("/parcelhubPOS/user/?msg=%s" % msg)
         else:
             messages.error(request, 'Please correct the error below.')
@@ -181,7 +180,7 @@ def adduser(request):
 def deleteuser(request, duser_id ):
     duser_id = request.GET.get('duser_id')
     user = User.objects.filter(id = duser_id )
-    msg = 'User "%s" have been deleted successfully.' % user.first().name
+    msg = 'User "%s" have been deleted successfully.' % ( user.first().first_name + ' ' + user.first().last_name )
     if user:
         user.delete()
     return HttpResponseRedirect("/parcelhubPOS/user/?msg=%s" % msg)
