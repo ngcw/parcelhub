@@ -8,6 +8,7 @@ from .commons import *
 from .models import SKU, ZoneType, ProductType, UserBranchAccess
 from .forms import SKUForm
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 CONST_branchid = 'branchid'
 #method to retrieve SKU list
 @login_required
@@ -56,7 +57,14 @@ def SKUlist(request):
     final_SKU_table = SKUTable(sku_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_SKU_table)
-    
+    loguser = User.objects.get(id=request.session.get('userid'))
+    issearchempty = True
+    searchmsg = 'There no SKU matching the search criteria...'
+    try:
+        if sku_list or (not submitted_skucode and not submitted_producttype and not submitted_courier and not submitted_weight and not submitted_zonetype and not submitted_zone):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'sku': final_SKU_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -66,8 +74,12 @@ def SKUlist(request):
                 'producttype_list' : producttype_list,
                 'formdata': formdata,
                 'title': "SKU",
-                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'isedit' : loguser.is_superuser,
+                'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
+                'header': "SKU",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'sku.html', context)
 
@@ -107,6 +119,7 @@ def editSKU(request, skucode):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
+                'header': title
                 }
     return render(request, 'editsku.html', context)
 

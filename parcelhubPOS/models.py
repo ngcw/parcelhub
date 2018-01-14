@@ -8,6 +8,7 @@ class UserExtend(models.Model):
 
 class Branch(models.Model):
     name = models.CharField(max_length=50, verbose_name='*Name' )
+    branch_code = models.CharField(max_length=10, verbose_name='*Branch code' )
     owner = models.CharField(max_length=50, verbose_name='*Owner')
     contact = models.CharField(max_length=25, verbose_name='*Contact')
     email = models.EmailField(max_length=254, verbose_name='*Email')
@@ -28,13 +29,7 @@ class Branch(models.Model):
 class UserBranchAccess(models.Model):
     user = models.ForeignKey(User, blank=False, null=False,on_delete=models.CASCADE, verbose_name='*User')
     branch = models.ForeignKey(Branch, blank=False, null=False, on_delete=models.CASCADE, verbose_name='*Branch')
-    masterdata_auth = models.CharField(max_length=20, verbose_name='Master data')
-    branch_auth = models.CharField(max_length=20, verbose_name='Branch')
-    user_auth = models.CharField(max_length=20, verbose_name='User')
-    skupricing_auth = models.CharField(max_length=20, verbose_name='SKU price' )
-    transaction_auth = models.CharField(max_length=20, verbose_name='Invoice')
-    custacc_auth = models.CharField(max_length=20, verbose_name='Cust acc')
-    report_auth = models.CharField(max_length=20, verbose_name='Report',)
+    access_level = models.CharField(max_length=20, verbose_name='*Access level')
 
 class ZoneType(models.Model):
     name = models.CharField(max_length=50, primary_key=True, unique=True)  
@@ -181,7 +176,6 @@ class PaymentType(models.Model):
 class Invoice(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     invoiceno = models.CharField(max_length=25, verbose_name='Invoice No.')
-    invoice_date = models.DateField(blank=True, null=True, verbose_name='*Invoice date')
     invoicetype =models.ForeignKey(InvoiceType, verbose_name='*Type')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
     remarks = models.CharField(max_length=254,blank=True, null=True)
@@ -192,7 +186,7 @@ class Invoice(models.Model):
     total = models.DecimalField(max_digits=30, decimal_places=2)
     payment = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
     payment_type = models.ForeignKey(PaymentType)
-    createtimestamp = models.DateTimeField(default=timezone.now, verbose_name='Created datetime')
+    createtimestamp = models.DateTimeField(default=timezone.now, verbose_name='*Invoice datetime', blank=True, null=True)
     updatetimestamp = models.DateTimeField(blank=True, null=True, verbose_name='Update datetime')
     created_by = models.ForeignKey(User)
     def __str__(self):
@@ -210,9 +204,9 @@ class InvoiceItem(models.Model):
     zone = models.CharField(max_length=100, verbose_name='Zone',blank=True, null=True)
     weight = models.DecimalField(max_digits=25, decimal_places=3, verbose_name='Weight(kg)',blank=True, null=True)
     dimension_weight = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True,  verbose_name='Dim wt(kg)')
-    height = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Height(mm)')
-    length = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Length(mm)')
-    width = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Width(mm)')
+    height = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Height(cm)')
+    length = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Length(cm)')
+    width = models.DecimalField(max_digits=25, decimal_places=3,blank=True, null=True, verbose_name='Width(cm)')
     sku = models.CharField(max_length=100, verbose_name='*SKU')
     gst = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='GST')
     price = models.DecimalField(max_digits=30, decimal_places=2)
@@ -222,14 +216,12 @@ class Payment(models.Model):
     total = models.DecimalField(max_digits=30, decimal_places=3,blank=True, null=True)
     payment_paymenttype = models.ForeignKey(PaymentType,blank=True, null=True, verbose_name="Payment method")
     createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
-    updatetimestamp = models.DateTimeField('update timestamp',blank=True, null=True)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(User,blank=True, null=True)
 
 class PaymentInvoice(models.Model):
     payment = models.ForeignKey(Payment, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     remainder = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Remainder',blank=True, null=True)
-    prevamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Previous amount',blank=True, null=True)
     paidamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Paid amount',blank=True, null=True)
     
 class VendorReport(models.Model):

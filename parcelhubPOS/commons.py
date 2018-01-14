@@ -6,19 +6,16 @@ from django.contrib.auth import login
 CONST_branchid = 'branchid'
 CONST_username = 'Username'
 CONST_invoice = '1Invoice'
-CONST_masterdata = '3Master Data'
 CONST_custacc = '2Customer Account'
-CONST_report = '4Report'
-CONST_system = '5System'
-
+CONST_payment = '3Payment'
+CONST_soa = '4StatementOfAccount'
+CONST_masterdata = '5Information'
+CONST_system = '6System'
 def userselection(request):
     sessiondict = []
     if 'loggedusers' in request.session:
         sessiondict = request.session['loggedusers']
-    try:
-        selectedbranch = request.session[CONST_branchid]
-    except:
-        selectedbranch = ''
+
     if request.method == "POST":
         selecteduser = request.POST.get('userselection') 
         if selecteduser:
@@ -29,28 +26,29 @@ def userselection(request):
                 name = "%s %s"%(loguser.last_name, loguser.first_name )
                 request.session[CONST_username] = name
                 request.session['loggedusers'] = sessiondict
-                
-        selectedbranch = request.POST.get('branchselection') 
-    request.session[CONST_branchid] = selectedbranch
+                request.session['issuperuser'] = loguser.is_superuser
     allloggedusers = User.objects.filter(id__in=request.session['loggedusers'])
     return allloggedusers
 
 def branchselection(request):
     loguser = User.objects.get(id=request.session.get('userid'))
-    allbranchaccess = UserBranchAccess.objects.filter(user=loguser)
+    if loguser.is_superuser:
+        branches = Branch.objects.all()
+    else:
+        allbranchaccess = UserBranchAccess.objects.filter(user=loguser)
+        branchidlist = allbranchaccess.values_list('branch_id', flat=True)
+        branches = Branch.objects.filter(id__in=branchidlist)
     selectedbranch = request.session.get(CONST_branchid)
-    if not selectedbranch :
-        branchaccess = allbranchaccess.first()
+    if not selectedbranch:
+        branchaccess = branches.first()
         if branchaccess:
-            branchid = branchaccess.branch.id 
+            branchid = branchaccess.id 
             request.session[CONST_branchid] = branchid 
-    if request.method == "POST":
+    if request.method == "POST" and 'branchselection' in request.POST:
         selectedbranch = request.POST.get('branchselection') 
         if selectedbranch:
             request.session[CONST_branchid] = selectedbranch
-    
-    
-    return allbranchaccess
+    return branches
     
 
 def navbar(request):
@@ -60,34 +58,35 @@ def navbar(request):
     branchaccess = UserBranchAccess.objects.filter(user=loguser, branch=sel_branch).first()
     menudict = {}
     if loguser.is_superuser or branchaccess:
-        if loguser.is_superuser or branchaccess.transaction_auth != 'n/a' :
+        #Everyone access feature
+        if branchid == '-1':
             menudict[CONST_invoice] =[('Invoice list','/parcelhubPOS/invoice')]
-            if loguser.is_superuser or branchaccess.transaction_auth == 'edit':
-                menudict[CONST_invoice].append(('New invoice','/parcelhubPOS/invoice/editinvoice/?invoiceid='))
+        else:
+            menudict[CONST_invoice] =[('New invoice (F9)','/parcelhubPOS/invoice/editinvoice/?invoiceid='),('Invoice list','/parcelhubPOS/invoice')]
+        menudict[CONST_custacc] =[('Customer account','/parcelhubPOS/customer'),
+                                      ] 
+        menudict[CONST_payment] =[('Payment overview','/parcelhubPOS/payment/?custid=""'),
+                                    ('Payment receive','/parcelhubPOS/makepayment'),
+                                      ]   
+        menudict[CONST_soa] =[('Statement of account','/parcelhubPOS/statementofaccount'),
+                                  ('New statement of account','/parcelhubPOS/statementofaccount_new'),
+                                      ]   
         menudict[CONST_masterdata] = []
-        if loguser.is_superuser or branchaccess.masterdata_auth != 'n/a':
+        #Super admin and branch admin only feature
+        if loguser.is_superuser or branchaccess.access_level == 'Branch admin':
             menudict[CONST_masterdata].append(('Vendor','/parcelhubPOS/vendor'))
             menudict[CONST_masterdata].append(('Tax','/parcelhubPOS/tax') )
             menudict[CONST_masterdata].append(('Zone domestic','/parcelhubPOS/zonedomestic') )
             menudict[CONST_masterdata].append(('Zone international','/parcelhubPOS/zoneinternational') )
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
-            menudict[CONST_system] =[('Global parameters','/parcelhubPOS/globalparameter')]
-        if loguser.is_superuser or branchaccess.skupricing_auth != 'n/a':
-            menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))                            
-        if loguser.is_superuser or branchaccess.branch_auth != 'n/a':
+            menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
+            menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))                            
+        #Super admin only feature
+        if loguser.is_superuser:
             menudict[CONST_masterdata].append(('Branch','/parcelhubPOS/branch'))
-        if loguser.is_superuser or branchaccess.user_auth != 'n/a':
-            menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
-        
+            menudict[CONST_system] =[('Global parameters','/parcelhubPOS/globalparameter')]
+            
         if len(menudict[CONST_masterdata]) == 0:
             menudict.pop(CONST_masterdata)
         
-        if loguser.is_superuser or branchaccess.custacc_auth != 'n/a':
-            menudict[CONST_custacc] =[('Customer account','/parcelhubPOS/customer'),
-                                      ('Statement of account','/parcelhubPOS/statementofaccount'),
-                                      ('Payment','/parcelhubPOS/payment/?custid=""')]
-        #if loguser.is_superuser or branchaccess.report_auth != 'n/a':
-        #    menudict[CONST_report] =[('Customer report','/parcelhubPOS/custreport'),
-        #                        ('Vendor report','/parcelhubPOS/vendorreport'),
-        #                        ('Account report','/parcelhubPOS/accreport')]
     return menudict

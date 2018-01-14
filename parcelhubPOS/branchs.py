@@ -9,6 +9,7 @@ from .models import Branch, UserBranchAccess
 from .forms import BranchForm
 from django.db.models import Q
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 CONST_branchid = 'branchid'
 #method to retrieve branch list
 @login_required
@@ -17,17 +18,19 @@ def branchlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branch_list = Branch.objects.all()
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     final_branch_table = BranchTable(branch_list)
     RequestConfig(request, paginate={'per_page': 25}).configure(final_branch_table)
+    loguser = User.objects.get(id=request.session.get('userid'))
     context = {
                 'branch': final_branch_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'title': 'Branch',
-                'isedit' : branchaccess.branch_auth == 'edit',
+                'isedit' : loguser.is_superuser,
+                'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
+                'header': 'Branch',
                 }
     return render(request, 'branch.html', context)
 
@@ -58,13 +61,16 @@ def editbranch(request, ebranchid):
             return HttpResponseRedirect("/parcelhubPOS/branch/?msg=%s" % msg)
     else:
         formset = BranchForm(instance=branchqueryset)
+    
     context = {
                 'formset': formset,
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'title': title
+                'title': title,
+                'header': title,
+                
                 }
     return render(request, 'editbranch.html', context)
 

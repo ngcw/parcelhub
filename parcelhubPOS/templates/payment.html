@@ -13,29 +13,6 @@
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table payment %}
-	{% if isedit %}
-	<form class="searchform" action="/parcelhubPOS/payment/editpayment/?paymentid=">
-		<div>
-		<label for="customerselection">Customer:</label>
-			<select name="customerinput" id="customerselection" >
-				<option value="" ></option>
-				{% for customer in customerlist %}
-					<option value="{{customer.id}}" {% if customer.id == formdata.customerinput %} selected {% endif %}>{{customer.name}}</option>
-				{% endfor %}
-			</select>
-		</div>
-		<div>Date from:<input type="date" name="datefrom" maxlength ="50" /></div>
-		<div>Date to:<input type="date" name="dateto" maxlength ="50" /></div>
-		<div>
-		<label for="paymentoption">Option:</label>
-			<select name="paymentoptioninput" id="paymentoption" >
-				<option value="all" >All</option>
-				<option value="Unpaid" >Unpaid only</option>
-			</select>
-		</div>
-    	<input type="submit" value="Create payment" id="generatestatement"/>
-	</form>
-	{% endif %}
 {% endblock %}
 
 {% include 'footer.html' %}

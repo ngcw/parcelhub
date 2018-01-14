@@ -33,9 +33,11 @@ def statementofacclist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
-    customerlist = Customer.objects.filter(branch__id=branchid)
-    statementofacc_list = StatementOfAccount.objects.filter(customer__branch__id=branchid)
+    loguser = User.objects.get(id=request.session.get('userid'))
+    if branchid == '-1':
+        statementofacc_list = StatementOfAccount.objects.all()
+    else:
+        statementofacc_list = StatementOfAccount.objects.filter(customer__branch__id=branchid)
     formdata = {'customerinput':'',
                 'date': ''
                 }
@@ -51,20 +53,54 @@ def statementofacclist(request):
     final_StatementOfAccount_table = StatementOfAccountTable(statementofacc_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_StatementOfAccount_table)
-    
+    issearchempty = True
+    searchmsg = 'There no statement of account matching the search criteria...'
+    try:
+        if statementofacc_list or (not submitted_customer and not submitted_date):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'statementofacc': final_StatementOfAccount_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
-                'customerlist':customerlist,
                 'title': "Statement of account",
-                'isedit' : branchaccess.custacc_auth == 'edit',
+                'isedit' : True,
+                'issuperuser' : loguser.is_superuser,
+                'isall': branchid != '-1',
                 'statusmsg' : request.GET.get('msg'),
+                'header': "Statement of account",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'statementofaccount.html', context)
 
+@login_required
+def statementofaccnew(request):
+    loggedusers = userselection(request)
+    branchselectlist = branchselection(request)
+    menubar = navbar(request)
+    branchid = request.session.get(CONST_branchid)
+    loguser = User.objects.get(id=request.session.get('userid'))
+    if branchid == '-1':
+        customerlist = Customer.objects.all()
+    else:
+        customerlist = Customer.objects.filter(branch__id=branchid)
+
+    context = {
+                'nav_bar' : sorted(menubar.items()),
+                'branchselection': branchselectlist,
+                'loggedusers' : loggedusers,
+                'customerlist':customerlist,
+                'title': "Generate statement of account",
+                'isedit' : True,
+                'issuperuser' : loguser.is_superuser,
+                'isall': branchid != '-1',
+                'header': "Generate statement of account",
+                }
+    return render(request, 'statementofaccount_new.html', context)
 @login_required
 def viewstatementofacc(request):
     try:
@@ -80,7 +116,7 @@ def viewstatementofacc(request):
         date_to = request.GET.get('dateto')
         statementoption = request.GET.get('soaoptioninput')
         selectedcustomer =  Customer.objects.get(id=customerid)
-        invoicelist = Invoice.objects.filter(customer__id = customerid, invoice_date__gte = date_from, invoice_date__lte=date_to)
+        invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
         if statementoption == 'unpaid':
             invoicelist = invoicelist.filter(payment__gte=models.F('total'))
         
@@ -106,7 +142,8 @@ def viewstatementofacc(request):
         statementofacc.paidamount = paidamt
         statementofacc.outstandindamount = outstandingamt
         statementofacc.save(update_fields=["totalamount", 'paidamount', 'outstandindamount']) 
-    return statementofacc_pdf(request, statementofacc)
+        soa_pdf = statementofacc_pdf(request, statementofacc)
+    return HttpResponse(soa_pdf, content_type='application/pdf')
 
 def statementofacc_pdf(request, statementofacc):
     response = HttpResponse(content_type='application/pdf')
@@ -122,9 +159,17 @@ def statementofacc_pdf(request, statementofacc):
     center = totalwidth / 2.0
     
     customer = statementofacc.customer
-    addresstxt = customer.addressline1 + customer.addressline2 + customer.addressline3 + customer.addressline4
-    addresstokenize = addresstxt.split(',')
-    addressline = len(addresstokenize);
+    addresstokenize = []
+    if customer.addressline1:
+        addresstokenize.append(customer.addressline1)
+    if customer.addressline2:
+        addresstokenize.append(customer.addressline2)
+    if customer.addressline3:
+        addresstokenize.append(customer.addressline3)
+    if customer.addressline4:
+        addresstokenize.append(customer.addressline4)
+    
+    addressline = 4;
     
         
     buffer = BytesIO()
@@ -155,9 +200,9 @@ def statementofacc_pdf(request, statementofacc):
     p.setFont(CONST_font, 12)
     addresslinedrawcount = 0;
     for line in addresstokenize:
-        addresslinedrawcount += 1;
+        addresslinedrawcount = addresslinedrawcount + 1;
         p.drawString(margin, heightcustaddress - ( linecount * addresslinedrawcount ), line.lstrip())
-    heightafteraddress = heightcustaddress - ( linecount * addresslinedrawcount )
+    heightafteraddress = heightcustaddress - ( linecount * addressline )
     contactlineheight = 15;
     p.drawString(margin, heightafteraddress - (contactlineheight * 1), "Tel        " + customer.contact)
     p.drawString(margin, heightafteraddress - (contactlineheight * 2), "Fax        " + customer.fax)
@@ -337,45 +382,43 @@ def statementofacc_pdf(request, statementofacc):
     p.rect(boxmargin + (boxwidth * 4 ) ,boxytop, boxwidth, 15, stroke=True, fill=False) 
     p.rect(boxmargin + (boxwidth * 5 ) ,boxytop, boxwidth, 15, stroke=True, fill=False) 
     
-    currentmonthitem = soaitem.filter(invoice__invoice_date__month = statementofacc.get_month(),
-                                      invoice__invoice_date__year = statementofacc.get_year())
+    currentmonthitem = soaitem.filter(invoice__createtimestamp__month = statementofacc.get_month(),
+                                      invoice__createtimestamp__year = statementofacc.get_year())
     currentmonthbalance = calculate_soabalance(currentmonthitem)
     p.drawRightString( boxmargin + (boxwidth * 1 ) - 2, boxytop + 3, str(round(currentmonthbalance, 2)))
     
     month1 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 1)
-    month1item = soaitem.filter(invoice__invoice_date__month = month1[0],
-                                invoice__invoice_date__year =  month1[1])
+    month1item = soaitem.filter(invoice__createtimestamp__month = month1[0],
+                                invoice__createtimestamp__year =  month1[1])
     month1balance = calculate_soabalance(month1item)
     p.drawRightString( boxmargin + (boxwidth * 2 ) - 2, boxytop + 3, str(round(month1balance, 2)))
     
     month2 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 2)
-    month2item = soaitem.filter(invoice__invoice_date__month = month2[0],
-                                invoice__invoice_date__year =  month2[1])
+    month2item = soaitem.filter(invoice__createtimestamp__month = month2[0],
+                                invoice__createtimestamp__year =  month2[1])
     month2balance = calculate_soabalance(month2item)
     p.drawRightString( boxmargin + (boxwidth * 3 ) - 2, boxytop + 3, str(round(month2balance, 2)))
     
     month3 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 3)
-    month3item = soaitem.filter(invoice__invoice_date__month = month3[0],
-                                invoice__invoice_date__year =  month3[1])
+    month3item = soaitem.filter(invoice__createtimestamp__month = month3[0],
+                                invoice__createtimestamp__year =  month3[1])
     month3balance = calculate_soabalance(month3item)
     p.drawRightString( boxmargin + (boxwidth * 4 ) - 2, boxytop + 3, str(round(month3balance, 2)))
     
     month4 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 4)
-    month4item = soaitem.filter(invoice__invoice_date__month = month4[0],
-                                invoice__invoice_date__year =  month4[1])
+    month4item = soaitem.filter(invoice__createtimestamp__month = month4[0],
+                                invoice__createtimestamp__year =  month4[1])
     month4balance = calculate_soabalance(month4item)
     p.drawRightString( boxmargin + (boxwidth * 5 ) - 2, boxytop + 3, str(round(month4balance, 2)))
     
     month5balance = cummulativebalance - currentmonthbalance - month1balance - month2balance - month3balance - month4balance
     p.drawRightString( boxmargin + (boxwidth * 6 ) - 2, boxytop + 3, str(round(month5balance, 2)))
     p.showPage()
-    p.save()
 
     # Get the value of the BytesIO buffer and write it to the response.
-    pdf = buffer.getvalue()
+    pdf = p.getpdfdata()
     buffer.close()
-    response.write(pdf)
-    return response
+    return pdf
 def get_month_year_value(month, year, offsetmonth):
     monthafteroffset = month - offsetmonth;
     outputyear = year

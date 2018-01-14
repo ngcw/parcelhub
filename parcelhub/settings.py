@@ -138,10 +138,11 @@ TIME_ZONE = 'Asia/Kuala_Lumpur'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
-
+SHORT_DATETIME_FORMAT = 'd/m/Y P'
+DATETIME_FORMAT = 'd/m/Y P'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -159,4 +160,3 @@ STATICFILES_DIRS = (
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 LOGIN_REDIRECT_URL = 'parcelhubPOS/login'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000000
-

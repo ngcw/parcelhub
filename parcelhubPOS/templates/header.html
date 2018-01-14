@@ -4,12 +4,12 @@
 <html>
     <head>
     	<meta charset="utf-8">
-        <title>ParcelHub Invoicing</title>
+        <title>{{ header }}</title>
         <link rel="stylesheet" href="{% static 'django_tables2/themes/paleblue/css/screen.css' %}" />
 		<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"/>
 		<link rel="stylesheet" type="text/css" href="{% static 'jquery-ui.css' %}"/>
 		<link rel="stylesheet" type="text/css" href="{% static 'select2.min.css' %}"/>
-		
+		<link rel=icon href="{% static 'img/PPS_Logo.png' %}">
 		<script src="{% static '/js/jquery-3.2.1.min.js' %}"></script>
 		<script src="{% static '/js/bootstrap.min.js' %}"></script>
 		<script src="{% static '/js/jquery-ui.js' %}"></script>
@@ -42,25 +42,30 @@
 		  		<form action='{{ branchselectionaction }}' method="post" >
 		  		{% csrf_token %}
 			  		<select name="branchselection" id="branchselection" onChange="this.form.submit();" {% if headerselectiondisabled %}disabled{% endif %}>
+			  			{% if request.session.issuperuser  %}
+			  				<option value='-1'>All</option>
+			  			{% endif %}
 			  			{% for branchaccess in branchselection %}
-			  				{% if branchaccess.branch.id == request.session.branchid|add:"0" %}
-			  					<option value='{{ branchaccess.branch.id }}' selected>{{branchaccess.branch.name}}</option>
+			  				{% if branchaccess.id == request.session.branchid|add:"0" %}
+			  					<option value='{{ branchaccess.id }}' selected>{{branchaccess.name}}</option>
 			  				{% else %}
-			  					<option value='{{ branchaccess.branch.id}}'>{{branchaccess.branch.name}}</option>
+			  					<option value='{{ branchaccess.id}}'>{{branchaccess.name}}</option>
 			  				{% endif %}
 			  			{% endfor %}
+			  			
 			  		</select>
 		  		</form>
 	  		</div>	
 	  		
+	  		
 	  		<div class='header1' id='logout_button'>
 	  			<a href="/parcelhubPOS/logout/" >
-					<button  label="Logout" name="logout_link">Logout</button>
+					<button label="Logout" name="logout_link">Logout</button>
 				</a>
 			</div>
 			<div class='header' id='login_button'>
 	  			<a href="/parcelhubPOS/" >
-					<button  label="Login" name="logout_link">Login as other user</button>
+					<button label="Login" name="logout_link">Login as other user</button>
 				</a>
 			</div>
 	  	</div>
@@ -90,11 +95,26 @@
     	</div>
 		
 		  <div id="content">
-		  	<h2>{{ title }}</h2>
+		  	<h2>{{ title }}</h2> 
 		  	   
 		       {% block content %}{% endblock %}
 		  </div>
 		  <script>
+		  function startTime() {
+			    var dt = new Date();
+			    var hours = dt.getHours() > 12 ? dt.getHours() - 12 : dt.getHours();
+		        var am_pm = dt.getHours() >= 12 ? "PM" : "AM";
+		        hours = hours < 10 ? "0" + hours : hours;
+		        var minutes = dt.getMinutes() < 10 ? "0" + dt.getMinutes() : dt.getMinutes();
+		        var seconds = dt.getSeconds() < 10 ? "0" + dt.getSeconds() : dt.getSeconds();
+		        time = hours + ":" + minutes + ":" + seconds + " " + am_pm;
+			    document.getElementById("datetimestamp").innerHTML = (("0"+dt.getDate()).slice(-2)) +"/"+ (("0"+(dt.getMonth()+1)).slice(-2)) +"/"+ (dt.getFullYear()) +" "+ time;
+			    var t = setTimeout(startTime, 500);
+			}
+			function checkTime(i) {
+			    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+			    return i;
+			}
 		  /* When the user clicks on the button, 
 		  toggle between hiding and showing the dropdown content */
 			
@@ -117,6 +137,7 @@
 		        {% endifequal %}
 	        
 	    	{% endfor %}
+
 	    	$(window).keydown(function(e) {
     		  switch (e.keyCode) {
     		    case 120: // f9
@@ -124,12 +145,30 @@
     		      return;
     		  }
     		});
-	    	{% if isedit %}
-	    	function myFunction1Invoice()
-	    	{
-	    		window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=', '_blank');
-	    	}
-	    	{% endif %}
+	    	function disableEdit() {
+    		    var inputs = document.getElementsByTagName('input');
+    		    for (var i = 0; i < inputs.length; i += 1) {
+    		        inputs[i].disabled = true;
+    		    }
+    		    var selections = document.getElementsByTagName('select');
+    		    for (var i = 0; i < selections.length; i += 1) {
+    		    	selections[i].disabled = true;
+    		    }
+    		    var textarea = document.getElementsByTagName('textarea');
+    		    for (var i = 0; i < textarea.length; i += 1) {
+    		    	textarea[i].disabled = true;
+    		    }
+    		}
+	    	{% if issearchempty %}
+			alert("{{ searchmsg }}")
+	        {% endif %}
+			{% if request.session.branchid != '-1'  %}
+				function myFunction1Invoice()
+		    	{
+		    		window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=', '_blank');
+		    	}
+			{% endif %}
+	    	
 	    	$( ".disabledinput input" ).prop( "disabled", true ); //Disable
 	    	$('body').on('keydown', 'input, select, textarea, a, button', function(e) {
 	    	    var self = $(this)
@@ -143,8 +182,13 @@
 	    	        if( this.classList.contains('lastInput'))
 	    	        	{
 	    	        	$("#add").click()
+	    	        	var inputid = this.id
+	    	        	var inputstr = inputid.split("-");
+	    	        	var inputcount = parseInt(inputstr[1], 10);
+	    	    		var count =  inputcount + 1
+	    	    		document.getElementById("id_form-"+count+"-tracking_code").focus();
 	    	        	}
-	    	        if (next.length) {
+	    	        else if (next.length) {
 	    	            next.focus();
 	    	        } else {
 	    	            form.submit();
@@ -166,9 +210,18 @@
 	    	});
 	    	{% endif %}
 	    	{% if invoice_form %}
+	    	$(window).keydown(function(e) {
+	    		  switch (e.keyCode) {
+	    		    case 119: // f8
+	    		    	document.getElementById("id_discount").focus();
+	    		      return;
+	    		  }
+	    		});	
+	    	{% if isedit %}
 	    	$(document).ready(function() {
 	    	    $('#id_customer').select2({ width: '150px' });
 	    	});
+	    	{% endif %}
 	    	function CountItem()
 	    	{
 	    		document.getElementById("itemcount").innerHTML = document.getElementsByClassName("counter").length
@@ -215,6 +268,8 @@
 				
 	    	    function copyPreviousSelection(selectiontype, formCount)
 	    	    {
+	    	    	try
+	    	    	{
 	    	    	var count = formCount - 1;
                 	var selectiontypeid = "id_form-" + count + "-" + selectiontype;
     	    	    var selectiontypesel = document.getElementById(selectiontypeid);
@@ -222,6 +277,9 @@
     	    	    var currselectiontypeid = "id_form-" + formCount + "-" + selectiontype;
     	    	    var currselectiontypesel = document.getElementById(currselectiontypeid);
     	    	    currselectiontypesel.value = selectedselectiontype
+	    	    	}
+	    	    	catch(err)
+	    	    	{}
 	    	    }
 	    	    function addForm(btn, prefix) {
 	    	        var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
@@ -235,13 +293,13 @@
     	         		
     	         		if($(row).find(".item_input_dimensional").length == 0)
     	         		{
-    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(mm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(mm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(mm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
+    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(cm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(cm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(cm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
 
         	            	row.innerHTML +=theElement
     	         		}
 					}
 					catch(err) {
-						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(mm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(mm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(mm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
+						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(cm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(cm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(cm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
 
 							row.innerHTML +=theElement
 					}
@@ -312,6 +370,7 @@
 			        }
 			    })
 			}
+	    	
 	    	$('body').on('keydown', '.ui-button', function (event) {
 	    	    var myself = this;
 	    	    if (event.keyCode === $.ui.keyCode.ENTER 
@@ -323,40 +382,45 @@
 	    	}); 
 	    	$(function() {
 	    		$(document).on("keydown.autocomplete",".sku-autocomplete",function(e){
-    			var selectedsku = document.activeElement.id;
-	    		var inputstr = selectedsku.split("-");
-	    	    var count = inputstr[1]
-	    	    var customersel = document.getElementById("id_customer");
-	    	    var selectedcust = customersel.options[customersel.selectedIndex].value;
-	    	    var zonetypeid = "id_form-" + count + "-zone_type";
-	    	    var zonetypesel = document.getElementById(zonetypeid);
-	    	    var selectedzonetype = zonetypesel.options[zonetypesel.selectedIndex].value;
-	    	    var prodtypeid = "id_form-" + count + "-producttype";
-	    	    var prodtypesel = document.getElementById(prodtypeid);
-	    	    var selectedprodtype = prodtypesel.options[prodtypesel.selectedIndex].value;
-	    	    var courierid = "id_form-" + count + "-courier";
-	    	    var couriersel = document.getElementById(courierid);
-	    	    var selectedcourier = couriersel.options[couriersel.selectedIndex].value;
-	    	    var zoneid = "id_form-" + count + "-zone";
-	    	    var zoneinput = document.getElementById(zoneid).value;
-	    	    var weightid = "id_form-" + count + "-weight";
-	    	    var weightinput = document.getElementById(weightid).value;
-	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
-	    	    var dimweightinput = document.getElementById(dimweightid).value;
-	    	    var weightval = weightinput
-	    	    if( dimweightinput > weightinput)
-	    	    {
-	    	    	weightval = dimweightinput
-	    	    }
-	    		$(this).autocomplete({
-	    			source: "/parcelhubPOS/autocompletesku/?zonetypename="+selectedzonetype
-	    					 +"&customerid="+selectedcust
-	    					 +"&prodtypename="+selectedprodtype
-	    					 +"&courierid="+selectedcourier
-	    					 +"&zoneinput="+zoneinput
-	    					 +"&weightinput="+weightval,
-	                minLength: 0
-	    		  });
+	    		try
+	    		{
+	    			var selectedsku = document.activeElement.id;
+		    		var inputstr = selectedsku.split("-");
+		    	    var count = inputstr[1]
+		    	    var customersel = document.getElementById("id_customer");
+		    	    var selectedcust = customersel.options[customersel.selectedIndex].value;
+		    	    var zonetypeid = "id_form-" + count + "-zone_type";
+		    	    var zonetypesel = document.getElementById(zonetypeid);
+		    	    var selectedzonetype = zonetypesel.options[zonetypesel.selectedIndex].value;
+		    	    var prodtypeid = "id_form-" + count + "-producttype";
+		    	    var prodtypesel = document.getElementById(prodtypeid);
+		    	    var selectedprodtype = prodtypesel.options[prodtypesel.selectedIndex].value;
+		    	    var courierid = "id_form-" + count + "-courier";
+		    	    var couriersel = document.getElementById(courierid);
+		    	    var selectedcourier = couriersel.options[couriersel.selectedIndex].value;
+		    	    var zoneid = "id_form-" + count + "-zone";
+		    	    var zoneinput = document.getElementById(zoneid).value;
+		    	    var weightid = "id_form-" + count + "-weight";
+		    	    var weightinput = document.getElementById(weightid).value;
+		    	    var dimweightid = "id_form-" + count + "-dimension_weight";
+		    	    var dimweightinput = document.getElementById(dimweightid).value;
+		    	    var weightval = weightinput
+		    	    if( dimweightinput > weightinput)
+		    	    {
+		    	    	weightval = dimweightinput
+		    	    }
+		    		$(this).autocomplete({
+		    			source: "/parcelhubPOS/autocompletesku/?zonetypename="+selectedzonetype
+		    					 +"&customerid="+selectedcust
+		    					 +"&prodtypename="+selectedprodtype
+		    					 +"&courierid="+selectedcourier
+		    					 +"&zoneinput="+zoneinput
+		    					 +"&weightinput="+weightval,
+		                minLength: 0
+		    		  });
+	    		}
+    			catch(err)
+    			{}
 	    		});
 	    	});
 	    	
@@ -408,16 +472,21 @@
 	    	    var couriersel = document.getElementById(courierid);
 	    	    var selectedcourier = couriersel.options[couriersel.selectedIndex].value;
 	    	    var zoneid = "id_form-" + count + "-zone";
-	    	    var zoneinput = document.getElementById(zoneid).value;
+	    	    var zoneele = document.getElementById(zoneid)
+	    	    var zoneinput = zoneele.value;
 	    	    var weightid = "id_form-" + count + "-weight";
-	    	    var weightinput = document.getElementById(weightid).value;
+	    	    var weightele = document.getElementById(weightid)
+	    	    var weightinput = weightele.value;
 	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
-	    	    var dimweightinput = document.getElementById(dimweightid).value;
+	    	    var dimweightele = document.getElementById(dimweightid)
+	    	    var dimweightinput = dimweightele.value;
 	    	    var weightval = weightinput
 	    	    if( parseFloat(dimweightinput) > parseFloat(weightinput))
 	    	    {
 	    	    	weightval = dimweightinput
 	    	    }
+	    	    var skuid = "id_form-" + count + "-sku"
+	    	    var skuinput = document.getElementById(skuid);
 	    	    $.ajax({
 	                url:"/parcelhubPOS/autocompleteskufield/?zonetypename="+selectedzonetype
 	    					 +"&customerid="+selectedcust
@@ -433,9 +502,28 @@
 	                	var dataobj = JSON.parse(data)
 	                	if (dataobj.length == 1){
 	                		$( "#id_form-" + count + "-sku" ).val( dataobj[0]['value'] )
-	                		AutoCompleteSKUDetail("id_form-" + count + "-sku")
-	                		
-	               		}
+	                		AutoCompleteSKUDetail(skuid)
+	                		skuinput.style.backgroundColor = ''
+	                		zoneele.style.backgroundColor = ''
+	                		weightele.style.backgroundColor = ''
+	                		dimweightele.style.backgroundColor = ''
+	                		skuinput.setAttribute('title', '');
+	                		zoneele.setAttribute('title', '');
+	                		weightele.setAttribute('title', '');
+	                		dimweightele.setAttribute('title', '');
+                		}
+	                	else
+	                	{
+	           		
+	                		skuinput.style.backgroundColor = 'red'
+	                		zoneele.style.backgroundColor = 'red'
+	                		weightele.style.backgroundColor = 'red'
+	                		dimweightele.style.backgroundColor = 'red'
+	                		skuinput.setAttribute('title', 'No SKU found');
+	                		zoneele.setAttribute('title', 'No SKU found for this zone-weight combination');
+	                		weightele.setAttribute('title', 'No SKU found for this zone-weight combination');
+	                		dimweightele.setAttribute('title', 'No SKU found for this zone-dimension weight combination');
+	                	}
 	                }
 	            });
 	    	};
@@ -491,6 +579,7 @@
 	    	    var prodtypeid = "id_form-" + count + "-producttype";
 	    	    var prodtypesel = document.getElementById(prodtypeid);
 	    	    var selectedprodtype = prodtypesel.options[prodtypesel.selectedIndex].value;
+	    	    var zoneinput = document.getElementById("id_form-" + count + "-zone")
 	    	    $.ajax({
 	                url:"/parcelhubPOS/autocompletezone/?postcode_country="+value+"&zonetypename="+selectedzonetype+"&prodtypename="+selectedprodtype+"&courier="+selectedcourier,
 	                type:"POST",
@@ -499,11 +588,19 @@
 	                contentType: "application/json",
 	                success: function(data){
 	                	var dataobj = JSON.parse(data)
-	                	if( dataobj[0] !== null && dataobj[0] != undefined && data.length == 1 )
+	                	if( dataobj[0] !== null && dataobj[0] != undefined && dataobj.length == 1 )
                 		{
 	                		PopulateZone( count, 
          		 					      dataobj[0]['zone']); 
+	                		zoneinput.style.backgroundColor = ''
+	                		zoneinput.setAttribute('title', '');
                 		}
+	                	else
+	                	{
+	                		
+	                		zoneinput.style.backgroundColor = 'red'
+	                		zoneinput.setAttribute('title', 'No zone found');
+	                	}
            		 		
 	                }
 	            });
@@ -600,6 +697,9 @@
 					change = parseFloat(payment) - finaltotal;
 				}
 				document.getElementById('change').innerHTML = parseFloat(change).toFixed(2);
+				document.getElementById('confirm_change').innerHTML = document.getElementById('change').innerHTML
+				document.getElementById('confirm_payment').innerHTML = parseFloat(document.getElementById('id_payment').value).toFixed(2)
+				document.getElementById('confirm_total').innerHTML = document.getElementById('total').innerHTML
 				
     		};
     		function SetParentVisibility( id, show ) {
@@ -607,10 +707,13 @@
     			if( show)
    				{
     				selection.parentNode.parentNode.style.display = ""; 
+    				selection.disabled = false;
+    				
    				}
     			else
     			{
     				selection.parentNode.parentNode.style.display = "none"; 
+    				selection.disabled = true;
     			}
     		}
     		function SetVisibility( id, show ) {
@@ -620,10 +723,12 @@
 	    			if( show )
 	   				{
 	    				selection.style.display = ""; 
+	    				selection.disabled = false;
 	   				}
 	    			else
 	    			{
 	    				selection.style.display = "none"; 
+	    				selection.disabled = true;
 	    			}
     			}
     		}
@@ -646,6 +751,10 @@
 	                		SetParentVisibility( 'change', dataobj[0]['invoicetype'] == false); 
 	                		SetVisibility( 'print_do', dataobj[0]['invoicetype'] );
 	                		SetVisibility( 'print_do_up', dataobj[0]['invoicetype'] );
+	                		{%if isedit %}
+	                		{% else %}
+	                		disableEdit();
+	                		{% endif %}
                 		}
            		 		
 	                }
@@ -656,12 +765,23 @@
 	    	    document.getElementById(inputid).focus();
 	    	    ValidateTrackingCode(inputid)
 	    	}
+	    	
 	    	window.onload = function() {
 	    		  HideShowCashType();
 	    		  UpdateTotal();
 	    		  CountItem();
 	    		  setFocusToTextBox();
+	    		  {% if invoice %}
+	    		  	{% if isedit %}
+	    		  	{% else %}
+	    		  	disableEdit();
+	    		  	{% endif %}
+	    		  {% else %}
+	    		  startTime();
+	    		  {% endif %}
+	    		  
 	    		};
+    		
     		$(function() {
                 $(document).on('keydown', '.lastInput', function(e) {
                     var keyCode = e.keyCode;
@@ -678,7 +798,12 @@
 	    	    var value = inputelement.value.trim();
 	    	    var courierid = "id_form-" + count + "-courier";
 	    	    var couriersel = document.getElementById(courierid);
-	    	    var selectedcourier = couriersel.options[couriersel.selectedIndex].value;
+	    	    var selectedcourier = ''
+	    	    if (couriersel != null)
+	    	    	{
+	    	    	selectedcourier = couriersel.options[couriersel.selectedIndex].value;
+	    	    	}
+	    	    
 	    	    var trackingcodeinput = [];
 	    	    var mystring = JSON.stringify(trackingcodeinput);
 	    	    $.ajax({
@@ -713,16 +838,17 @@
 	                	if( duplicated || ( dataobj[0] !== null && dataobj[0] != undefined && dataobj[0]['trackcode'] ))
                 		{
 	                		inputelement.style.backgroundColor = 'red';
+	                		inputelement.setAttribute('title', 'Invalid tracking code');
                 		}
 	                	else
 	                	{
 	                		inputelement.style.backgroundColor = '';
+	                		inputelement.setAttribute('title', '');
 	                	}
            		 		
 	                }
 	            });
 	    	};
-	    	
 	    	function validateInvoiceItem()
 	    	{
 	    		var cansubmittc = true;
@@ -748,6 +874,7 @@
 	    		
 	    		var cansubmitweight = true;
 	    		var cansubmitzone = true;
+	    		var cansubmitsku = true;
 	    		var arr = document.getElementsByClassName('validateFieldWeight');
 	    		var rowempty = 0;
 			    for(var i=0;i<arr.length && cansubmitweight;i++){
@@ -762,14 +889,18 @@
 		    	    var zoneid = "id_form-" + count + "-zone";
 		    	    var zoneelement = document.getElementById(zoneid)
 		    	    rowempty = i + 1;
-			        if(arr[i].value.length == 0 && dimweightelement.value.length == 0 && selectedzonetype !== 'Others')
+			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && selectedzonetype !== 'Others' )
 			        {
 			        	cansubmitweight = false;
 			       	}
-		    	    if( zoneelement.value.length == 0 && selectedzonetype !== 'Others')
-		    	    	{
-		    	    	 cansubmitzone = false;
-		    	    	}
+		    	    if( zoneelement.value.length == 0  && selectedzonetype !== 'Others' )
+	    	    	{
+	    	    	 	cansubmitzone = false;
+	    	    	}
+		    	    if ( arr[i].style.backgroundColor == 'red' && zoneelement.style.backgroundColor == 'red' )
+		    	    {
+		    	    	cansubmitsku = false;
+		    	    }
 			    }
 	    		var zonetypevalue = document.getElementById('id_invoicetype').value
 	    		var totalvalue = parseFloat(document.getElementById('total').innerHTML).toFixed(2)
@@ -784,14 +915,19 @@
 	    	      	alert("There are duplicated tracking code field at row number " + rowduplicated + ".");
 	    	      	return false;
 	    	  	}
+	    	    if( cansubmitsku == false )
+	    	    {
+	    	    	alert("There are invalid zone-weight combination at row number " + String(rowempty) +".");
+	    	      	return false;
+	    	    }
 	    	    if( cansubmitweight == false)
 	    	    { 
-	    	      	alert("There are empty weight field at row number " + String(rowempty) +".");
+	    	      	alert("There are invalid weight field at row number " + String(rowempty) +".");
 	    	      	return false;
 	    	  	}
 	    	    if( cansubmitzone == false)
 	    	    { 
-	    	      	alert("There are empty zone field at row number " + String(rowempty) +".");
+	    	      	alert("There are invalid zone field at row number " + String(rowempty) +".");
 	    	      	return false;
 	    	  	}
 	    	    if( zonetypevalue == 'Cash' && parseFloat(payment) < parseFloat(totalvalue))
@@ -799,19 +935,61 @@
 	    	    	alert("Payment of RM " + payment + " is insufficient as total is RM " + totalvalue);
 	    	      	return false;
 	    		}
-	    	    alert('Invoice saved!')
 	    	  	return true;
 	    	}
+	    	function confirmPayment()
+			{
+	    		var def = $.Deferred();
+				$('#cash_confirm_popup').dialog({
+			        resizable: false,
+			        height:220,
+			        modal: true,
+			        buttons: {
+			            "Confirm": function() {
+			                $( this ).dialog( "close" );
+			                def.resolve()
+			            },
+			            Cancel: function() {
+			                $( this ).dialog( "close" );
+			                def.reject()
+			            }
+			        }
+			    })
+			    return def.promise();
+			}
 	    	function validateAndNew()
 	    	{
 	    		var validated = validateInvoiceItem()
 	    		if( validated )
     			{
-    				document.getElementById("newInvoicePage").click();
+	    			var invoicetype = document.getElementById('id_invoicetype').value.trim();
+	    			if( invoicetype == 'Cash')
+	    			{
+	    				confirmPayment().done(function() {
+	    					document.getElementById("newInvoicePage").click();
+	    					document.getElementById("editinvoiceform").submit();
+	    				}).fail(function() {
+	    					validated = false;
+	    				});
+	    			}
+	    			else
+	    			{
+	    				if ( validated )
+	    				{
+	    					document.getElementById("newInvoicePage").click();
+	    					document.getElementById("editinvoiceform").submit();
+	    				}
+	    			}
+    				
     			}
-	    		return validated
-	    		
 	    	}
+	    	document.getElementById("invoicesubmitbutton").addEventListener("keydown", function(e) {
+	    	    if (!e) { var e = window.event; }
+	    	    e.preventDefault(); // sometimes useful
+
+	    	    // Enter is pressed
+	    	    if (e.keyCode == 13) { validateAndNew(); }
+	    	}, false);
 	    	function SetDescriptionAvailability(inputid)
 	    	{
 	    		var value = document.getElementById(inputid).value.trim();
@@ -880,8 +1058,12 @@
 	    	    $(id).select2().val(newID);
 	    	    $(id).select2().trigger('change')
 	    	}
-
+			
 	    	{% endif %}
+	    	function enabledCustomer() {
+	    		document.getElementById('id_customer').disabled=false;
+	    		return true;
+	    	}
 	    	{% if iscustomer %}
 	    	window.onload = function () {
 	    	    document.getElementById('id_form-0-branch').disabled=true;
@@ -890,6 +1072,11 @@
 	    		document.getElementById('id_form-0-branch').disabled=false;
 	    		return true;
 	    	}
+	    	{% endif %}
+	    	{% if isview  %}
+		    	window.onload = function () {
+		    		disableEdit();
+		    	}
 	    	{% endif %}
 		  </script>
           {% block jsscript %}{% endblock %}

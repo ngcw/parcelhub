@@ -3,7 +3,7 @@ from django_tables2 import RequestConfig
 from django.forms import modelformset_factory
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .tables import UserTable, UserBranchAccessTable
+from .tables import UserTable, UserBranchAccessTable, UserTable2
 from .commons import *
 from django.contrib.auth.models import User
 from .forms import UserCreateForm
@@ -21,8 +21,16 @@ def userlist(request):
     branchlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
-    user_list = User.objects.all()
+    if branchid == '-1':
+        isedit = True
+    else:
+        branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+        isedit = branchaccess.access_level != 'Cashier'
+    currentuser = User.objects.get(id=request.session['userid'])
+    if currentuser.is_superuser:
+        user_list = User.objects.all();
+    else:
+        user_list = User.objects.filter(is_superuser = False)
     formdata = {'firstname':'',
                 'lastname':'',
                 'username':'',
@@ -45,8 +53,19 @@ def userlist(request):
             formdata['email'] = submitted_email;
             user_list =  user_list.filter(email__icontains=submitted_email)
             
-    final_user_table = UserTable(user_list)
+    
+    if branchid == "-1":
+        final_user_table = UserTable2(user_list)
+    else:
+        final_user_table = UserTable(user_list)
     RequestConfig(request, paginate={'per_page': 25}).configure(final_user_table)
+    issearchempty = True
+    searchmsg = 'There no user matching the search criteria...'
+    try:
+        if user_list or (not submitted_firstname and not submitted_lastname and not submitted_username and not submitted_email ):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'userlist': final_user_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -54,8 +73,13 @@ def userlist(request):
                 'loggedusers' : loggedusers,
                 'formdata' :formdata,
                 'title': "User",
-                'isedit' : branchaccess.user_auth == 'edit',
+                'isedit' : isedit,
+                'issuperuser' : currentuser.is_superuser,
+                'isall': branchid != '-1',
                 'statusmsg' : request.GET.get('msg'),
+                'header': "User",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'user.html', context)
 
@@ -91,7 +115,8 @@ def edituser(request, user_id):
                 'branchselection': branchlist,
                 'loggedusers' : loggedusers,
                 'user_id': user_id,
-                'title' : title
+                'title' : title,
+                'header': title
                 }
     return render(request, 'edituser.html', context)
 
@@ -147,7 +172,8 @@ def adduser(request):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
                 'loggedusers' : loggedusers,
-                'title': "New user"
+                'title': "New user",
+                'header': "New user"
                 }
     return render(request, 'adduser.html', context)
 
@@ -166,10 +192,15 @@ def userbranchaccess( request, user_id):
     branchlist = branchselection(request)
     menubar = navbar(request)
     user_id = request.GET.get('user_id')
+    loguser = User.objects.get(id=request.session.get('userid'))
     #return HttpResponse(user_id)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     selected_user = User.objects.get(id=user_id)
+    if branchid == '-1':
+        isedit = True
+    else:
+        branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+        isedit = branchaccess.access_level != 'Cashier'
     branchaccesslevel = UserBranchAccess.objects.filter(user__id = user_id)
     final_branchaccesslevel_table = UserBranchAccessTable(branchaccesslevel)
     
@@ -182,8 +213,11 @@ def userbranchaccess( request, user_id):
                 'branchselection': branchlist,
                 'loggedusers' : loggedusers,
                 'title': "User branch access",
-                'isedit' : branchaccess.user_auth == 'edit',
+                'isedit' : isedit,
+                'issuperuser' : loguser.is_superuser,
+                'isall': branchid != '-1',
                 'statusmsg' : request.GET.get('msg'),
+                'header': "User access"
                 }
     return render(request, 'userbranchaccess.html', context)
 
@@ -211,42 +245,25 @@ def edituserbranchaccess(request, userbranch_id):
     userselected = User.objects.get(id=user_id)
     loguser = User.objects.get(id=request.session['userid'])
     branchsel_list = Branch.objects.all();
-    selectionoption = ["n/a", "view", "edit"]
+    selectionoption = ["Cashier", "Branch admin"]
+    
     if not loguser.is_superuser:
         branchaccesslist = branchlist.values_list('branch__id', flat=True)
         branchsel_list = Branch.objects.filter(id__in=branchaccesslist)
     # processing post
     if request.method == "POST":
         submitted_branchid = request.POST['branchselected'] 
-        submitted_masterdata = request.POST['masterdata_auth']
-        submitted_branch = request.POST['branch_auth']
-        submitted_user = request.POST['user_auth']
-        submitted_skupricing = request.POST['skupricing_auth']
-        submitted_transaction = request.POST['transaction_auth']
-        submitted_custacc = request.POST['custacc_auth']
-        submitted_report = request.POST['report_auth']
+        submitted_access_level = request.POST['access_level']
         
         submitted_branchid = int('0' + submitted_branchid )
         if userbainstance:
             userbainstance.branch_id = submitted_branchid
-            userbainstance.masterdata_auth = submitted_masterdata
-            userbainstance.branch_auth = submitted_branch
-            userbainstance.user_auth = submitted_user
-            userbainstance.skupricing_auth = submitted_skupricing
-            userbainstance.transaction_auth = submitted_transaction
-            userbainstance.custacc_auth = submitted_custacc
-            userbainstance.report_auth = submitted_report
+            userbainstance.access_level = submitted_access_level
             userbainstance.save()
         else:
             userbainstance = UserBranchAccess( user = userselected,
                                                branch_id = submitted_branchid,
-                                               masterdata_auth = submitted_masterdata,
-                                               branch_auth = submitted_branch,
-                                               user_auth = submitted_user,
-                                               skupricing_auth = submitted_skupricing,
-                                               transaction_auth = submitted_transaction,
-                                               custacc_auth = submitted_custacc,
-                                               report_auth = submitted_report )
+                                               access_level = submitted_access_level )
         
             userbainstance.save()
         branch = Branch.objects.get(id= submitted_branchid)
@@ -271,6 +288,7 @@ def edituserbranchaccess(request, userbranch_id):
                 'selectionoption' : selectionoption,
                 'title': title,
                 'statusmsg' : request.GET.get('msg'),
+                'header': title
                 }
     return render(request, 'edituserbranchaccess.html', context)
 

@@ -48,7 +48,7 @@ def loginuser(request):
             request.session['userid'] = loguser.id 
             name = "%s %s"%(loguser.last_name, loguser.first_name )
             request.session[CONST_username] = name
-            
+            request.session['issuperuser'] = loguser.is_superuser
             sessiondict.append(loguser.id)
             request.session['loggedusers'] = sessiondict
             
@@ -80,9 +80,10 @@ def dashboard(request):
                     'nav_bar' : sorted(menubar.items()),
                     'branchselection': branchlist,
                     'loggedusers' : loggedusers,
-                    'branchselectionaction': '/parcelhubPOS/invoice/'
+                    'branchselectionaction': '/parcelhubPOS/dashboard/',
+                    'issuperuser': loguser.is_superuser
                     }
-        return HttpResponseRedirect('/parcelhubPOS/invoice/')#render(request, 'dashboard.html', context)
+        return render(request, 'dashboard.html', context)#HttpResponseRedirect('/parcelhubPOS/invoice/')#
     else:
         return HttpResponse("No branch access configured for user")
     
@@ -93,7 +94,7 @@ def globalparameter(request):
     menubar = navbar(request)
     
     title = "Update global parameter"
-
+    loguser = User.objects.get(id=request.session.get('userid'))
     gpqueryset = GlobalParameter.objects.filter().first()
     
     if request.method == "POST":
@@ -112,6 +113,7 @@ def globalparameter(request):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
+                'issuperuser' : loguser.is_superuser,
                 'title' : title,
                 'statusmsg' : request.GET.get('msg'),
                 }

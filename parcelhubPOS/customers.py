@@ -4,7 +4,7 @@ from django.forms import modelformset_factory
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .tables import CustomerTable
+from .tables import CustomerTable, CustomerTable2
 from .commons import *
 from .models import Customer, UserBranchAccess
 
@@ -17,8 +17,12 @@ def customerlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+    loguser = User.objects.get(id=request.session.get('userid'))
     customer_list = Customer.objects.filter(branch__id=branchid)
+    if branchid == "-1":
+        customer_list = Customer.objects.all()
+    else:
+        customer_list = Customer.objects.filter(branch__id=branchid)
     formdata = {'name':'',
                 'contact':'',
                 'email':'',
@@ -41,10 +45,19 @@ def customerlist(request):
             formdata['icno'] = submitted_icno;
             customer_list =  customer_list.filter(identificationno__icontains=submitted_icno)
         
-    final_Customer_table = CustomerTable(customer_list)
     
+    if branchid == "-1":
+        final_Customer_table = CustomerTable2(customer_list)
+    else:
+        final_Customer_table = CustomerTable(customer_list) 
     RequestConfig(request, paginate={'per_page': 25}).configure(final_Customer_table)
-    
+    issearchempty = True
+    searchmsg = 'There no customer matching the search criteria...'
+    try:
+        if customer_list or (not submitted_name and not submitted_contact and not submitted_email and not submitted_icno):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'customer': final_Customer_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -52,8 +65,13 @@ def customerlist(request):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title' : 'Customer',
-                'isedit' : branchaccess.custacc_auth == 'edit',
+                'isedit' : True,
+                'issuperuser' : loguser.is_superuser,
+                'isall': branchid != '-1',
                 'statusmsg' : request.GET.get('msg'),
+                'header': 'Customer',
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
             }
     return render(request, 'customer.html', context)
 
@@ -95,6 +113,7 @@ def editcustomer(request, customerid):
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
                 'iscustomer' : True,
+                'header': title
                 }
     return render(request, 'editcustomer.html', context)
 

@@ -10,7 +10,7 @@
 		<div class="searchinput">Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
-    {% if isedit %}
+    {% if isedit and isall %}
     <form action="/parcelhubPOS/user/adduser">
     	<input type="submit" value="Add" />
 	</form>
@@ -20,7 +20,7 @@
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table userlist %}
-	{% if isedit %}
+	{% if isedit and isall %}
 	<form action="/parcelhubPOS/user/adduser">
     	<input type="submit" value="Add" />
 	</form>

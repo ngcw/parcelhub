@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .tables import VendorTable
 from .commons import *
 from .models import CourierVendor, ZoneType, UserBranchAccess
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 CONST_branchid = 'branchid'
@@ -16,7 +17,7 @@ def vendorlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+    loguser = User.objects.get(id=request.session.get('userid'))
     vendor_list = CourierVendor.objects.all()
     zonetype_list = ZoneType.objects.all()
     formdata = {'name':'',
@@ -34,7 +35,14 @@ def vendorlist(request):
     final_Vendor_table = VendorTable(vendor_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_Vendor_table)
-    
+    loguser = User.objects.get(id=request.session.get('userid'))
+    issearchempty = True
+    searchmsg = 'There no courier vendor matching the search criteria...'
+    try:
+        if vendor_list or (not submitted_name and not submitted_zonetype and not submitted_courier):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'vendor': final_Vendor_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -43,8 +51,12 @@ def vendorlist(request):
                 'zonetype_list' : zonetype_list,
                 'formdata' : formdata,
                 'title': "Courier vendor",
-                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'isedit' : loguser.is_superuser,
+                'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
+                'header': "Courier vendor",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'vendor.html', context)
 
@@ -80,7 +92,8 @@ def editvendor(request, vendorid):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'title' : title
+                'title' : title,
+                'header': title
                 }
     return render(request, 'editvendor.html', context)
 

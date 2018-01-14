@@ -9,12 +9,12 @@ body
 
 #content h2
 {
-	margin-top: 8px;
+	margin-top: 0px;
     margin-bottom: 8px;
 }
 #invoice_container h2
 {
-	margin-top: 20px;
+	margin-top: 10px;
     margin-bottom: 8px;
 }
 input:focus, select:focus, textarea:focus {
@@ -30,7 +30,7 @@ select
 {
 	margin-right: 15px;
 }
-button, input[type=submit], .link_button
+button, input[type=submit], .link_button, input[type=button]
 {
     background-color: #2C2B62; /* Blue */
     border: none;
@@ -44,6 +44,10 @@ button, input[type=submit], .link_button
     font-size: 12px;
     cursor: pointer;
     border-radius: 4px;
+}
+input:disabled, select:disabled, textarea:disabled
+{
+	background-color:  #c0c0c0;
 }
 #logout_button
 {
@@ -92,15 +96,16 @@ button, input[type=submit], .link_button
     font-family: Arial;
     width: 99%;
     min-width: 850px;
-    z-index:3
+    z-index:3;
+    height: 37px;
 }
 
 .container a {
     float: left;
-    font-size: 16px;
+    font-size: 14px;
     color: white;
     text-align: center;
-    padding: 14px 14px;
+    padding: 10px 10px;
     text-decoration: none;
     border-radius: 4px;
     background-color: #2C2B62;
@@ -115,11 +120,11 @@ button, input[type=submit], .link_button
 }
 
 .dropdown .dropbtn {
-    font-size: 16px;    
+    font-size: 14px;    
     border: none;
     outline: none;
     color: white;
-    padding: 14px 14px;
+    padding: 10px 10px;
     background-color: inherit;
     z-index:2;
     margin: 0px;
@@ -141,7 +146,7 @@ button, input[type=submit], .link_button
 .dropdown-content a {
     float: none;
     color: white;
-    padding: 12px 16px;
+    padding: 10px 10px;
     text-decoration: none;
     display: block;
     text-align: left;
@@ -176,6 +181,7 @@ button, input[type=submit], .link_button
 .searchform
 {
 	min-width: 1050px;
+	margin-top: 5px;
 }
 .searchform div
 {
@@ -184,11 +190,11 @@ button, input[type=submit], .link_button
 }
 .searchinput
 {
-	margin-left: 10px;
+	margin-left: 2px;
 }
 .searchform input
 {
-	width: 80px;
+	width: 100px;
 }
 .searchform input[type=date]
 {
@@ -214,6 +220,11 @@ button, input[type=submit], .link_button
 
     text-decoration: none;
     color: initial;
+}
+#deletediv
+{
+	min-width: 1450px;
+	clear:both;
 }
 #changepassword label 
 {
@@ -257,17 +268,38 @@ button, input[type=submit], .link_button
 	display: inline;
 	min-width: 30px;
 }
+.counter_label_p, .counter_input_p
+{
+	float: left;
+	display: inline;
+	min-width: 30px;
+	border: 1px solid;
+}
 .itemform_label
 {
 	float: left;
 	display: inline;
 	width: 100px;
 }
-.item_input, .item_input selection
+.itemform_label_p
 {
 	float: left;
 	display: inline;
 	width: 100px;
+	border: 1px solid;
+}
+.item_input, .item_input selection, .item_input input
+{
+	float: left;
+	display: inline;
+	width: 100px;
+}
+.item_input_p, .item_input_p selection, .item_input_p input
+{
+	float: left;
+	display: inline;
+	width: 100px;
+	border: 1px solid;
 }
 .itemform_label_description
 {
@@ -317,7 +349,7 @@ button, input[type=submit], .link_button
 	clear: both;
 	position: fixed;
 	min-width: 1450px;
-	height: 290px;
+	height: 275px;
 	background-color: #c0c0c0;
 	z-index:1;
 	margin-top:-20px;
@@ -335,12 +367,13 @@ button, input[type=submit], .link_button
 	display: block;
 	clear: both;
 	position: relative;
-	padding-top:260px;
+	padding-top:250px;
 }
 .itemform_container
 {
 	height: 20px;
 	margin-top: -20px;
+	min-width: 1450px;
 }
 .itemcontainer
 {
@@ -349,6 +382,7 @@ button, input[type=submit], .link_button
 #invoicesubmit
 {
 	clear:both;
+	margin-top:80px;
 }
 #generatestatement
 {
@@ -356,7 +390,7 @@ button, input[type=submit], .link_button
 }
 #customerselection
 {
-	display: block;
+	display: inline-block;
 }
 #invoicebottom
 {
@@ -366,9 +400,10 @@ button, input[type=submit], .link_button
 	min-width: 1450px;
 	max-width: 1450px;
 }
-#addanotheritem
+.addanotheritem
 {
-	margin-bottom: 10px;
+	margin-right: 5px;
+	display: inline-block;
 }
 #nrOfItem
 {
@@ -424,4 +459,15 @@ button, input[type=submit], .link_button
 {
 	vertical-align: bottom
 }
-
+.hiddenlabels
+{
+	visibility: hidden;
+}
+#cash_confirm_popup
+{
+	display: none;
+}
+.paymentinput
+{
+	border: none;
+}

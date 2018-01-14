@@ -1,5 +1,5 @@
 from .models import *
-from .tables import InvoiceTable
+from .tables import InvoiceTable, InvoiceTable2
 from .commons import *
 from .forms import InvoiceForm, InvoiceItemForm, CustomerForm
 from datetime import timedelta, datetime
@@ -23,12 +23,6 @@ def invoice(request):
     loguser = User.objects.get(id=request.session.get('userid'))
     branchaccess = UserBranchAccess.objects.filter(user=loguser).first()
     if loguser.is_superuser or branchaccess:
-        try:
-            branchid = branchaccess.branch.id 
-            user = branchaccess.user
-            request.session[CONST_branchid] = branchid 
-        except:
-            pass
         return retrieveInvoice(request)
     else:
         return HttpResponse("No branch access configured for user")
@@ -42,45 +36,45 @@ def retrieveInvoice(request):
         deadlinedatetime = datetime.combine(globalparameter.invoice_lockin_date, datetime.min.time())
     except:
         deadlinedatetime = timezone.now() - timedelta(days=1); 
-    loguser = User.objects.get(id=request.session.get('userid'))
+    
     branchselectlist = branchselection(request)
     menubar = navbar(request)
+    loguser = User.objects.get(id=request.session.get('userid'))
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
-    invoice_list = Invoice.objects.filter(branch_id=branchid )
+    if branchid == "-1":
+        invoice_list = Invoice.objects.all();
+    else:
+        invoice_list = Invoice.objects.filter(branch_id=branchid )
     formdata = {'invoicenumber':'',
                 'fromdate':'',
                 'todate':'',
                 'customer':'',
-                'trackingcode':''}
+                'trackingcode':'',
+                'remark': ''}
     if request.method == "GET":
         submitted_trackingcode = request.GET.get('trackingcode') 
         if submitted_trackingcode:
             formdata['trackingcode'] = submitted_trackingcode;
-            try:
-                invoiceitem = InvoiceItem.objects.get(tracking_code__icontains=submitted_trackingcode)
-                invoiceitem_invoiceid = invoiceitem.invoice.invoiceno
-                userbranchaccess = UserBranchAccess.objects.filter(user = loguser)
-                if loguser.is_superuser:
-                    invoice_list = Invoice.objects.all();
-                elif userbranchaccess.count() > 1:
-                    
-                    branchaccess = []
-                    for useraccess in userbranchaccess:
-                        branchaccess.append(useraccess.branch.id) 
-                    invoice_list = Invoice.objects.filter(branch__id__in=branchaccess)  
-                invoice_list =  invoice_list.filter(invoiceno__icontains=invoiceitem_invoiceid)
-            except:
-                invoice_list = invoice_list.filter(invoiceno = "-1")
+            invoiceitem_invoiceid = InvoiceItem.objects.filter(tracking_code__icontains=submitted_trackingcode).values_list('invoice_id', flat=True)
+
+            invoice_list =  invoice_list.filter(id__in=invoiceitem_invoiceid)
+
         submitted_invoiceno = request.GET.get('invoicenumber') 
         if submitted_invoiceno:
             formdata['invoicenumber'] = submitted_invoiceno;
             invoice_list =  invoice_list.filter(invoiceno__icontains=submitted_invoiceno)
+        submitted_remark = request.GET.get('remark') 
+        if submitted_remark:
+            formdata['remark'] = submitted_remark;
+            invoice_list =  invoice_list.filter(remarks__icontains=submitted_remark)
         submitted_fromdate = request.GET.get('fromdate') 
-        submitted_todate = request.GET.get('todate')
+        submitted_todate = request.GET.get('todate') ;
         if submitted_fromdate and submitted_todate:
-            formdata['fromdate'] = submitted_fromdate;
-            formdata['todate'] = submitted_todate;
+            submitted_todate = datetime.strptime(submitted_todate, '%Y-%m-%d')
+            submitted_todate = submitted_todate + timedelta(days=1) - timedelta(seconds=1);
+            submitted_fromdate = datetime.strptime(submitted_fromdate, '%Y-%m-%d')
+            formdata['fromdate'] = request.GET.get('fromdate') ;
+            formdata['todate'] = request.GET.get('todate') 
             invoice_list =  invoice_list.filter(createtimestamp__gte=submitted_fromdate,
                                                 createtimestamp__lte= submitted_todate )
         submitted_customer = request.GET.get('customer')
@@ -88,9 +82,18 @@ def retrieveInvoice(request):
             formdata['customer'] = submitted_customer;
             invoice_list = invoice_list.filter( customer__name__icontains=submitted_customer)
         
-            
-    final_invoice_table = InvoiceTable(invoice_list.order_by('-createtimestamp'))
+    if branchid == "-1":
+        final_invoice_table = InvoiceTable2(invoice_list.order_by('-createtimestamp'))
+    else:
+        final_invoice_table = InvoiceTable(invoice_list.order_by('-createtimestamp'))     
     
+    issearchempty = True
+    searchmsg = 'There no invoice matching the search criteria...'
+    try:
+        if invoice_list or (not submitted_trackingcode and not submitted_invoiceno and not submitted_remark and not submitted_fromdate and not submitted_todate and not submitted_customer):
+            issearchempty = False
+    except:
+        issearchempty = False
     #template = loader.get_template('invoice.html')
     RequestConfig(request, paginate={'per_page': 25}).configure(final_invoice_table)
     
@@ -102,23 +105,29 @@ def retrieveInvoice(request):
                 'branchselectionaction': '/parcelhubPOS/invoice/',
                 'formdata' : formdata,
                 'deadlinetime': deadlinedatetime,
-                'issuperuser' : loguser.is_superuser,
                 'title' : 'Invoice',
-                'isedit' : branchaccess.transaction_auth == 'edit',
+                'isedit' : True,
+                'isall': branchid != '-1',
                 'statusmsg' : request.GET.get('msg'),
+                'header': 'Invoice list',
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'invoice.html', context)
 
 def gen_invoice_number(request):
     branchid = request.session.get(CONST_branchid)
+    branch = Branch.objects.get(id=branchid)
     last_invoice = Invoice.objects.filter(branch_id=branchid).order_by('invoiceno').last()
     if not last_invoice:
-         return 'INV000001'
+         return branch.branch_code + '000001'
     invoiceno = last_invoice.invoiceno
-    invoice_int = int(invoiceno.split('INV')[-1])
+    invoice_int = int(invoiceno.split(branch.branch_code)[-1])
     new_invoice_int = invoice_int + 1
-    
-    new_invoice_no = 'INV' + '%06d' % new_invoice_int
+    length_int = len(str(new_invoice_int))
+    paddingnumber = max([6,length_int])
+    paddingstr = '%0' + str(paddingnumber) +'d'
+    new_invoice_no = branch.branch_code + paddingstr % new_invoice_int
     return new_invoice_no
 
 def round_to(n, precision):
@@ -135,44 +144,50 @@ def editInvoice(request, invoiceid):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     invoiceid = request.GET.get('invoiceid')
-    
     title = 'New invoice'
     if invoiceid:
         title = "Edit invoice"
     branchid = request.session.get(CONST_branchid)
-    customer = Customer.objects.filter(branch__id = branchid) 
-    customerlist = []
-    for cust in customer:
-        customerlist.append(cust.name)
-    customerlist = json.dumps(customerlist)
-    sel_branch = Branch.objects.get(id=branchid)
+    if branchid == '-1':
+        sel_branch = Branch.objects.all().first()
+    else:
+        sel_branch = Branch.objects.get(id=branchid)
     user = User.objects.get(id = request.session.get('userid'))
     if invoiceid:
         InvoiceItemFormSet = modelformset_factory(InvoiceItem, form = InvoiceItemForm, extra=0)
         invoicequeryset = Invoice.objects.get(id=invoiceid)
         invoiceitemqueryset = InvoiceItem.objects.filter(invoice=invoicequeryset)
-        invoice_form = InvoiceForm(branchid, instance=invoicequeryset)
+        invoice_form = InvoiceForm(invoicequeryset.branch.id, instance=invoicequeryset)
+        
         invoice = invoicequeryset
+        haspayment = invoice.paymentinvoice_set.count() > 0
     else:
         InvoiceItemFormSet = modelformset_factory(InvoiceItem, form = InvoiceItemForm, extra=1)
         invoicequeryset = None;
         invoiceitemqueryset = InvoiceItem.objects.none()
+
         invoice_form = InvoiceForm(branchid, instance=invoicequeryset, initial={'discount': 0, 
-                                                                      'invoice_date': timezone.now().date(),
-                                                                      'invoicetype': 'Cash',
-                                                                      'payment_type': 'Cash'}
+                                                                                  'invoice_date': timezone.now().date(),
+                                                                                  'invoicetype': 'Cash',
+                                                                                  'payment_type': 'Cash',
+                                                                                  'branch': sel_branch.id,}
                                    )
+        
         invoice = None;
+        haspayment = False
     defaultcourier = CourierVendor.objects.filter().first()
     invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'zone_type': 'Domestic', 'producttype':'Parcel', 'courier': defaultcourier.id}])
     
     #printing
-    
     if request.method == 'POST':
+        invoicebranch = branchid
+        if invoicequeryset:
+            invoicebranch = invoicequeryset.branch.id
         invoice_form = InvoiceForm(branchid, request.POST, instance=invoicequeryset) # A form bound to the POST data
+        invoicebranch
         # Create a formset from the submitted data
         invoice_item_formset = InvoiceItemFormSet(request.POST, request.FILES)
-
+        postaction = ''
         if invoice_form.is_valid() and invoice_item_formset.is_valid():
             subtotal = 0;
             invoice = invoice_form.save(commit=False)
@@ -192,7 +207,6 @@ def editInvoice(request, invoiceid):
                 invoice.invoiceno = gen_invoice_number(request)
                 invoice.createtimestamp = timezone.now()
             invoice.updatetimestamp = timezone.now()
-            invoice.branch = sel_branch
             invoice.subtotal = subtotal
             invoice.created_by = user
             discount = formdatainvoice.get('discount')
@@ -204,7 +218,7 @@ def editInvoice(request, invoiceid):
             invoice.total = round_to_05(subtotal - discount)
             
             invoice.gst = gsttotal
-            invoice_list = invoice_form.save()
+            invoice.save()
             
             # save invoice item
             trackingcodes = []
@@ -217,20 +231,26 @@ def editInvoice(request, invoiceid):
                 price = formdata.get('price') 
                 invoice_item.save()
                 trackingcodes.append(invoice_item.tracking_code)
-            itemstodelete = InvoiceItem.objects.filter(invoice__id=invoice_list.id).exclude(tracking_code__in=trackingcodes)
+            itemstodelete = InvoiceItem.objects.filter(invoice__id=invoice.id).exclude(tracking_code__in=trackingcodes)
             for item in itemstodelete:
                 item.delete()
-            if request.POST['action'] == 'Confirm' or request.POST['action'] == 'Confirm and new':
-                if invoice_list.invoicetype.name == 'Cash':
-                    invoiceprint = invoice_thermal(request, invoice_list.id)
+                
+            if 'action' in request.POST and request.POST['action'] == 'Print delivery order':
+                return deliveryorder_pdf(request, invoice.id)
+            else:
+                if invoice.invoicetype.name == 'Cash':
+                    invoiceprint = invoice_thermal(request, invoice.id)
                 else:
-                    invoiceprint = invoice_pdf(request, invoice_list.id) 
+                    invoiceprint = invoice_pdf(request, invoice.id) 
                 return HttpResponse(invoiceprint, content_type='application/pdf')#HttpResponseRedirect("/parcelhubPOS/invoice/editinvoice/?invoiceid=" + str( invoice_list.id ) ) # Redirect to a 'success' page
-
-            elif request.POST['action'] == 'Print delivery order':
-                return deliveryorder_pdf(request, invoice_list.id)
+            
     # For CSRF protection
-    # See http://docs.djangoproject.com/en/dev/ref/contrib/csrf/ 
+    # See http://docs.djangoproject.com/en/dev/ref/contrib/csrf/
+    globalparam = GlobalParameter.objects.all().first();
+    isnotlocked = True;
+    if invoicequeryset and globalparam:
+         isnotlocked = globalparam.invoice_lockin_date > invoicequeryset.createtimestamp.date()
+    isedit = isnotlocked and not haspayment
     context = {'invoice_form': invoice_form,
                  'invoice_item_formset': invoice_item_formset,
                  'headerselectiondisabled' : True,
@@ -238,9 +258,12 @@ def editInvoice(request, invoiceid):
                  'loggedusers' : loggedusers,
                  'branchselection': branchselectlist,
                  'invoice': invoice,
-                 'customerlist': customerlist,
-                 'invoicetitle': title
-                 
+                 'invoicetitle': title,
+                 'isedit' : isedit,
+                 'haspayment': haspayment,
+                 'isall': branchid == '-1',
+                 'header': 'Sales invoice',
+                 'sel_branch': sel_branch
                  }
     return render(request, 'editinvoice.html', context)
 
@@ -440,7 +463,10 @@ def autocompletezone(request):
             zone_list = ZoneInternational.objects.filter(couriervendor__id =courier)
     if postcode_country:
         if zonetype == 'Domestic':
-            zone_list =  zone_list.filter(postcode_start__lte=postcode_country,postcode_end__gte=postcode_country)
+            if len(postcode_country) > 3:
+                zone_list =  zone_list.filter(postcode_start__lte=postcode_country,postcode_end__gte=postcode_country)
+            else:
+                zone_list =  zone_list.filter(zone = postcode_country)
         else:
             zone_list = zone_list.filter(country = postcode_country)
     for zone in zone_list:

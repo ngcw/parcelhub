@@ -7,6 +7,7 @@ from .tables import TaxTable
 from .commons import *
 from .models import Tax, UserBranchAccess
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 CONST_branchid = 'branchid'
 #method to retrieve Courier tax list
 @login_required
@@ -14,7 +15,6 @@ def taxlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     menubar = navbar(request)
     tax_list = Tax.objects.all()
     formdata = {'taxcode':''}
@@ -26,7 +26,14 @@ def taxlist(request):
     final_Tax_table = TaxTable(tax_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_Tax_table)
-    
+    loguser = User.objects.get(id=request.session.get('userid'))
+    issearchempty = True
+    searchmsg = 'There no tax matching the search criteria...'
+    try:
+        if tax_list or (not submitted_taxcode ):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'tax': final_Tax_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -34,8 +41,12 @@ def taxlist(request):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': "Tax",
-                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'isedit' : loguser.is_superuser,
+                'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
+                'header': "Tax",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'tax.html', context)
 
@@ -71,7 +82,8 @@ def edittax(request, taxid):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'title' : title
+                'title' : title,
+                'header': title
                 }
     return render(request, 'edittax.html', context)
 

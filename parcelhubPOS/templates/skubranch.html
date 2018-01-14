@@ -9,7 +9,7 @@
 		<div>Customer:<input type="text" name="customername" maxlength ="50" value="{{ formdata.customername }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
-    {% if isedit %}
+    {% if isedit and isall %}
     <form action="/parcelhubPOS/skubranch/editskubranch/?skubranchid=">
     	<input type="submit" value="Add" />
 	</form>
@@ -19,7 +19,7 @@
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table skubranch %}
-	{% if isedit %}
+	{% if isedit and isall %}
 	<form action="/parcelhubPOS/skubranch/editskubranch/?skubranchid=">
     	<input type="submit" value="Add" />
 	</form>

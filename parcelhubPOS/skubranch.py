@@ -15,8 +15,17 @@ def skubranchlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
-    skubranch_list = SKUBranch.objects.filter(branch__id=branchid)
+    if branchid == '-1':
+        isedit = True
+    else:
+        branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+        isedit = branchaccess.access_level != 'Cashier'
+    loguser = User.objects.get(id=request.session.get('userid'))
+    if branchid == "-1":
+        skubranch_list = SKUBranch.objects.all()
+    else:
+        skubranch_list = SKUBranch.objects.filter(branch__id=branchid)
+    
     formdata = {'skucode':'',
                 'branchname':'',
                 'customername':''}
@@ -24,7 +33,7 @@ def skubranchlist(request):
         submitted_skucode = request.GET.get('skucode') 
         if submitted_skucode:
             formdata['skucode'] = submitted_skucode;
-            skubranch_list =  skubranch_list.filter(sku_code__icontains=submitted_skucode)
+            skubranch_list =  skubranch_list.filter(sku__sku_code__icontains=submitted_skucode)
         submitted_branchname = request.GET.get('branchname') 
         if submitted_branchname:
             formdata['branchname'] = submitted_branchname;
@@ -36,7 +45,13 @@ def skubranchlist(request):
     final_SKUBranch_table = SKUBranchTable(skubranch_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_SKUBranch_table)
-    
+    issearchempty = True
+    searchmsg = 'There no SKU pricing matching the search criteria...'
+    try:
+        if skubranch_list or (not submitted_skucode and not submitted_branchname and not submitted_customername):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'skubranch': final_SKUBranch_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -44,8 +59,13 @@ def skubranchlist(request):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': 'SKU per branch',
-                'isedit' : branchaccess.skupricing_auth == 'edit',
+                'isedit' : isedit,
+                'issuperuser' : loguser.is_superuser,
+                'isall': branchid != '-1',
                 'statusmsg' : request.GET.get('msg'),
+                'header': "SKU branch",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
             }
     return render(request, 'skubranch.html', context)
 
@@ -173,7 +193,8 @@ def editskubranch(request, skubranchid):
                 'customer_list': customer_list,
                 'branch': branch,
                 'errortext' : errortext,
-                'title' : title
+                'title' : title,
+                'header': title
                 }
     return render(request, 'editskubranch.html', context)
 

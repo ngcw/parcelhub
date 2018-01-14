@@ -10,7 +10,7 @@
 		<div>IC No:<input type="text" name="icno" maxlength ="50" value="{{ formdata.icno }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
     </form>
-    {% if isedit %}
+    {% if isedit and isall %}
 	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">
     	<input type="submit" value="Add" />
 	</form>
@@ -20,7 +20,7 @@
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table customer %}
-	{% if isedit %}
+	{% if isedit and isall %}
 	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">
     	<input type="submit" value="Add" />
 	</form>

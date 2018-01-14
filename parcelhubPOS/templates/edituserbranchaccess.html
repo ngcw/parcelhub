@@ -21,69 +21,9 @@
 	  		<tr>
 	  			<td>Master data:</td>
 	  			<td>
-	  				<select name="masterdata_auth">
+	  				<select name="access_level">
 	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.masterdata_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
-	  					{% endfor %}
-	  				</select>
-	  			</td>
-	  		</tr>
-	  		<tr>
-	  			<td>Branch:</td>
-	  			<td>
-	  				<select name="branch_auth">
-	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.branch_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
-	  					{% endfor %}
-	  				</select>
-	  			</td>
-	  		</tr>
-	  		<tr>
-	  			<td>User:</td>
-	  			<td>
-	  				<select name="user_auth">
-	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.user_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
-	  					{% endfor %}
-	  				</select>
-	  			</td>
-	  		</tr>
-	  		<tr>
-	  			<td>SKU pricing:</td>
-	  			<td>
-	  				<select name="skupricing_auth">
-	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.skupricing_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
-	  					{% endfor %}
-	  				</select>
-	  			</td>
-	  		</tr>
-	  		<tr>
-	  			<td>Invoice data:</td>
-	  			<td>
-	  				<select name="transaction_auth">
-	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.transaction_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
-	  					{% endfor %}
-	  				</select>
-	  			</td>
-	  		</tr>
-	  		<tr>
-	  			<td>Customer account:</td>
-	  			<td>
-	  				<select name="custacc_auth">
-	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.custacc_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
-	  					{% endfor %}
-	  				</select>
-	  			</td>
-	  		</tr>
-	  		<tr>
-	  			<td>Report:</td>
-	  			<td>
-	  				<select name="report_auth">
-	  					{% for seloption in selectionoption %}
-	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.report_auth == seloption %} selected {% endif %}>{{ seloption }}</option>
+	  					<option value="{{ seloption }}" {% if currentuserba and currentuserba.access_level == seloption %} selected {% endif %}>{{ seloption }}</option>
 	  					{% endfor %}
 	  				</select>
 	  			</td>

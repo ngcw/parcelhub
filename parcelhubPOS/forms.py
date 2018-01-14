@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from .models import SKU, Invoice, InvoiceItem, Payment, PaymentInvoice, Customer, Branch, GlobalParameter
 from django.db.models import Q
 from django.forms.models import BaseModelFormSet
+from django.forms.widgets import HiddenInput
 
 class UserCreateForm(UserCreationForm):
     class Meta:
@@ -64,7 +65,7 @@ class SKUForm(forms.ModelForm):
 class BranchForm(forms.ModelForm):
     class Meta:
         model = Branch
-        fields = ( "name", 'owner', 'contact', 'email', 'address', 'registrationno', 'gstno', 'payment_bank', 'payment_acc','fax', 'tollfree', 'website')
+        fields = ( "name", "branch_code",'owner', 'contact', 'email', 'address', 'registrationno', 'gstno', 'payment_bank', 'payment_acc','fax', 'tollfree', 'website')
         widgets = {
             'address': Textarea(attrs={'cols': 33, 'rows': 4})
         }
@@ -81,10 +82,11 @@ class GlobalParameterForm(forms.ModelForm):
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
-        fields = ( "invoice_date", "invoicetype",  "customer", "remarks", 'discount', "payment", 'payment_type')
+        fields = ( "branch","createtimestamp", "invoicetype",  "customer", "remarks", 'discount', "payment", 'payment_type')
         widgets = {
             'remarks': Textarea(attrs={'cols': 25, 'rows': 3}),
-            "invoice_date": DateInput()
+            "invoice_date": DateInput(),
+            'branch': HiddenInput(),
         }
     def clean_customer(self):
         return self.cleaned_data['customer'] or None
@@ -98,13 +100,14 @@ class InvoiceForm(forms.ModelForm):
             
         self.fields['payment'].widget.attrs\
             .update({
-                'oninput': 'UpdateTotal()'
+                'oninput': 'UpdateTotal()',
             })
         self.fields['invoicetype'].widget.attrs\
             .update({
                 'onchange': 'HideShowCashType()'
             })
-    
+
+
 class InvoiceItemForm(forms.ModelForm):
     #sku = forms.ModelChoiceField(queryset=SKU.objects.all())
     class Meta: 
@@ -160,7 +163,7 @@ class InvoiceItemForm(forms.ModelForm):
         .update({
             'onchange': 'AutoCompleteSKU(this.id)',
             'ondblclick': 'editDimensionalWeight(this.id)',
-            
+            'class': 'lastInput'
         })
         self.fields['height'].widget.attrs\
             .update({
@@ -207,14 +210,20 @@ class PaymentForm(forms.ModelForm):
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.fields['customer'].widget.attrs\
             .update({
-                'readOnly': 'True'
+                'readOnly': 'True',
+                'disabled': 'disabled'
             })   
+        self.fields['payment_paymenttype'].empty_label = None
 class PaymentInvoiceForm(forms.ModelForm):
     class Meta: 
         model = PaymentInvoice
         fields = ('paidamount',)
-        exclude = ('previousamount',)
-
+    def __init__(self, *args, **kwargs):
+        super(PaymentInvoiceForm, self).__init__(*args, **kwargs)
+        self.fields['paidamount'].widget.attrs\
+            .update({
+                'class': 'paymentinput',
+            })   
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer

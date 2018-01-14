@@ -7,6 +7,7 @@ from .tables import ZoneDomesticTable, ZoneInternationalTable
 from .commons import *
 from .models import ZoneDomestic, ZoneInternational, UserBranchAccess, CourierVendor
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 CONST_branchid = 'branchid'
 #method to retrieve Courier zonedomestic list
 @login_required
@@ -15,7 +16,6 @@ def zonedomesticlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     zonedomestic_list = ZoneDomestic.objects.all()
     formdata = {'state':'',
                 'postcode':'',
@@ -38,7 +38,14 @@ def zonedomesticlist(request):
     final_ZoneDomestic_table = ZoneDomesticTable(zonedomestic_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_ZoneDomestic_table)
-    
+    loguser = User.objects.get(id=request.session.get('userid'))
+    issearchempty = True
+    searchmsg = 'There no domestic zone matching the search criteria...'
+    try:
+        if zonedomestic_list or (not submitted_state and not submitted_zone and not submitted_postcode):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'zonedomestic': final_ZoneDomestic_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -46,8 +53,12 @@ def zonedomesticlist(request):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': 'Domestic zone',
-                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'isedit' : loguser.is_superuser,
+                'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
+                'header': "Domestic zone",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'zonedomestic.html', context)
 
@@ -83,7 +94,8 @@ def editzonedomestic(request, zonedomesticid):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'title': title
+                'title': title,
+                'header': title
                 }
     return render(request, 'editzonedomestic.html', context)
 
@@ -102,7 +114,6 @@ def zoneinternationallist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
     zoneinternational_list = ZoneInternational.objects.all()
     formdata = {'country':'',
                 'zonedoc':'',
@@ -130,7 +141,14 @@ def zoneinternationallist(request):
     final_ZoneInternational_table = ZoneInternationalTable(zoneinternational_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_ZoneInternational_table)
-    
+    loguser = User.objects.get(id=request.session.get('userid'))
+    issearchempty = True
+    searchmsg = 'There no international zone matching the search criteria...'
+    try:
+        if zoneinternational_list or (not submitted_country and not submitted_courier and not submitted_zonedoc and not submitted_zonemer):
+            issearchempty = False
+    except:
+        issearchempty = False
     context = {
                 'zoneinternational': final_ZoneInternational_table,
                 'nav_bar' : sorted(menubar.items()),
@@ -138,8 +156,12 @@ def zoneinternationallist(request):
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': "International zone",
-                'isedit' : branchaccess.masterdata_auth == 'edit',
+                'isedit' : loguser.is_superuser,
+                'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
+                'header': "International zone",
+                'issearchempty': issearchempty,
+                'searchmsg': searchmsg
                 }
     return render(request, 'zoneinternational.html', context)
 
@@ -176,7 +198,8 @@ def editzoneinternational(request, zoneinternationalid):
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
                 'loggedusers' : loggedusers,
-                'title': title
+                'title': title,
+                'header': title
                 }
     return render(request, 'editzoneinternational.html', context)
 
