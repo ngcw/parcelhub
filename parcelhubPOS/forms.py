@@ -199,7 +199,7 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['skudescription'].widget.attrs\
             .update({
                 'readOnly': 'True',
-                'class': 'lastInput skudescription'
+                'class': 'skudescription'
             })
 class PaymentForm(forms.ModelForm):
     class Meta:

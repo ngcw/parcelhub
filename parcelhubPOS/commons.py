@@ -8,7 +8,7 @@ CONST_username = 'Username'
 CONST_invoice = '1Invoice'
 CONST_custacc = '2Customer Account'
 CONST_payment = '3Payment'
-CONST_soa = '4StatementOfAccount'
+CONST_soa = '4Statement Of Account'
 CONST_masterdata = '5Information'
 CONST_system = '6System'
 def userselection(request):

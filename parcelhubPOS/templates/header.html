@@ -976,6 +976,7 @@
 	    			{
 	    				if ( validated )
 	    				{
+	    					alert("Are you sure you want to commit this invoice?");
 	    					document.getElementById("newInvoicePage").click();
 	    					document.getElementById("editinvoiceform").submit();
 	    				}
@@ -1054,7 +1055,6 @@
 	    	    $(id).append('<option value=' + newID + ' >' + newRepr + '</option>')
 	    	    win.close();
 	    	    var newOption = new Option(newRepr, newID, true, true);
-	    	    $(id).select2().append(newOption)
 	    	    $(id).select2().val(newID);
 	    	    $(id).select2().trigger('change')
 	    	}
