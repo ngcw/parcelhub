@@ -120,9 +120,9 @@ def editpayment(request, paymentid):
         selectedcustomer =  Customer.objects.get(id=customerid)
         invoicetopay = Invoice.objects.filter(customer__id = customerid)
         if date_from:
-            invoicetopay = invoicetopay.filter(invoice_date__gte = date_from)
+            invoicetopay = invoicetopay.filter(createtimestamp__gte = date_from)
         if date_to:
-            invoicetopay = invoicetopay.filter(invoice_date__lte = date_to)
+            invoicetopay = invoicetopay.filter(createtimestamp__lte = date_to)
         if paymentoption == 'Unpaid':
             invoicetopay = invoicetopay.filter(payment__lt=models.F('total'))
         if invoicetopay:

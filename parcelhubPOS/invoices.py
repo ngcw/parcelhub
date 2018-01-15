@@ -249,7 +249,7 @@ def editInvoice(request, invoiceid):
     globalparam = GlobalParameter.objects.all().first();
     isnotlocked = True;
     if invoicequeryset and globalparam:
-         isnotlocked = globalparam.invoice_lockin_date > invoicequeryset.createtimestamp.date()
+         isnotlocked = invoicequeryset.createtimestamp.date() > globalparam.invoice_lockin_date
     isedit = isnotlocked and not haspayment
     context = {'invoice_form': invoice_form,
                  'invoice_item_formset': invoice_item_formset,
