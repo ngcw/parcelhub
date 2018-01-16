@@ -1089,6 +1089,21 @@
 		    	}
 	    	{% endif %}
 	    	{%if payment_form %}
+	    	function validatePayment()
+	    	{
+	    		
+	    		var arr = document.getElementsByClassName('paymentinput');
+	    		for(var i=0;i<arr.length;i++){
+	    			if(arr[i].style.backgroundColor == 'red')
+	    			{
+	    				var row = i + 1
+	    				alert('Invalid paid amount at row ' + row +'.')
+	    				return false;
+	    			}
+	    		}
+	    		enabledCustomer()
+	    		return true
+	    	}
 	    	function UpdateTotalAndRemaining() {
 				var arr = document.getElementsByClassName('paymentinput');
 				var total = 0;
@@ -1096,25 +1111,33 @@
 			    	var value = parseFloat(arr[i].value)
 			        if( isNaN(value) )
 			        {
-			        	
+			        	value = 0
 			        }
-			        else
-		        	{
-			        	total += value;
-			        	var paidamtid = arr[i].id
-			        	var inputstr = paidamtid.split("-");
-			    	    var count = inputstr[1]
-			    	    var finalcount = (parseFloat(inputstr[1]) + 1).toFixed(0)
-			        	var arrtotal = document.getElementById('total_'+ finalcount)
-			        	var arrpaid = document.getElementById('payment_'+ finalcount)
-			        	var arrremainder = document.getElementById('remainder_'+ finalcount)
-			        	var finalremainder = (parseFloat(arrtotal.innerHTML) - parseFloat(arrpaid.innerHTML) - value).toFixed(2);
-			    	    
-			    	    if( finalremainder !== null || finalremainder !== '' )
-			    	    	{
-			    	    	arrremainder.innerHTML = finalremainder
-			    	    	}
-		        	}
+			        
+		        	total += value;
+		        	var paidamtid = arr[i].id
+		        	var inputstr = paidamtid.split("-");
+		    	    var count = inputstr[1]
+		    	    var finalcount = (parseFloat(inputstr[1]) + 1).toFixed(0)
+		        	var arrtotal = document.getElementById('total_'+ finalcount)
+		        	var arrpaid = document.getElementById('payment_'+ finalcount)
+		        	var arrremainder = document.getElementById('remainder_'+ finalcount)
+		        	var remaindervalue = (parseFloat(arrtotal.innerHTML) - parseFloat(arrpaid.innerHTML) - value)
+		        	var finalremainder = remaindervalue.toFixed(2);
+		    	    
+		    	    if( finalremainder !== null || finalremainder !== '' )
+		    	    {
+		    	    	arrremainder.innerHTML = finalremainder
+		    	    	if (remaindervalue < 0)
+		    	    	{
+		    	    		arr[i].style.backgroundColor = 'red'
+		    	    	}
+		    	    	else
+	    	    		{
+		    	    		arr[i].style.backgroundColor = ''
+	    	    		}
+		    	    }
+		        	
 			        	
 			        	
 			    }
