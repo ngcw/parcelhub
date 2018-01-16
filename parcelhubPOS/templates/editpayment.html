@@ -4,37 +4,59 @@
 	
 	<form action="/parcelhubPOS/payment/editpayment/?paymentid={{ paymentid }}" method="POST">{% csrf_token %}
 	{{ payment_form.non_field_errors }}
-	<div>Customer: {{ payment_form.customer }}</div>
-	<div>Payment type: {{ payment_form.payment_paymenttype }}</div>
+	
+	<table class="paymenttable">
+		<tr>
+			<th>Customer:</th>
+			<td>{{ payment_form.customer }}</td>
+		</tr>
+		<tr>
+			<th>Payment type:</th>
+			<td>{{ payment_form.payment_paymenttype }}</td>
+		</tr>
+	</table>
+	<h2>Payment per invoice</h2>
     <div id="paymentitemheader">
-		    <h2>Payment</h2>
 		    
 		    {{ payment_item_formset.management_form }}
 		    {{ payment_item_formset.non_field_errors }}
-		    <div class ="paymentitem_container">
+		    <table class ="paymentitem_container">
 		    {% for form in payment_item_formset.forms %}
 	            {% if forloop.first %}
-	            	<div class="paymentitemform_container">
-	            		<div class="counter_label_p">Nr.</div>
-	            			<div class="itemform_label_p">Invoice no:</div>
-	            			<div class="itemform_label_p">Total:</div>
-	            			<div class="itemform_label_p">Paid amount:</div>
-	            			<div class="itemform_label_p">Remaining:</div>
-		            		<div class="itemform_label_p">Amt to pay:</div>
-	                <div ></div>
-	                </div>
+	            	<tr class="paymentitemform_container">
+	            		<td class="counter_label_p">Nr.</td>
+	            			<td class="itemform_label_p">Invoice no:</td>
+	            			<td class="itemform_label_p">Total:</td>
+	            			<td class="itemform_label_p">Paid amount:</td>
+	            			<td class="itemform_label_p">Remaining:</td>
+	            			{% if isview %}
+	            			<td class="itemform_label_p">Amt paid:</td>
+	            			{% else %}
+		            		<td class="itemform_label_p">Amt to pay:</td>
+		            		{% endif %}
+	                <td ></td>
+	                </tr>
 	            {% endif %}
-	            <div class="paymentitem">
-	            	<div class="counter_input_p"><label  class="counter">{{forloop.counter}}</label> </div>
-	            			<div class="item_input_p">{{ form.instance.invoice.invoiceno }}</div>
-	            			<div class="item_input_p">{{ form.instance.invoice.total }}</div>
-	            			<div class="item_input_p">{{ form.instance.invoice.payment }}</div>
-	            			<div class="item_input_p">{{ form.instance.remainder }}</div>
-		            		<div class="item_input_p">{{ form.paidamount }}</div>
-		            		<div >{{ form.id }}</div>
-		    	</div>
+	            <tr class="paymentitem">
+	            	<td class="counter_input_p"><label  class="counter">{{forloop.counter}}</label> </td>
+	            			<td class="item_input_p">{{ form.instance.invoice.invoiceno }}</td>
+	            			<td class="item_input_p" id="total_{{forloop.counter}}">{{ form.instance.invoice.total }}</td>
+	            			<td class="item_input_p" id="payment_{{forloop.counter}}">{{ form.instance.invoice.payment }}</td>
+	            			<td class="item_input_p" id="remainder_{{forloop.counter}}">{{ form.instance.remainder }}</td>
+		            		<td class="item_input_p" id="paidamount_{{forloop.counter}}">{{ form.paidamount }}</td>
+		            		<td >{{ form.id }}</td>
+		    	</tr>
 		    {% endfor %}
-		    </div>
+		    	<tr></tr>
+		    	<tr class="paymentitem">
+	            	<td class="counter_input_p"></td>
+	            			<td class="item_input_p"><label id="totalpaidlabel">Total paid:</label></td>
+	            			<td class="item_input_p"></td>
+	            			<td class="item_input_p"></td>
+	            			<td class="item_input_p"></td>
+		            		<td class="item_input_p"><label id="totalamt">{{ totalamt }}</label></td>
+		    	</tr>
+		    </table>
 		    
 	    </div>
 	   

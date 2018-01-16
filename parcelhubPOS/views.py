@@ -115,6 +115,7 @@ def globalparameter(request):
                 'loggedusers' : loggedusers,
                 'issuperuser' : loguser.is_superuser,
                 'title' : title,
+                'header' : title,
                 'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'globalparameter.html', context)

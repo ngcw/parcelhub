@@ -223,6 +223,7 @@ class PaymentInvoiceForm(forms.ModelForm):
         self.fields['paidamount'].widget.attrs\
             .update({
                 'class': 'paymentinput',
+                'onchange' : 'UpdateTotalAndRemaining()'
             })   
 class CustomerForm(forms.ModelForm):
     class Meta:

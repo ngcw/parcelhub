@@ -273,7 +273,6 @@ input:disabled, select:disabled, textarea:disabled
 	float: left;
 	display: inline;
 	min-width: 30px;
-	border: 1px solid;
 }
 .itemform_label
 {
@@ -285,8 +284,7 @@ input:disabled, select:disabled, textarea:disabled
 {
 	float: left;
 	display: inline;
-	width: 100px;
-	border: 1px solid;
+	width: 100px
 }
 .item_input, .item_input selection, .item_input input
 {
@@ -299,7 +297,6 @@ input:disabled, select:disabled, textarea:disabled
 	float: left;
 	display: inline;
 	width: 100px;
-	border: 1px solid;
 }
 .itemform_label_description
 {
@@ -476,4 +473,20 @@ input:disabled, select:disabled, textarea:disabled
 .paymentinput
 {
 	border: none;
+}
+.paymenttable
+{
+	margin-bottom: 10px;
+}
+.paymenttable th
+{
+	text-align: right;
+}
+#paymentitemheader
+{
+	float: left;
+}
+#totalpaidlabel, #totalamt
+{
+	font-weight: bold;
 }

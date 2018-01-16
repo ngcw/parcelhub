@@ -183,10 +183,11 @@ def editpayment(request, paymentid):
                     
                     total = total + paidamount 
                     paymentinvoice.save()
+                    invoicetoupdate.save()
                 payment.total = total;
                 
                
-                invoicetoupdate.save()
+                
                 customername = request.POST['customer'] 
                 if title == 'New payment':
                     msg = 'Payment for "%s" have been created successfully.' % customername
@@ -196,6 +197,10 @@ def editpayment(request, paymentid):
                 return HttpResponseRedirect('/parcelhubPOS/payment?custid=""&msg=%s' %msg)
         elif request.POST['action'] == 'Cancel payment':
             return HttpResponseRedirect("/parcelhubPOS/payment/deletepayment?dpaymentid=%s"% paymentqueryset.id)
+    totalamt = 0;
+    if paymentqueryset.total:
+        totalamt = '%.2f'% paymentqueryset.total
+    
     context = {'payment_form': payment_form,
                 'payment_item_formset': payment_item_formset,
                 'headerselectiondisabled' : True,
@@ -206,6 +211,7 @@ def editpayment(request, paymentid):
                 'title': title,
                 'header': title,
                 'isview': title == 'View payment',
+                'totalamt': totalamt
                 }
     return render(request, 'editpayment.html', context)
 

@@ -216,7 +216,10 @@ def editInvoice(request, invoiceid):
             if discountmode == '%':
                 discount = ( discount / 100 ) * (subtotal + gsttotal)
             invoice.total = round_to_05(subtotal - discount)
-            
+            payment = formdatainvoice.get('payment')
+            if not payment:
+                payment = 0;
+            invoice.payment = payment
             invoice.gst = gsttotal
             invoice.save()
             
@@ -249,7 +252,7 @@ def editInvoice(request, invoiceid):
     globalparam = GlobalParameter.objects.all().first();
     isnotlocked = True;
     if invoicequeryset and globalparam:
-         isnotlocked = invoicequeryset.createtimestamp.date() > globalparam.invoice_lockin_date
+         isnotlocked = invoicequeryset.createtimestamp.date() >= globalparam.invoice_lockin_date
     isedit = isnotlocked and not haspayment
     context = {'invoice_form': invoice_form,
                  'invoice_item_formset': invoice_item_formset,
@@ -263,7 +266,7 @@ def editInvoice(request, invoiceid):
                  'haspayment': haspayment,
                  'isall': branchid == '-1',
                  'header': 'Sales invoice',
-                 'sel_branch': sel_branch
+                 'sel_branch': sel_branch,
                  }
     return render(request, 'editinvoice.html', context)
 
