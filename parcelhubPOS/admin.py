@@ -2,7 +2,9 @@ from django.contrib import admin
 from .models import *
 from import_export.admin import ImportExportModelAdmin
 
-
+admin.site.site_header = "Print Pack Ship Administration"
+admin.site.site_title = "Print Pack Ship Administration"
+admin.site.index_title = "Print Pack Ship Administration"
 admin.site.register(UserExtend)
 @admin.register(Branch)
 class BranchAdmin(ImportExportModelAdmin):
