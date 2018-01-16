@@ -115,6 +115,13 @@
 			    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
 			    return i;
 			}
+			function clearSearch()
+			{
+				var inputs = document.getElementsByClassName('searchdata');
+    		    for (var i = 0; i < inputs.length; i += 1) {
+    		        inputs[i].value = '';
+    		    }
+			}
 		  /* When the user clicks on the button, 
 		  toggle between hiding and showing the dropdown content */
 			
@@ -142,6 +149,9 @@
     		  switch (e.keyCode) {
     		    case 120: // f9
     		    	window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=');
+    		      return;
+    		    case 123:
+    		    	clearSearch();
     		      return;
     		  }
     		});
