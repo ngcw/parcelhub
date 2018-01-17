@@ -3,16 +3,18 @@
 
 {% block content %}
 	{{ ionvoiceitem }}
-	<form class="searchform" action="" method="get">
+	<form class="searchform" action="" method="get" style="min-width: 1350px">
 		<div >Tracking#:<input type="text" name="trackingcode" maxlength ="50" value="{{ formdata.trackingcode }}" class="searchdata"/></div>
 		<div class="searchinput">Invoice#:<input type="text" name="invoicenumber" maxlength ="50" value="{{ formdata.invoicenumber }}" class="searchdata"/></div>
+		<div class="searchinput">Remark:<input type="text" name="remark" maxlength ="255" value="{{ formdata.remark }}" class="searchdata"/></div>
         <div class="searchinput">From date:<input type="date" name="fromdate" value="{{ formdata.fromdate }}" class="searchdata"/></div>
-        <div class="searchinput">To date:<input type="date" name="todate" value="{{ formdata.todate }}" class="searchdata"/></div>
+        <div class="searchinput">To date:<input type="date" name="todate" value="{{ formdata.todate }}" class="searchdata"/></div> 
         <div class="searchinput">Customer:<input type="text" name="customer" maxlength ="50" value="{{ formdata.customer }}" class="searchdata"/></div>
-        <div class="searchinput">Remark:<input type="text" name="remark" maxlength ="255" value="{{ formdata.remark }}" class="searchdata"/></div>
+        
         <input class="searchbutton" type="submit" value="Search"/> 
-       
+        <button onclick="clearSearch()">Clear search</button>
     </form>
+     
     
     {% if isedit and isall %}
     <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">

@@ -47,7 +47,7 @@ def paymentlist(request, custid):
         if submitted_date:
             formdata['date'] = submitted_date;
             payment_list =  payment_list.filter(createtimestamp__lte=submitted_date, createtimestamp__gte=submitted_date )
-    final_Payment_table = PaymentTable(payment_list)
+    final_Payment_table = PaymentTable(payment_list.order_by('-createtimestamp'))
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_Payment_table)
     issearchempty = True

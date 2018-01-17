@@ -8,6 +8,7 @@
 		<div>Postcode:<input type="number" name="postcode" maxlength ="25" value="{{ formdata.postcode }}"/></div>
 		<div>Zone:<input type="number" name="zone" maxlength ="25" value="{{ formdata.zone }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/zonedomestic/editzonedomestic/?zonedomesticid=">

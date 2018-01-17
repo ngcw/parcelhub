@@ -8,6 +8,7 @@
 		<div>Document zone:<input type="number" name="zonedoc" maxlength ="25" value="{{ formdata.zonedoc }}"/></div>
 		<div>Merchandise zone:<input type="number" name="zonemer" maxlength ="25" value="{{ formdata.zonemer }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/zoneinternational/editzoneinternational/?zoneinternationalid=">

@@ -6,6 +6,7 @@
 	<form class="searchform" action="/parcelhubPOS/tax/" method="get">
 		<div>Tax code:<input type="text" name="taxcode" maxlength ="50" value="{{ formdata.taxcode }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/tax/edittax/?taxid=">

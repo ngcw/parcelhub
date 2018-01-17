@@ -150,7 +150,7 @@
     		    case 120: // f9
     		    	window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=');
     		      return;
-    		    case 123:
+    		    case 115: //f4
     		    	clearSearch();
     		      return;
     		  }
@@ -1089,6 +1089,11 @@
 		    	}
 	    	{% endif %}
 	    	{%if payment_form %}
+	    	function setFocusToPaymentBox(){
+	    		var inputid = "id_form-0-paidamount"
+	    	    document.getElementById(inputid).focus();
+	    	    ValidateTrackingCode(inputid)
+	    	}
 	    	function validatePayment()
 	    	{
 	    		
@@ -1156,6 +1161,7 @@
     		{% else %}
     		window.onload = function () {
     			UpdateTotalAndRemaining();
+    			setFocusToPaymentBox()
 	    	}
     		{% endif %}
 	    	{% endif %}

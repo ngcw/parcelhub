@@ -7,6 +7,7 @@
 		<div>Customer name:<input type="text" name="customername" maxlength ="50" value="{{ formdata.customername }}"/></div>
 		<div>Date:<input type="date" name="date" maxlength ="50" value="{{ formdata.date }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if statusmsg %}
 	<div class="statusspacing"></div>

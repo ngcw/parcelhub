@@ -9,6 +9,7 @@
 		<div>Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
 		<div>IC No:<input type="text" name="icno" maxlength ="50" value="{{ formdata.icno }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if isedit and isall %}
 	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">

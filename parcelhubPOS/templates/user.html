@@ -9,6 +9,7 @@
 		<div>Username:<input type="text" name="username" maxlength ="50" value="{{ formdata.username }}"/></div>
 		<div class="searchinput">Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if isedit and isall %}
     <form action="/parcelhubPOS/user/adduser">

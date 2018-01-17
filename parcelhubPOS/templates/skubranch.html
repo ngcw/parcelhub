@@ -8,6 +8,7 @@
 		<div>Branch:<input type="text" name="branchname" maxlength ="50" value="{{ formdata.branchname }}"/></div>
 		<div>Customer:<input type="text" name="customername" maxlength ="50" value="{{ formdata.customername }}"/></div>
         <input class="searchbutton" type="submit" value="Search"/> 
+        <button onclick="clearSearch()">Clear search</button>
     </form>
     {% if isedit and isall %}
     <form action="/parcelhubPOS/skubranch/editskubranch/?skubranchid=">
