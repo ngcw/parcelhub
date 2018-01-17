@@ -16,8 +16,8 @@
 				{% endfor %}
 			</select>
 		</div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/vendor/editvendor/?vendorid=">

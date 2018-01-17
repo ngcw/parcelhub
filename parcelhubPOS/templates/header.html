@@ -1092,7 +1092,22 @@
 	    	function setFocusToPaymentBox(){
 	    		var inputid = "id_form-0-paidamount"
 	    	    document.getElementById(inputid).focus();
-	    	    ValidateTrackingCode(inputid)
+	    	}
+	    	function togglePayment(inputid){
+	    		var inputstr = inputid.split("_");
+	    	    var count = inputstr[1]
+	    	    var finalcount = (parseFloat(inputstr[1]) - 1).toFixed(0)
+	    	    var paidinput = document.getElementById('id_form-'+ finalcount+'-paidamount')
+	    	    var outstandingele = document.getElementById(inputid)
+	    	    if(parseFloat(paidinput.value) !== parseFloat(outstandingele.innerHTML))
+    	    	{
+    	    		paidinput.value = parseFloat(outstandingele.innerHTML)
+    	    	}
+	    	    else
+	    	    {
+	    	    	paidinput.value = 0.00
+	    	    }
+	    	    UpdateTotalAndRemaining()
 	    	}
 	    	function validatePayment()
 	    	{
@@ -1129,11 +1144,11 @@
 		        	var arrremainder = document.getElementById('remainder_'+ finalcount)
 		        	var remaindervalue = (parseFloat(arrtotal.innerHTML) - parseFloat(arrpaid.innerHTML) - value)
 		        	var finalremainder = remaindervalue.toFixed(2);
-		    	    
+
 		    	    if( finalremainder !== null || finalremainder !== '' )
 		    	    {
 		    	    	arrremainder.innerHTML = finalremainder
-		    	    	if (remaindervalue < 0)
+		    	    	if (parseFloat(remaindervalue.toFixed(2)) < 0)
 		    	    	{
 		    	    		arr[i].style.backgroundColor = 'red'
 		    	    	}

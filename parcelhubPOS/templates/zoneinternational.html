@@ -7,8 +7,8 @@
 		<div>Country:<input type="text" name="country" maxlength ="50" value="{{ formdata.country }}"/></div>
 		<div>Document zone:<input type="number" name="zonedoc" maxlength ="25" value="{{ formdata.zonedoc }}"/></div>
 		<div>Merchandise zone:<input type="number" name="zonemer" maxlength ="25" value="{{ formdata.zonemer }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/zoneinternational/editzoneinternational/?zoneinternationalid=">

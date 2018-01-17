@@ -207,7 +207,26 @@ input:disabled, select:disabled, textarea:disabled
 }
 .searchbutton
 {
-	margin-left:20px;
+	margin-left:5px;
+	
+}
+#searchbutton, #clearsearchbutton
+{
+	width:15px;
+	height: 15px;
+	background-color: #2C2B62; /* Blue */
+    border: none;
+    color: white;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    vertical-align: bottom
 }
 .table-container
 {
@@ -419,7 +438,7 @@ input:disabled, select:disabled, textarea:disabled
 }
 .paymentitem_container
 {
-	width: 550px;
+	width: 700px;
 }
 .ui-button .ui-icon
 {
@@ -494,15 +513,4 @@ input:disabled, select:disabled, textarea:disabled
 #totalpaidlabel, #totalamt
 {
 	font-weight: bold;
-}
-#invoicesearchbutton
-{
-	clear: both;
-	margin-top: 10px;
-}
-#invoiceaddbutton
-{
-	margin-top: -24px;
-    margin-left: 195px;
-    position: absolute;
 }

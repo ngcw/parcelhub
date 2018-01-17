@@ -7,8 +7,8 @@
 		<div>State:<input type="text" name="state" maxlength ="50" value="{{ formdata.state }}"/></div>
 		<div>Postcode:<input type="number" name="postcode" maxlength ="25" value="{{ formdata.postcode }}"/></div>
 		<div>Zone:<input type="number" name="zone" maxlength ="25" value="{{ formdata.zone }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/zonedomestic/editzonedomestic/?zonedomesticid=">

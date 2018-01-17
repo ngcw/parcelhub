@@ -26,9 +26,8 @@
 			</select>
 		</div>
         <div class="searchinput">Zone:<input type="text" name="zone" maxlength ="50" value="{{ formdata.zone }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
-    </form>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/>     </form>
     {% if isedit %}
 	<form action="/parcelhubPOS/sku/editsku/?skucode=">
     	<input type="submit" value="Add" />

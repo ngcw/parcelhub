@@ -8,8 +8,8 @@
 		<div>Last name:<input type="text" name="lastname" maxlength ="50" value="{{ formdata.lastname }}"/></div>
 		<div>Username:<input type="text" name="username" maxlength ="50" value="{{ formdata.username }}"/></div>
 		<div class="searchinput">Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if isedit and isall %}
     <form action="/parcelhubPOS/user/adduser">

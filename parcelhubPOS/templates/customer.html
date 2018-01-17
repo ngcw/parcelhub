@@ -8,8 +8,8 @@
 		<div>Contact:<input type="text" name="contact" maxlength ="50" value="{{ formdata.contact }}"/></div>
 		<div>Email:<input type="text" name="email" maxlength ="50" value="{{ formdata.email }}"/></div>
 		<div>IC No:<input type="text" name="icno" maxlength ="50" value="{{ formdata.icno }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if isedit and isall %}
 	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">

@@ -5,8 +5,8 @@
 	
 	<form class="searchform" action="/parcelhubPOS/tax/" method="get">
 		<div>Tax code:<input type="text" name="taxcode" maxlength ="50" value="{{ formdata.taxcode }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
-        <button onclick="clearSearch()">Clear search</button>
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if isedit %}
     <form action="/parcelhubPOS/tax/edittax/?taxid=">

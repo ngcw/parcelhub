@@ -28,6 +28,7 @@
 	            			<td class="itemform_label_p">Invoice no:</td>
 	            			<td class="itemform_label_p">Total:</td>
 	            			<td class="itemform_label_p">Paid amount:</td>
+	            			<td class="itemform_label_p">Oustanding:</td>
 	            			<td class="itemform_label_p">Remaining:</td>
 	            			{% if isview %}
 	            			<td class="itemform_label_p">Amt paid:</td>
@@ -42,6 +43,7 @@
 	            			<td class="item_input_p">{{ form.instance.invoice.invoiceno }}</td>
 	            			<td class="item_input_p" id="total_{{forloop.counter}}">{{ form.instance.invoice.total }}</td>
 	            			<td class="item_input_p" id="payment_{{forloop.counter}}">{{ form.instance.invoice.payment }}</td>
+	            			<td class="item_input_p" > {%if isview %} {% else %}<button type="button" onclick="togglePayment('outstanding_{{forloop.counter}}')"><label id="outstanding_{{forloop.counter}}">{{ form.instance.remainder }}</label></button> {% endif %}</td>
 	            			<td class="item_input_p" id="remainder_{{forloop.counter}}">{{ form.instance.remainder }}</td>
 		            		<td class="item_input_p" id="paidamount_{{forloop.counter}}">{{ form.paidamount }}</td>
 		            		<td >{{ form.id }}</td>
@@ -54,7 +56,9 @@
 	            			<td class="item_input_p"></td>
 	            			<td class="item_input_p"></td>
 	            			<td class="item_input_p"></td>
+	            			<td class="item_input_p"></td>
 		            		<td class="item_input_p"><label id="totalamt">{{ totalamt }}</label></td>
+		            		<td ></td>
 		    	</tr>
 		    </table>
 		    

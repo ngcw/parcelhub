@@ -6,7 +6,8 @@
 	<form class="searchform" action="/parcelhubPOS/statementofaccount/" method="get">
 		<div>Customer:<input type="text" name="customer" maxlength ="50" value="{{ formdata.customer }}"/></div>
 		<div>Date:<input type="date" name="date" maxlength ="50" value="{{ formdata.date }}"/></div>
-        <input class="searchbutton" type="submit" value="Search"/> 
+        <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
+        <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
     {% if statusmsg %}
 	<div class="statusspacing"></div>

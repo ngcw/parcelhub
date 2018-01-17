@@ -213,7 +213,7 @@ class InvoiceItem(models.Model):
     
 class Payment(models.Model):
     customer = models.ForeignKey(Customer, verbose_name='*Customer')
-    total = models.DecimalField(max_digits=30, decimal_places=3,blank=True, null=True)
+    total = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
     payment_paymenttype = models.ForeignKey(PaymentType,blank=True, null=True, verbose_name="Payment method")
     createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
     created_by = models.ForeignKey(User,blank=True, null=True)
@@ -222,7 +222,7 @@ class PaymentInvoice(models.Model):
     payment = models.ForeignKey(Payment, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     remainder = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Remainder',blank=True, null=True)
-    paidamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Paid amount',blank=True, null=True)
+    paidamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Paid amount',blank=True, null=True, default=0.00)
     
 class VendorReport(models.Model):
     vendor = models.ForeignKey(CourierVendor, on_delete=models.CASCADE)
