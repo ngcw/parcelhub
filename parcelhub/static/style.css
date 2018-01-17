@@ -180,6 +180,7 @@ input:disabled, select:disabled, textarea:disabled
 }
 .searchform
 {
+	min-width: 1000px;
 	margin-top: 5px;
 }
 .searchform button
@@ -493,4 +494,15 @@ input:disabled, select:disabled, textarea:disabled
 #totalpaidlabel, #totalamt
 {
 	font-weight: bold;
+}
+#invoicesearchbutton
+{
+	clear: both;
+	margin-top: 10px;
+}
+#invoiceaddbutton
+{
+	margin-top: -24px;
+    margin-left: 195px;
+    position: absolute;
 }

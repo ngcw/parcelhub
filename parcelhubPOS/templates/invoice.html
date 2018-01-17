@@ -9,16 +9,15 @@
 		<div class="searchinput">Remark:<input type="text" name="remark" maxlength ="255" value="{{ formdata.remark }}" class="searchdata"/></div>
         <div class="searchinput">From date:<input type="date" name="fromdate" value="{{ formdata.fromdate }}" class="searchdata"/></div>
         <div class="searchinput">To date:<input type="date" name="todate" value="{{ formdata.todate }}" class="searchdata"/></div> 
-        <div class="searchinput">Customer:<input type="text" name="customer" maxlength ="50" value="{{ formdata.customer }}" class="searchdata"/></div>
-        
-        <input class="searchbutton" type="submit" value="Search"/> 
+        <div class="searchinput">Customer:<input type="text" name="customer" maxlength ="50" value="{{ formdata.customer }}" class="searchdata"/></div> <br/>
+        <input type="submit" value="Search" id="invoicesearchbutton"/> 
         <button onclick="clearSearch()">Clear search</button>
     </form>
      
     
     {% if isedit and isall %}
     <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
-    	<input type="submit" value="Add" />
+    	<input type="submit" value="Add" id="invoiceaddbutton"/>
 	</form>
 	{% endif %}
 	{% if statusmsg %}
