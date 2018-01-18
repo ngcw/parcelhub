@@ -70,7 +70,8 @@ def paymentlist(request, custid):
                 'statusmsg' : request.GET.get('msg'),
                 'header': 'Payment overview',
                 'issearchempty': issearchempty,
-                'searchmsg': searchmsg
+                'searchmsg': searchmsg,
+                'titleid': 'paymentlisttile'
                 }
     return render(request, 'payment.html', context)
 
@@ -96,6 +97,7 @@ def paymentreceive(request):
                 'isall': branchid != '-1',
                 'header': 'Payment receive',
                 'statusmsg' : request.GET.get('msg'),
+                'titleid': 'paymentedittitle'
                 }
     return render(request, 'paymentreceive.html', context)
 
@@ -211,7 +213,8 @@ def editpayment(request, paymentid):
                 'title': title,
                 'header': title,
                 'isview': title == 'View payment',
-                'totalamt': totalamt
+                'totalamt': totalamt,
+                'titleid': 'paymentedittitle'
                 }
     return render(request, 'editpayment.html', context)
 

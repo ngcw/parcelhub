@@ -4,7 +4,7 @@
 	
 	<form action="" method="POST" target='_blank' id="editinvoiceform">{% csrf_token %}
 	<div id="invoice_container">
-		<h2>{{ invoicetitle }}</h2>
+		<h2 id="invoicetitle">{{ invoicetitle }}</h2>
 		{{ invoice_form.non_field_errors }}
 		{% for hidden_field in invoice_form.hidden_fields %}
 		  {{ hidden_field.errors }}

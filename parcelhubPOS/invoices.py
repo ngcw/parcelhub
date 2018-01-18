@@ -111,7 +111,8 @@ def retrieveInvoice(request):
                 'statusmsg' : request.GET.get('msg'),
                 'header': 'Invoice list',
                 'issearchempty': issearchempty,
-                'searchmsg': searchmsg
+                'searchmsg': searchmsg,
+                'titleid': 'invoicelisttitle'
                 }
     return render(request, 'invoice.html', context)
 
