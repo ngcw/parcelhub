@@ -2,10 +2,12 @@
 {% load render_table from django_tables2 %}
 
 {% block content %}
-	
+	{% if isall %}
+	{% else %}
 	<form class="searchform" action="/parcelhubPOS/cashupreport/viewcur/" method="POST" target="_blank">{% csrf_token %}
         <input type="submit" value="Generate cash up report" id="generatecur"/>
     </form>
+    {% endif %}
     {% if statusmsg %}
 	<div class="statusspacing"></div>
    	<div class="statusmsg">{{ statusmsg }}</div>

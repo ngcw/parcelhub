@@ -83,7 +83,7 @@ def navbar(request):
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
             menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
         # branch admin only feature
-        if branchaccess.access_level == 'Branch admin':  
+        if branchaccess and branchaccess.access_level == 'Branch admin':  
             menudict[CONST_reporting] =[('Cash up report','/parcelhubPOS/cashupreport'),
                                       ]    
         #Super admin only feature
