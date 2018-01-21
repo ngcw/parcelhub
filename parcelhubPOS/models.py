@@ -169,6 +169,7 @@ class InvoiceType(models.Model):
 
 class PaymentType(models.Model):
     name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name')  
+    legend = models.CharField(max_length=5, verbose_name='*Legend',blank=True, null=True)  
     def __str__(self):
         return self.name
     class Meta:
@@ -224,29 +225,23 @@ class PaymentInvoice(models.Model):
     remainder = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Remainder',blank=True, null=True)
     paidamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Paid amount',blank=True, null=True, default=0.00)
     
-class VendorReport(models.Model):
-    vendor = models.ForeignKey(CourierVendor, on_delete=models.CASCADE)
-    datefrom = models.DateField()
-    dateto = models.DateField()
-    itemcount = models.PositiveIntegerField()
-    createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
-    created_by = models.ForeignKey(User)
     
 class CashUpReport(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    datefrom = models.DateField()
-    dateto = models.DateField()
-    cashremaining = models.DecimalField(max_digits=30, decimal_places=2)
+    total = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
+    sessiontimestamp = models.DateTimeField('session timestamp')
+    invoicenofrom = models.CharField(max_length=100, verbose_name='Invoice from',blank=True, null=True)
+    invoicenoto = models.CharField(max_length=100, verbose_name='Invoice to',blank=True, null=True)
     createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
     created_by = models.ForeignKey(User)
     
-class AccountReport(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    datefrom = models.DateField()
-    dateto = models.DateField()
-    createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
-    created_by = models.ForeignKey(User)
-
+class CashUpReportPaymentType(models.Model):
+    cashupreport = models.ForeignKey(CashUpReport, on_delete=models.CASCADE)
+    payment_type  = models.ForeignKey(PaymentType, on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=30, decimal_places=2)
+    percentage = models.DecimalField(max_digits=30, decimal_places=2)
+    count = models.IntegerField()
+    
 class StatementOfAccount(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='*Customer')
     datefrom = models.DateField('*Date from')
@@ -267,3 +262,9 @@ class StatementOfAccountInvoice(models.Model):
 
 class GlobalParameter(models.Model):
     invoice_lockin_date = models.DateField('*Invoice lock in date' )
+    
+class Terminal(models.Model):
+    name = models.CharField(max_length=50, verbose_name='*Name')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    float = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
+    isactive = models.BooleanField()

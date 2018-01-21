@@ -64,6 +64,9 @@ urlpatterns = [
     #url(r'^customer/customerdocuments(?P<customer_id>\w{0,50})/$', views.customerdocuments, name='customerdocuments'),
     url(r'^customer/editcustomer(?P<customerid>\w{0,50})/$', views.editcustomer, name='editcustomer'),
     url(r'^customer/deletecustomer(?P<dcustomerid>\w{0,50})/$', views.deletecustomer, name='deletecustomer'),
+    url(r'^cashupreport/$', views.cashuplist, name='cashupreport'),
+    url(r'^cashupreport/viewcur/$', views.viewcashupreport, name='viewcashupreport'),
+    url(r'^cashupreport/deletecur(?P<dcurid>\w{0,50})/$$', views.deletecashupreport, name='deletecashupreport'),
 ]
 
 # Change admin site title

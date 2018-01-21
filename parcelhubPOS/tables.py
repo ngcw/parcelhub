@@ -291,3 +291,19 @@ class StatementOfAccountTable(tables.Table):
         sequence = ('createtimestamp', 'customer', 'branch','datefrom', 'dateto','totalamount', 'paidamount', 'outstandindamount', 'view', 'delete')
         exclude = {'id', 'created_by'}
         empty_text = "There are no statement of account matching the search criteria..."
+
+deletelinksoa = '''{% if isedit %}<a href="/parcelhubPOS/cashupreport/deletecur?dcurid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete cash up report from {{ record.sessiontimestamp}} to {{record.createtimestamp}}?')">Delete</a>
+                        {% endif %}'''
+viewlinksoa = '<a href="/parcelhubPOS/cashupreport/viewcur?curid={{record.id}}" target="_blank">View</a>'
+class CashUpReportTable(tables.Table):
+    view = tables.TemplateColumn(viewlinksoa,
+                                      orderable = False)
+    delete = tables.TemplateColumn( deletelinksoa,
+                                    orderable = False );
+    class Meta:
+        model = CashUpReport
+        attrs = {'class': 'paleblue'
+                 }
+        sequence = ('sessiontimestamp', 'createtimestamp', 'branch','invoicenofrom', 'invoicenoto','total', 'view', 'delete')
+        exclude = {'id', 'created_by'}
+        empty_text = "There are no cash up report generate yet..."

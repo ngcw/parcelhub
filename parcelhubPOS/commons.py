@@ -10,7 +10,8 @@ CONST_custacc = '2Customer Account'
 CONST_payment = '3Payment'
 CONST_soa = '4Statement Of Account'
 CONST_masterdata = '5Information'
-CONST_system = '6System'
+CONST_reporting = '6Report'
+CONST_system = '7System'
 def userselection(request):
     sessiondict = []
     if 'loggedusers' in request.session:
@@ -80,7 +81,11 @@ def navbar(request):
             menudict[CONST_masterdata].append(('Zone international','/parcelhubPOS/zoneinternational') )
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
-            menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))                            
+            menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
+        # branch admin only feature
+        if branchaccess.access_level == 'Branch admin':  
+            menudict[CONST_reporting] =[('Cash up report','/parcelhubPOS/cashupreport'),
+                                      ]    
         #Super admin only feature
         if loguser.is_superuser:
             menudict[CONST_masterdata].append(('Branch','/parcelhubPOS/branch'))

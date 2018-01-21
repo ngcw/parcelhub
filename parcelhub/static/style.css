@@ -97,7 +97,7 @@ input:disabled, select:disabled, textarea:disabled
     background-color:#2C2B62;
     font-family: Arial;
     width: 99%;
-    min-width: 950px;
+    min-width: 1050px;
     z-index:3;
     height: 37px;
 }
@@ -407,6 +407,10 @@ input:disabled, select:disabled, textarea:disabled
 	margin-top:80px;
 }
 #generatestatement
+{
+	width: 150px;	
+}
+#generatecur
 {
 	width: 150px;	
 }

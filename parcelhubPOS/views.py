@@ -21,6 +21,7 @@ from .customers import *
 from .invoices import *
 from .payments import *
 from .statementofaccounts import *
+from .reporting import *
 # Constants
 CONST_branchid = 'branchid'
 CONST_username = 'Username'
@@ -101,7 +102,7 @@ def globalparameter(request):
         formset = GlobalParameterForm(request.POST, request.FILES,
                              instance=gpqueryset)
         if formset.is_valid():
-            msg = 'Global parameter for invoice lock in date have been updated successfully.'
+            msg = 'Global parameter have been updated successfully.'
             formset.save()
             return HttpResponseRedirect("/parcelhubPOS/globalparameter/?msg=%s" % msg)
     else:
