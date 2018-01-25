@@ -71,6 +71,8 @@ def navbar(request):
         menudict[CONST_soa] =[('Statement of account','/parcelhubPOS/statementofaccount'),
                                   ('New statement of account','/parcelhubPOS/statementofaccount_new'),
                                       ]   
+        menudict[CONST_reporting] =[('Cash up report','/parcelhubPOS/cashupreport'),
+                                      ]     
         menudict[CONST_masterdata] = []
         #Super admin and branch admin only feature
         if loguser.is_superuser or branchaccess.access_level == 'Branch admin':
@@ -81,8 +83,7 @@ def navbar(request):
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
             menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
-            menudict[CONST_reporting] =[('Cash up report','/parcelhubPOS/cashupreport'),
-                                      ]     
+            
             
         #Super admin only feature
         if loguser.is_superuser:
