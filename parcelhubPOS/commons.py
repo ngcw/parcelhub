@@ -64,8 +64,7 @@ def navbar(request):
             menudict[CONST_invoice] =[('Invoice list','/parcelhubPOS/invoice')]
         else:
             menudict[CONST_invoice] =[('New invoice (F9)','/parcelhubPOS/invoice/editinvoice/?invoiceid='),('Invoice list','/parcelhubPOS/invoice')]
-        menudict[CONST_custacc] =[('Customer account','/parcelhubPOS/customer'),
-                                      ] 
+        menudict[CONST_custacc] =[]
         menudict[CONST_payment] =[('Payment overview','/parcelhubPOS/payment/?custid=""'),
                                     ('Payment receive','/parcelhubPOS/makepayment'),
                                       ]   

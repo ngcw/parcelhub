@@ -74,6 +74,7 @@
         
         {% block navbar %}
         	{% for menu in nav_bar %}
+        		
 	        	<div class="dropdown">
 	   				<button class="dropbtn" onclick="myFunction{{ menu.0.split|join:'_' }}()">{{ menu.0|slice:"1:" }}</button>
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
@@ -100,6 +101,7 @@
 		       {% block content %}{% endblock %}
 		  </div>
 		  <script>
+		  
 		  function startTime() {
 			    var dt = new Date();
 			    var hours = dt.getHours() > 12 ? dt.getHours() - 12 : dt.getHours();
@@ -155,6 +157,10 @@
     		      return;
     		  }
     		});
+	    	function myFunction2Customer_Account()
+	    	{
+			  window.location.href = '/parcelhubPOS/customer/';
+	    	}
 	    	function disableEdit() {
     		    var inputs = document.getElementsByTagName('input');
     		    for (var i = 0; i < inputs.length; i += 1) {

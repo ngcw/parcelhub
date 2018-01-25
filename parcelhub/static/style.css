@@ -13,6 +13,7 @@ body
     margin-bottom: 8px;
     padding-top: 10px;
     padding-bottom: 10px;
+    padding-left:10px;
 }
 #invoice_container h2
 {
@@ -523,6 +524,7 @@ input:disabled, select:disabled, textarea:disabled
 {
 	background-color: #6CB657;
 	width: 100%;
+	padding-left:10px;
 }
 #invoicelisttitle
 {
