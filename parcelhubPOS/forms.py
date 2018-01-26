@@ -95,12 +95,14 @@ class InvoiceForm(forms.ModelForm):
         self.fields['customer'].queryset = Customer.objects.filter(branch__id=branchid)
         self.fields['discount'].widget.attrs\
             .update({
-                'oninput': 'UpdateTotal()'
+                'oninput': 'UpdateTotal()',
+                'onchange': 'completeNumber(this.id)'
             })
             
         self.fields['payment'].widget.attrs\
             .update({
                 'oninput': 'UpdateTotal()',
+                'onchange': 'completeNumber(this.id)'
             })
         self.fields['invoicetype'].widget.attrs\
             .update({
@@ -155,13 +157,13 @@ class InvoiceItemForm(forms.ModelForm):
             })
 
         self.fields['weight'].widget.attrs\
-        .update({
-            'onchange': 'AutoCompleteSKU(this.id)',
+        .update({ 
+            'onchange': 'AutoCompleteSKU(this.id);completeNumber(this.id)',
             'class': "validateFieldWeight"
         })
         self.fields['dimension_weight'].widget.attrs\
         .update({
-            'onchange': 'AutoCompleteSKU(this.id)',
+            'onchange': 'AutoCompleteSKU(this.id);completeNumber(this.id)',
             'ondblclick': 'editDimensionalWeight(this.id)',
             'class': 'lastInput'
         })

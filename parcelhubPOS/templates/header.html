@@ -131,22 +131,32 @@
 				{% ifequal menu.1|length 1 %}
 		        {% else %}
 			        function myFunction{{ menu.0.split|join:'_' }}() {
-					    document.getElementById("myDropdown{{ menu.0.split|join:'_' }}").classList.toggle("show");
-					}
-					
-					// Close the dropdown if the user clicks outside of it
-					window.onclick = function(e) {
-					  if (!e.target.matches('.dropbtn')) {
-					    var myDropdown = document.getElementById("myDropdown{{ menu.0.split|join:'_' }}");
-					      if (myDropdown.classList.contains('show')) {
-					        myDropdown.classList.remove('show');
-					      }
-					  }
+			        	var selectedropdownid = "myDropdown{{ menu.0.split|join:'_' }}"
+					    document.getElementById(selectedropdownid).classList.toggle("show");
+					    var allDropdown = document.getElementsByClassName('dropdown-content')
+					    for (var i = 0; i < allDropdown.length; i += 1) {
+					 		if( allDropdown[i].id !== selectedropdownid && allDropdown[i].classList.contains('show'))
+				 			{
+					 			allDropdown[i].classList.toggle('show');
+				 			}
+		    		    }
 					}
 		        {% endifequal %}
-	        
 	    	{% endfor %}
-
+	    	// Close the dropdown if the user clicks outside of it
+			window.onclick = function(e) {
+			  if (!e.target.matches('.dropbtn')) {
+				  {% for menu in nav_bar %}
+					{% ifequal menu.1|length 1 %}
+			        {% else %}
+				        var myDropdown{{ menu.0.split|join:'_' }} = document.getElementById("myDropdown{{ menu.0.split|join:'_' }}");
+					      if (myDropdown{{ menu.0.split|join:'_' }}.classList.contains('show')) {
+					        myDropdown{{ menu.0.split|join:'_' }}.classList.remove('show');
+					      }
+			        {% endifequal %}
+		    	{% endfor %}
+			  }
+			}
 	    	$(window).keydown(function(e) {
     		  switch (e.keyCode) {
     		    case 120: // f9
@@ -178,15 +188,18 @@
 	    	{% if issearchempty %}
 			alert("{{ searchmsg }}")
 	        {% endif %}
-			{% if request.session.branchid != '-1'  %}
-				function myFunction1Invoice()
-		    	{
-		    		window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=', '_blank');
-		    	}
-			{% endif %}
+
+	    	function completeNumber(inputid)
+	    	{
+	    		var activeElement = document.getElementById(inputid)
+
+	    		activeElement.value = parseFloat(activeElement.value);
+	    		
+	    	}
 	    	
 	    	$( ".disabledinput input" ).prop( "disabled", true ); //Disable
 	    	$('body').on('keydown', 'input, select, textarea, a, button', function(e) {
+	    		
 	    	    var self = $(this)
 	    	      , form = self.parents('form:eq(0)')
 	    	      , focusable
@@ -520,7 +533,6 @@
 	                		$( "#id_form-" + count + "-sku" ).val( dataobj[0]['value'] )
 	                		AutoCompleteSKUDetail(skuid)
 	                		skuinput.style.backgroundColor = ''
-	                		zoneele.style.backgroundColor = ''
 	                		weightele.style.backgroundColor = ''
 	                		dimweightele.style.backgroundColor = ''
 	                		skuinput.setAttribute('title', '');
@@ -530,9 +542,8 @@
                 		}
 	                	else
 	                	{
-	           		
+	           				
 	                		skuinput.style.backgroundColor = 'red'
-	                		zoneele.style.backgroundColor = 'red'
 	                		weightele.style.backgroundColor = 'red'
 	                		dimweightele.style.backgroundColor = 'red'
 	                		skuinput.setAttribute('title', 'No SKU found');
@@ -611,7 +622,7 @@
 	                		zoneinput.style.backgroundColor = ''
 	                		zoneinput.setAttribute('title', '');
                 		}
-	                	else
+	                	else if (dataobj[0] !== null && dataobj[0] != undefined )
 	                	{
 	                		
 	                		zoneinput.style.backgroundColor = 'red'
@@ -692,18 +703,6 @@
     		  	document.getElementById('subtotal').innerHTML = parseFloat(subtotalfinal).toFixed(2);
     		  	document.getElementById('gsttotal').innerHTML = parseFloat(gst).toFixed(2);
     		  	document.getElementById('rounding').innerHTML = parseFloat(rounding).toFixed(2);
-    		  	
-    		  	{% if invoice %}
-				
-				{% else %}
-				if ( document.getElementById('total').innerHTML  != parseFloat(finaltotal).toFixed(2))
-				{
-					document.getElementById("id_payment").value = parseFloat(finaltotal).toFixed(2)
-					payment = finaltotal
-				}
-					
-				{% endif %}
-				
 				document.getElementById('total').innerHTML = parseFloat(finaltotal).toFixed(2);
 
 				
@@ -714,7 +713,6 @@
 				}
 				document.getElementById('change').innerHTML = parseFloat(change).toFixed(2);
 				document.getElementById('confirm_change').innerHTML = document.getElementById('change').innerHTML
-				document.getElementById('confirm_payment').innerHTML = parseFloat(document.getElementById('id_payment').value).toFixed(2)
 				document.getElementById('confirm_total').innerHTML = document.getElementById('total').innerHTML
 				
     		};
@@ -779,7 +777,6 @@
 	    	function setFocusToTextBox(){
 	    		var inputid = "id_form-0-tracking_code"
 	    	    document.getElementById(inputid).focus();
-	    	    ValidateTrackingCode(inputid)
 	    	}
 	    	
 	    	window.onload = function() {

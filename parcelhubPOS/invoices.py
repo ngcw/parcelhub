@@ -241,6 +241,12 @@ def editInvoice(request, invoiceid):
                 
             if 'action' in request.POST and request.POST['action'] == 'Print delivery order':
                 return deliveryorder_pdf(request, invoice.id)
+            elif 'action' in request.POST and request.POST['action'] == 'Preview':
+                if invoice.invoicetype.name == 'Cash':
+                    invoiceprint = invoice_thermal(request, invoice.id)
+                else:
+                    invoiceprint = invoice_pdf(request, invoice.id) 
+                return HttpResponse(invoiceprint, content_type='application/pdf')
             else:
                 if invoice.invoicetype.name == 'Cash':
                     invoiceprint = invoice_thermal(request, invoice.id)

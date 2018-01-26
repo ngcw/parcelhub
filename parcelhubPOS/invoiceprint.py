@@ -362,11 +362,8 @@ def invoice_thermal(request, invoiceid):
     username = invoice.created_by.last_name + ' ' +invoice.created_by.first_name
     p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 7 ) ),'Served by   : ' + username)
     # Date text
-    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 8 ) ),'Date        : ' + invoice.createtimestamp.strftime("%d/%m/%Y %H:%M%p"))
-    customername = ''
-    if invoice.customer:
-        customername = invoice.customer.name
-    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 9 ) ),'Sold to     : ' + customername)
+    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 8 ) ),'Date        : ' + invoice.createtimestamp.strftime("%d/%m/%Y %I:%M%p"))
+    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 9 ) ),'Sold to     : Cash' )
     
     # Invoice items 
     p.setFillColorRGB(0, 0, 0 ) 
@@ -429,7 +426,7 @@ def invoice_thermal(request, invoiceid):
     p.drawString( marginleft + 40, totaly , 'Total inc GST')
     # Payment details
     paymenttitley = footerliney - ((linespace * 7) )
-    p.drawString( marginleft, paymenttitley, 'Payment Details')
+    p.drawString( marginleft, paymenttitley, 'Payment Details  -  ' + invoice.payment_type.name)
     
     paymentreceivedy = footerliney - ((linespace * 8) + 5)
     p.drawString( marginleft + 40, paymentreceivedy, 'Received: ')

@@ -6,7 +6,10 @@ body
 	padding-right:5px;
 	padding:0px;
 }
-
+input:focus, select:focus, textarea:focus {
+  background: lightgreen;
+  outline: black solid;
+}
 #content h2
 {
 	margin-top: 0px;
@@ -20,9 +23,7 @@ body
 	margin-top: 10px;
     margin-bottom: 8px;
 }
-input:focus, select:focus, textarea:focus {
-  background: lightgreen;
-}
+
 select
 {
 	width: 100px;
@@ -161,10 +162,11 @@ input:disabled, select:disabled, textarea:disabled
     z-index:2;
 }
 
-.dropdown:hover .dropdown-content {
+.show {
     display: block;
     z-index:2;
 }
+
 #header
 {
 	position: fixed;
@@ -312,11 +314,17 @@ input:disabled, select:disabled, textarea:disabled
 	display: inline;
 	width: 100px
 }
-.item_input, .item_input selection, .item_input input
+.item_input
 {
 	float: left;
 	display: inline;
 	width: 100px;
+}
+.item_input selection, .item_input input
+{
+	float: left;
+	display: inline;
+	width: 95px;
 }
 .item_input_p, .item_input_p selection, .item_input_p input
 {

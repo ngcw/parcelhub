@@ -109,7 +109,7 @@
 		    
 		    {% if invoice %}
 			    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
-			    
+			    <input type="submit" name="action" value="Preview" id="print_preview" onClick="return validateInvoiceItem()"/>
 			{% endif %}
 			<a id="add" class="addanotheritem" href="#"><button>Add another item</button></a>
 		</div>
@@ -171,17 +171,9 @@
 	    	</div>
 	    </div>
 	</form>
-	{% if invoice %}
-		{% if isedit %}
-		<div id="deletediv">
-			<a href="/parcelhubPOS/invoice/deleteinvoice?dinvoiceid={{invoice.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete invoice {{ invoice.invoiceno }}?')"><button>Delete</button></a>
-		</div>
-		{% else %}
-		<div id="deletediv">
-			<a href="/parcelhubPOS/invoice/" class="deletebutton"><button>Back</button></a>
-		</div>
-		{% endif %}
-	{% endif %}
+	<div id="deletediv">
+		<a href="/parcelhubPOS/invoice/" class="deletebutton"><button>Back</button></a>
+	</div>
 {% endblock %}
 
 {% include 'footer.html' %}
