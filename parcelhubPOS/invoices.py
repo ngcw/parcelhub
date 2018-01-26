@@ -118,7 +118,7 @@ def retrieveInvoice(request):
 
 def gen_invoice_number(request):
     branchid = request.session.get(CONST_branchid)
-    branch = Branch.objects.get(id=branchid)
+    branch = Branch.objects.filter(id=branchid).first()
     last_invoice = Invoice.objects.filter(branch_id=branchid).order_by('invoiceno').last()
     if not last_invoice:
          return branch.branch_code + '000001'
@@ -152,7 +152,7 @@ def editInvoice(request, invoiceid):
     if branchid == '-1':
         sel_branch = Branch.objects.all().first()
     else:
-        sel_branch = Branch.objects.get(id=branchid)
+        sel_branch = Branch.objects.filter(id=branchid).first()
     user = User.objects.get(id = request.session.get('userid'))
     if invoiceid:
         InvoiceItemFormSet = modelformset_factory(InvoiceItem, form = InvoiceItemForm, extra=0)
