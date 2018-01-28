@@ -61,7 +61,7 @@ def navbar(request):
     if loguser.is_superuser or branchaccess:
         #Everyone access feature
         if branchid == '-1':
-            menudict[CONST_invoice] =[('Invoice list','/parcelhubPOS/invoice')]
+            menudict[CONST_invoice] =[('New invoice (F9)',''),('Invoice list','/parcelhubPOS/invoice')]
         else:
             menudict[CONST_invoice] =[('New invoice (F9)','/parcelhubPOS/invoice/editinvoice/?invoiceid='),('Invoice list','/parcelhubPOS/invoice')]
         menudict[CONST_custacc] =[]
@@ -83,13 +83,22 @@ def navbar(request):
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
             menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
-            
+        else:
+            menudict[CONST_masterdata].append(('Vendor',''))
+            menudict[CONST_masterdata].append(('Tax','') )
+            menudict[CONST_masterdata].append(('Zone domestic','') )
+            menudict[CONST_masterdata].append(('Zone international','') )
+            menudict[CONST_masterdata].append(('SKU',''))
+            menudict[CONST_masterdata].append(('SKU pricing',''))
+            menudict[CONST_masterdata].append(('User',''))
             
         #Super admin only feature
         if loguser.is_superuser:
             menudict[CONST_masterdata].append(('Branch','/parcelhubPOS/branch'))
             menudict[CONST_system] =[('Global parameters','/parcelhubPOS/globalparameter')]
-            
+        else:
+            menudict[CONST_masterdata].append(('Branch',''))
+            menudict[CONST_system] =[('Global parameters','')]
         if len(menudict[CONST_masterdata]) == 0:
             menudict.pop(CONST_masterdata)
         

@@ -162,6 +162,14 @@ input:disabled, select:disabled, textarea:disabled
     z-index:2;
 }
 
+.dropdown-content .disabledmenu
+{
+	background-color: grey;
+}
+.dropdown-content .disabledmenu:hover
+{
+	background-color: grey;
+}
 .show {
     display: block;
     z-index:2;

@@ -79,11 +79,15 @@
 	   				<button class="dropbtn" onclick="myFunction{{ menu.0.split|join:'_' }}()">{{ menu.0|slice:"1:" }}</button>
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
 		        	{% for submenu in menu.1 %}
-		        		{% if submenu.0 == "New invoice" %}
+		        	{% if submenu.1 == "" %}
+		        		<a class="disabledmenu">{{ submenu.0 }}</a>
+		        	{% else %}
+		        		{% if submenu.0 == "New invoice (F9)" %}
 		        		<a href="{{ submenu.1 }}" target="_blank">{{ submenu.0 }}</a>
 		        		{% else %}
 		        		<a href="{{ submenu.1 }}">{{ submenu.0 }}</a>
 		        		{% endif %}
+		        	{% endif %}
 		        	{% endfor %}
 		        	</div>
 		        </div>
@@ -128,8 +132,7 @@
 		  toggle between hiding and showing the dropdown content */
 			
 			{% for menu in nav_bar %}
-				{% ifequal menu.1|length 1 %}
-		        {% else %}
+
 			        function myFunction{{ menu.0.split|join:'_' }}() {
 			        	var selectedropdownid = "myDropdown{{ menu.0.split|join:'_' }}"
 					    document.getElementById(selectedropdownid).classList.toggle("show");
@@ -141,19 +144,16 @@
 				 			}
 		    		    }
 					}
-		        {% endifequal %}
 	    	{% endfor %}
 	    	// Close the dropdown if the user clicks outside of it
 			window.onclick = function(e) {
 			  if (!e.target.matches('.dropbtn')) {
 				  {% for menu in nav_bar %}
-					{% ifequal menu.1|length 1 %}
-			        {% else %}
+
 				        var myDropdown{{ menu.0.split|join:'_' }} = document.getElementById("myDropdown{{ menu.0.split|join:'_' }}");
 					      if (myDropdown{{ menu.0.split|join:'_' }}.classList.contains('show')) {
 					        myDropdown{{ menu.0.split|join:'_' }}.classList.remove('show');
 					      }
-			        {% endifequal %}
 		    	{% endfor %}
 			  }
 			}
