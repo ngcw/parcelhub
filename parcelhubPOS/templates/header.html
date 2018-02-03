@@ -797,14 +797,6 @@
 	    		  
 	    		};
     		
-    		$(function() {
-                $(document).on('keydown', '.lastInput', function(e) {
-                    var keyCode = e.keyCode;
-                    if (keyCode == 9) {
-                    	$("#add").click()
-                    }
-                });
-            });
     		function ValidateTrackingCode(inputid) { 
     			var inputstr = inputid.split("-");
 	    	    var count = inputstr[1]
