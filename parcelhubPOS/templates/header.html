@@ -534,6 +534,7 @@
 	                		AutoCompleteSKUDetail(skuid)
 	                		skuinput.style.backgroundColor = ''
 	                		weightele.style.backgroundColor = ''
+	                		zoneele.style.backgroundColor = ''
 	                		dimweightele.style.backgroundColor = ''
 	                		skuinput.setAttribute('title', '');
 	                		zoneele.setAttribute('title', '');
@@ -544,6 +545,7 @@
 	                	{
 	           				
 	                		skuinput.style.backgroundColor = 'red'
+	                		zoneele.style.backgroundColor = 'red'
 	                		weightele.style.backgroundColor = 'red'
 	                		dimweightele.style.backgroundColor = 'red'
 	                		skuinput.setAttribute('title', 'No SKU found');
@@ -713,8 +715,8 @@
 				}
 				document.getElementById('change').innerHTML = parseFloat(change).toFixed(2);
 				document.getElementById('confirm_change').innerHTML = document.getElementById('change').innerHTML
+				document.getElementById('confirm_payment').innerHTML = parseFloat(payment).toFixed(2);
 				document.getElementById('confirm_total').innerHTML = document.getElementById('total').innerHTML
-				
     		};
     		function SetParentVisibility( id, show ) {
     			var selection = document.getElementById(id);
