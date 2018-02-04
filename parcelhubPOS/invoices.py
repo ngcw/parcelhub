@@ -326,7 +326,10 @@ def getskulist(request):
     if courierid:
         skubranch_list = skubranch_list.filter(sku__couriervendor__id = courierid)
     if zoneinput:
-        skubranch_list = skubranch_list.filter(sku__zone = zoneinput)
+        try:
+            skubranch_list = skubranch_list.filter(sku__zone = zoneinput)
+        except:
+            pass
     if weightinput:
         skubranch_list = skubranch_list.filter(sku__weight_start__lte=weightinput,sku__weight_end__gt=weightinput )
     if customerid:
@@ -347,7 +350,10 @@ def getskulist(request):
     if courierid:
         sku_list = sku_list.filter(couriervendor__id = courierid)
     if zoneinput:
-        sku_list = sku_list.filter(zone = zoneinput)
+        try:
+            sku_list = sku_list.filter(zone = zoneinput)
+        except:
+            pass
     if weightinput:
         sku_list = sku_list.filter(weight_start__lt=weightinput,weight_end__gte=weightinput )
     for sku in sku_list:
@@ -476,7 +482,10 @@ def autocompletezone(request):
             if len(postcode_country) > 3:
                 zone_list =  zone_list.filter(postcode_start__lte=postcode_country,postcode_end__gte=postcode_country)
             else:
-                zone_list =  zone_list.filter(zone = postcode_country)
+                try:
+                    zone_list =  zone_list.filter(zone = postcode_country)
+                except:
+                    zone_list =  zone_list.filter(zone= -1)
         else:
             zone_list = zone_list.filter(country = postcode_country)
     for zone in zone_list:
