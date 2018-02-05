@@ -147,7 +147,7 @@ def editpayment(request, paymentid):
         payment_form = PaymentForm(instance=paymentqueryset)
         
     PaymentInvoiceFormSet = modelformset_factory(PaymentInvoice, form = PaymentInvoiceForm, extra=0)
-    paymentitemqueryset = PaymentInvoice.objects.filter(payment=paymentqueryset)
+    paymentitemqueryset = PaymentInvoice.objects.filter(payment=paymentqueryset).order_by('invoice')
     payment_item_formset = PaymentInvoiceFormSet(queryset=paymentitemqueryset )
     if request.method == "POST":
         

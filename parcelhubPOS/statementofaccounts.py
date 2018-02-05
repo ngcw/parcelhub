@@ -269,7 +269,7 @@ def statementofacc_pdf(request, statementofacc):
         debit = "{:,.2f}".format(debitvalue)
         cummulativedebit = cummulativedebit + debitvalue
         debitwidth = p.stringWidth(debit, CONST_font, 11)
-        debitstringwidth = p.stringWidth("Dedit", CONST_font, 8)
+        debitstringwidth = p.stringWidth("Debit", CONST_font, 8)
         p.drawString( margin + 350 + debitstringwidth - debitwidth, itemheight - (linecount * itemcount), debit)
         try:
             payment = float(invoiceitem.payment)
@@ -290,9 +290,7 @@ def statementofacc_pdf(request, statementofacc):
         balancevalue = float(invoiceitem.total) - payment
         
         
-        if balancevalue <= 0:
-            balance = float(invoiceitem.total)
-            balancevalue = balance
+        
         cummulativebalance = cummulativebalance + balancevalue
         balance = "{:,.2f}".format(round(cummulativebalance, 2 ))
         balancewidth = p.stringWidth(balance, CONST_font, 11)
@@ -436,8 +434,6 @@ def calculate_soabalance(soaitem):
         except:
             payment = 0.00
         balancevalue = float(invoiceitem.total) - payment
-        if balancevalue <= 0:
-            balancevalue = float(invoiceitem.total)
         balance = balance + balancevalue
     return balance
 @login_required
