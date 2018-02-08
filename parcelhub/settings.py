@@ -85,8 +85,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'parcelhubPOS',
-        'USER': 'myuser',#'USER': 'ngcw',
-        'PASSWORD': 'password',#'PASSWORD': 'bakayar00',
+        'USER': 'admin',#'USER': 'ngcw',
+        'PASSWORD': 'admin1234',#'PASSWORD': 'bakayar00',
         'HOST': 'localhost',#'HOST': '127.0.0.1',
         'PORT': '',#'PORT': '5432',
         'CONN_MAX_AGE': 500,
