@@ -20,7 +20,6 @@ import ctypes
 from io import BytesIO
 from decimal import Decimal
 from textwrap import wrap
-import inflect
 from django.utils import timezone
 from num2words import num2words
 CONST_branchid = 'branchid'
