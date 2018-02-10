@@ -543,11 +543,21 @@
                 		}
 	                	else if ( selectedzonetype == 'Others')
 	                	{
-	                		skuinput.style.backgroundColor = ''
+	                		if (skuinput.value == '')
+	                		{
+	                			skuinput.style.backgroundColor = 'red'
+	                			skuinput.setAttribute('title', 'SKU cannot be empty');
+	                		}
+	                		else
+	                		{
+	                			skuinput.style.backgroundColor = ''
+	                			skuinput.setAttribute('title', '');
+	                		}
+	                		
 	                		weightele.style.backgroundColor = ''
 	                		zoneele.style.backgroundColor = ''
 	                		dimweightele.style.backgroundColor = ''
-	                		skuinput.setAttribute('title', '');
+	                		
 	                		zoneele.setAttribute('title', '');
 	                		weightele.setAttribute('title', '');
 	                		dimweightele.setAttribute('title', '');
