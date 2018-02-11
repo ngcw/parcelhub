@@ -80,7 +80,7 @@
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
 		        	{% for submenu in menu.1 %}
 		        	{% if submenu.1 == "" %}
-		        		<a class="disabledmenu" title="you are not authorized to perform this action.">{{ submenu.0 }}</a>
+		        		<a class="disabledmenu" title="you are not authorized to perform this action with 'All' branch selected.">{{ submenu.0 }}</a>
 		        	{% else %}
 		        		{% if submenu.0 == "New invoice (F9)" %}
 		        		<a href="{{ submenu.1 }}" target="_blank">{{ submenu.0 }}</a>
