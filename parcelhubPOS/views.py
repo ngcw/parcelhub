@@ -77,7 +77,8 @@ def dashboard(request):
                     'branchselection': branchlist,
                     'loggedusers' : loggedusers,
                     'branchselectionaction': '/parcelhubPOS/dashboard/',
-                    'issuperuser': loguser.is_superuser
+                    'issuperuser': loguser.is_superuser,
+                    'header': 'Dashboard',
                     }
         return render(request, 'dashboard.html', context)#HttpResponseRedirect('/parcelhubPOS/invoice/')#
     elif branchaccess or loguser.is_superuser:
@@ -94,7 +95,8 @@ def dashboard(request):
                     'branchselection': branchlist,
                     'loggedusers' : loggedusers,
                     'branchselectionaction': '/parcelhubPOS/dashboard/',
-                    'issuperuser': loguser.is_superuser
+                    'issuperuser': loguser.is_superuser,
+                    'header': 'Dashboard',
                     }
         return render(request, 'dashboard.html', context)#HttpResponseRedirect('/parcelhubPOS/invoice/')#
     else:
