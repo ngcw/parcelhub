@@ -50,7 +50,7 @@ def cashuplist(request):
                 'title': "Cash up report",
                 'isedit' : True,
                 'issuperuser' : loguser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': "Cash up report",
                 }

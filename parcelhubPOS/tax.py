@@ -42,6 +42,7 @@ def taxlist(request):
                 'formdata' : formdata,
                 'title': "Tax",
                 'isedit' : loguser.is_superuser,
+                'isall': branchid == '-1',
                 'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
                 'header': "Tax",

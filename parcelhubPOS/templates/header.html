@@ -80,7 +80,11 @@
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
 		        	{% for submenu in menu.1 %}
 		        	{% if submenu.1 == "" %}
+		        	    {% if isall %}
 		        		<a class="disabledmenu" title="you are not authorized to perform this action with 'All' branch selected.">{{ submenu.0 }}</a>
+		        		{% else %}
+		        		<a class="disabledmenu" title="you are not authorized to access this page.">{{ submenu.0 }}</a>
+		        		{% endif %}
 		        	{% else %}
 		        		{% if submenu.0 == "New invoice (F9)" %}
 		        		<a href="{{ submenu.1 }}" target="_blank">{{ submenu.0 }}</a>
@@ -219,9 +223,7 @@
 	    	        	}
 	    	        else if (next.length) {
 	    	            next.focus();
-	    	        } else {
-	    	            form.submit();
-	    	        }
+	    	        } 
 	    	        return false;
 	    	    }
 	    	});
@@ -579,37 +581,48 @@
 	    	};
 	    	function AutoCompleteSKUDetail( inputid ) { 
 	    	    var value = document.getElementById(inputid).value.trim();
+	    	    
 	    		var inputstr = inputid.split("-");
 	    	    var count = inputstr[1]
 	    	    var selectedsku = [];
 	    	    var mystring = JSON.stringify(selectedsku);
 	    	    var customersel = document.getElementById("id_customer");
 	    	    var selectedcust = customersel.options[customersel.selectedIndex].value;
+	    	    var invoicetype = document.getElementById('id_invoicetype').value.trim();
 	    	    $.ajax({
 	                url:"/parcelhubPOS/autocompleteskudetail/?customerid="+selectedcust
-	                										+"&sku_code="+value,
+	                										+"&sku_code="+value
+	                										+"&invoicetype="+invoicetype,
 	                type:"POST",
 	                data:mystring,
 	                dataType: "json",
 	                contentType: "application/json",
 	                success: function(data){
 	                	var dataobj = JSON.parse(data)
-	                	for (var i = 0; i < dataobj.length; i++){
-	               			// look for the entry with a matching `code` value
-	               		 	if (dataobj[i]['skucode'] == value){
-	               		 		PopulateFields( count, 
-	               		 						dataobj[i]['description'],
-	               		 					   	dataobj[i]['couriervendor'],
-	               		 						dataobj[i]['zonetype'],
-	               		 						dataobj[i]['producttype'],
-	               		 						dataobj[i]['zone'],
-	               								dataobj[i]['tax'],
-	               								dataobj[i]['gst'],
-	               								dataobj[i]['price']);
-	               		 		UpdateTotal()
-	              		 	}
-	               		}
-	                	
+	                	if( value == '')
+	                    {
+	                    	$( "#id_form-" + count + "-zone" ).val( '' )
+	                    	$( "#id_form-" + count + "-weight" ).val( '' )
+	                    	$( "#id_form-" + count + "-dimension_weight" ).val( '' )
+	                    }
+	                	else
+	                	{
+		                	for (var i = 0; i < dataobj.length; i++){
+		               			// look for the entry with a matching `code` value
+		               		 	if (dataobj[i]['skucode'] == value){
+		               		 		PopulateFields( count, 
+		               		 						dataobj[i]['description'],
+		               		 					   	dataobj[i]['couriervendor'],
+		               		 						dataobj[i]['zonetype'],
+		               		 						dataobj[i]['producttype'],
+		               		 						dataobj[i]['zone'],
+		               								dataobj[i]['tax'],
+		               								dataobj[i]['gst'],
+		               								dataobj[i]['price']);
+		               		 		UpdateTotal()
+		              		 	}
+		               		}
+	                	}
 	                    
 	                }
 	            });
@@ -1093,7 +1106,14 @@
 	    	    $(id).select2().val(newID);
 	    	    $(id).select2().trigger('change')
 	    	}
-			
+			function updateAllSKU()
+			{
+				var arr = document.getElementsByClassName('sku-autocomplete');
+			    for(var i=0;i<arr.length;i++)
+				{
+			    	AutoCompleteSKUDetail(arr[i].id)
+			    }
+			}
 	    	{% endif %}
 	    	function enabledCustomer() {
 	    		document.getElementById('id_customer').disabled=false;

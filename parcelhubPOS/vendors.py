@@ -52,6 +52,7 @@ def vendorlist(request):
                 'formdata' : formdata,
                 'title': "Courier vendor",
                 'isedit' : loguser.is_superuser,
+                'isall': branchid == '-1',
                 'issuperuser' : loguser.is_superuser,
                 'statusmsg' : request.GET.get('msg'),
                 'header': "Courier vendor",

@@ -106,9 +106,12 @@ class InvoiceForm(forms.ModelForm):
             })
         self.fields['invoicetype'].widget.attrs\
             .update({
-                'onchange': 'HideShowCashType()'
+                'onchange': 'HideShowCashType();updateAllSKU()'
             })
-
+        self.fields['customer'].widget.attrs\
+            .update({
+                'onchange': 'HideShowCashType();updateAllSKU()'
+            })
 
 class InvoiceItemForm(forms.ModelForm):
     #sku = forms.ModelChoiceField(queryset=SKU.objects.all())
@@ -136,7 +139,7 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['sku'].widget.attrs\
             .update({
                 'class': 'sku-autocomplete',
-                'onchange' : 'AutoCompleteSKUDetail(this.id);AutoCompleteSKU(this.id)',
+                'onchange' : 'AutoCompleteSKUDetail(this.id)',
                 'onblur' : 'AutoCompleteSKUDetail(this.id)',
             })
         self.fields['courier'].widget.attrs\

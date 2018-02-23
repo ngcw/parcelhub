@@ -5,7 +5,8 @@
 	
 	<form class="searchform" action="/parcelhubPOS/payment/" method="get">
 		<div>Customer name:<input type="text" name="customername" maxlength ="50" value="{{ formdata.customername }}"/></div>
-		<div>Date:<input type="date" name="date" maxlength ="50" value="{{ formdata.date }}"/></div>
+		<div class="searchinput">Date:<input type="date" name="date" maxlength ="50" value="{{ formdata.date }}"/></div>
+		<div class="searchinput">Invoice no:<input type="text" name="invoiceno" maxlength ="50" value="{{ formdata.invoiceno }}"/></div>
         <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
         <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>

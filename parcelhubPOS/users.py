@@ -75,7 +75,7 @@ def userlist(request):
                 'title': "User",
                 'isedit' : isedit,
                 'issuperuser' : currentuser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': "User",
                 'issearchempty': issearchempty,
@@ -214,7 +214,7 @@ def userbranchaccess( request, user_id):
                 'title': "User branch access",
                 'isedit' : isedit,
                 'issuperuser' : loguser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': "User access"
                 }

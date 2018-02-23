@@ -228,7 +228,9 @@ def invoice_pdf(request, invoiceid):
     subtotalwidth = p.stringWidth(subtotal, CONST_font, 10)
     p.drawString(end - subtotalwidth, 153, subtotal)
     p.drawString(310, 138, 'Discount')
-    discount = "-%.2f" % invoice.discount
+    discount = '0.00'
+    if invoice.discountvalue and invoice.discountvalue > 0.00:
+        discount = "-%.2f" % invoice.discountvalue
     discountwidth = p.stringWidth(discount, CONST_font, 10)
     p.drawString(end - discountwidth, 138, discount)
     p.drawString(310, 123, 'GST')
@@ -441,7 +443,7 @@ def invoice_thermal(request, invoiceid):
     p.drawString( totalwidth - marginleft - subtotalwidth, subtotaly, subtotaltxt )
     p.drawString( totalwidth - currencymargin, subtotaly, 'RM' )
      # Discount
-    discounttxt = str(invoice.discount)
+    discounttxt = str(invoice.discountvalue)
     discountwidth = p.stringWidth(discounttxt, CONST_fontr, 9)
     p.drawString( totalwidth - marginleft - discountwidth, discounty, discounttxt )
     p.drawString( totalwidth - currencymargin, discounty, 'RM' )
@@ -577,7 +579,7 @@ def deliveryorder_pdf(request, invoiceid):
     p.setFont(CONST_font, 10)
     p.drawString(marginleft+385, top - (linesize * 7) - 5, "Account sale" )
     p.drawString(marginleft+385, top - (linesize * 9) , filename )
-    p.drawString(marginleft+385, top - (linesize * 10) - 5, invoice.invoice_date.strftime("%d/%m/%Y") )
+    p.drawString(marginleft+385, top - (linesize * 10) - 5, invoice.createtimestamp.strftime("%d/%m/%Y") )
 
     p.drawString(marginleft+385, top - (linesize * 12) - 5 , timezone.now().date().strftime("%d/%m/%Y") )
     username = invoice.created_by.last_name + ' ' +invoice.created_by.first_name
@@ -693,10 +695,7 @@ def deliveryorder_pdf(request, invoiceid):
     p.drawString(marginleft+300, 135, "Signature")
     p.drawString(475, 135, "Date")
     p.showPage()
-    p.save()
 
-    # Get the value of the BytesIO buffer and write it to the response.
-    pdf = buffer.getvalue()
+    pdf = p.getpdfdata()
     buffer.close()
-    response.write(pdf)
-    return response
+    return pdf

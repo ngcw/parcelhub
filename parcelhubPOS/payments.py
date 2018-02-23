@@ -37,7 +37,8 @@ def paymentlist(request, custid):
             pass
         
     formdata = {'customername':'',
-                'date':''}
+                'date':'',
+                'invoiceno': ''}
     if request.method == "GET":
         submitted_name = request.GET.get('customername') 
         if submitted_name:
@@ -47,6 +48,12 @@ def paymentlist(request, custid):
         if submitted_date:
             formdata['date'] = submitted_date;
             payment_list =  payment_list.filter(createtimestamp__lte=submitted_date, createtimestamp__gte=submitted_date )
+        submitted_invoiceno = request.GET.get('invoiceno') 
+        if submitted_invoiceno:
+            formdata['invoiceno'] = submitted_invoiceno;
+            paymentitem_paymentid = PaymentInvoice.objects.filter(invoice__invoiceno__icontains=submitted_invoiceno).values_list('payment_id', flat=True)
+
+            payment_list =  payment_list.filter(id__in=paymentitem_paymentid)
     final_Payment_table = PaymentTable(payment_list.order_by('-createtimestamp'))
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_Payment_table)
@@ -66,7 +73,7 @@ def paymentlist(request, custid):
                 'title': 'Payment overview',
                 'isedit' : True,
                 'issuperuser' : loguser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': 'Payment overview',
                 'issearchempty': issearchempty,
@@ -94,7 +101,7 @@ def paymentreceive(request):
                 'title': 'Payment receive',
                 'isedit' : True,
                 'issuperuser' : loguser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'header': 'Payment receive',
                 'statusmsg' : request.GET.get('msg'),
                 'titleid': 'paymentedittitle'

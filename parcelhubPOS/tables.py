@@ -12,10 +12,10 @@ class InvoiceTable(tables.Table):
     customer = tables.Column(default='Cash')
     class Meta:
         model = Invoice
-        fields = ('createtimestamp', 'invoiceno', 'customer','remarks', 'subtotal', 'discount', 'gst', 'total', 'payment','updatetimestamp' )
+        fields = ('createtimestamp', 'invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp' )
         attrs = {'class': 'paleblue'
                  }
-        exclude = {'invoicetype'}
+        exclude = {'invoicetype', 'discount'}
         empty_text = "There are no invoice matching the search criteria..."
 
 class InvoiceTable2(tables.Table):
@@ -24,10 +24,10 @@ class InvoiceTable2(tables.Table):
     customer = tables.Column(default='Cash')
     class Meta:
         model = Invoice
-        fields = ('createtimestamp', 'branch', 'invoiceno', 'customer','remarks', 'subtotal', 'discount', 'gst', 'total', 'payment','updatetimestamp' )
+        fields = ('createtimestamp', 'branch', 'invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp' )
         attrs = {'class': 'paleblue'
                  }
-        exclude = {'invoicetype'}
+        exclude = {'invoicetype', 'discount'}
         empty_text = "There are no invoice matching the search criteria..."
         
 deletelinksku = '''{% if isedit %}
@@ -120,7 +120,7 @@ class UserBranchAccessTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no assigned access to user"
         
-deletelinkvendor = '''{% if isedit and record.invoice_set.count <= 0 %}<a href="/parcelhubPOS/vendor/deletevendor?dvendorid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete vendor {{ record.name }}?')">Delete</a>
+deletelinkvendor = '''{% if isedit and record.invoiceitem_set.count <= 0 %}<a href="/parcelhubPOS/vendor/deletevendor?dvendorid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete vendor {{ record.name }}?')">Delete</a>
                         {% endif %}'''
 editlinkvendor = '''{% if isedit %}<a href="/parcelhubPOS/vendor/editvendor?vendorid={{record.id}}">Edit</a>
                     {% endif %}'''
@@ -137,7 +137,7 @@ class VendorTable(tables.Table):
         exclude = {'id'}
         empty_text = "There are no courier vendor matching the search criteria..."
         
-deletelinktax = '''{% if isedit and record.sku.count <= 0%}<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete tax {{record.tax_code}}?')">Delete</a>
+deletelinktax = '''{% if isedit and record.sku_set.count <= 0%}<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete tax {{record.tax_code}}?')">Delete</a>
                         {% endif %}'''
 editlinktax = '''{% if isedit %}<a href="/parcelhubPOS/tax/edittax?taxid={{record.id}}">Edit</a>
                     {% endif %}'''
@@ -202,7 +202,7 @@ class SKUBranchTable(tables.Table):
     zone = tables.Column(accessor='sku.zone')
     weight_start = tables.Column(accessor='sku.weight_start')
     weight_end = tables.Column(accessor='sku.weight_end')
-    GST_inclusive = tables.Column(accessor='sku.is_gst_inclusive')
+    GST_inclusive = tables.BooleanColumn(accessor='sku.is_gst_inclusive')
     master_last_update = tables.Column(accessor='sku.updatetimestamp')
     delete = tables.TemplateColumn( deletelinkskubranch,
                                     orderable = False );
@@ -298,12 +298,11 @@ viewlinksoa = '<a href="/parcelhubPOS/cashupreport/viewcur?curid={{record.id}}" 
 class CashUpReportTable(tables.Table):
     view = tables.TemplateColumn(viewlinksoa,
                                       orderable = False)
-    delete = tables.TemplateColumn( deletelinksoa,
-                                    orderable = False );
+
     class Meta:
         model = CashUpReport
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('sessiontimestamp', 'createtimestamp', 'branch','invoicenofrom', 'invoicenoto','total', 'view', 'delete')
+        sequence = ('sessiontimestamp', 'createtimestamp', 'branch','invoicenofrom', 'invoicenoto','total', 'view')
         exclude = {'id', 'created_by'}
         empty_text = "There are no cash up report generate yet..."

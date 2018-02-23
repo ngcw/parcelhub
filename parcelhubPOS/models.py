@@ -182,6 +182,7 @@ class Invoice(models.Model):
     remarks = models.CharField(max_length=254,blank=True, null=True)
     subtotal = models.DecimalField(max_digits=30, decimal_places=2)
     discount = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
+    discountvalue = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True, verbose_name='Discount (RM)')
     discountmode = models.CharField(max_length=25, verbose_name='Discount mode', blank=True, null=True)
     gst = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='GST')
     total = models.DecimalField(max_digits=30, decimal_places=2)

@@ -11,7 +11,9 @@
         <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
         <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
-    {% if isedit and isall %}
+    {% if isedit %}
+		{% if isall %}
+		{% else %}
     <form action="/parcelhubPOS/user/adduser">
     	<input type="submit" value="Add" />
 	</form>
@@ -21,7 +23,9 @@
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table userlist %}
-	{% if isedit and isall %}
+	{% if isedit %}
+		{% if isall %}
+		{% else %}
 	<form action="/parcelhubPOS/user/adduser">
     	<input type="submit" value="Add" />
 	</form>

@@ -216,6 +216,7 @@ def editInvoice(request, invoiceid):
             invoice.discountmode = discountmode
             if discountmode == '%':
                 discount = ( discount / 100 ) * (subtotal + gsttotal)
+            invoice.discountvalue = discount
             invoice.total = round_to_05(subtotal - discount)
             payment = formdatainvoice.get('payment')
             if not payment:
@@ -240,7 +241,8 @@ def editInvoice(request, invoiceid):
                 item.delete()
                 
             if 'action' in request.POST and request.POST['action'] == 'Print delivery order':
-                return deliveryorder_pdf(request, invoice.id)
+                doprint = deliveryorder_pdf(request, invoice.id)
+                return HttpResponse(doprint, content_type='application/pdf')
             elif 'action' in request.POST and request.POST['action'] == 'Preview':
                 if invoice.invoicetype.name == 'Cash':
                     invoiceprint = invoice_thermal(request, invoice.id)
@@ -382,6 +384,7 @@ def autocompleteskufield(request):
 def autocompleteskudetail(request):
     branchid = request.session.get(CONST_branchid)
     skucode =request.GET.get('sku_code')
+    invoicetype =request.GET.get('invoicetype')
     skubranch_list = SKUBranch.objects.filter(branch_id = branchid, sku__sku_code = skucode)
     results = []
     skucode_list = []
@@ -398,7 +401,7 @@ def autocompleteskudetail(request):
         except:
             pass
     skubranch = skubranch_list.first()
-    if skubranch:
+    if invoicetype != 'Cash' and skubranch:
         try:
             sku_json = {}
             sku = skubranch.sku
@@ -411,11 +414,11 @@ def autocompleteskudetail(request):
             sku_json['description'] = sku.description
             skuprice = 0.0
             if iswalkinspecial:
-                skuprice = sku.walkin_special_price
+                skuprice = skubranch.walkin_special_override
             elif iscorporate:
-                skuprice = sku.corporate_price
+                skuprice = skubranch.corporate_override
             else:
-                skuprice = sku.walkin_price
+                skuprice = skubranch.walkin_override
             gstpercentage = (sku.tax_code.gst / 100 )
             if sku.is_gst_inclusive:
                 gst = skuprice - (skuprice/(1+gstpercentage))

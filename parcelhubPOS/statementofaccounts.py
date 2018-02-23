@@ -68,7 +68,7 @@ def statementofacclist(request):
                 'title': "Statement of account",
                 'isedit' : True,
                 'issuperuser' : loguser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': "Statement of account",
                 'issearchempty': issearchempty,
@@ -115,10 +115,7 @@ def viewstatementofacc(request):
         date_to = request.GET.get('dateto')
         statementoption = request.GET.get('soaoptioninput')
         selectedcustomer =  Customer.objects.get(id=customerid)
-        invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
-        if statementoption == 'unpaid':
-            invoicelist = invoicelist.filter(payment__gte=models.F('total'))
-        
+        invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)      
         user = User.objects.get(id = request.session.get('userid'))
         statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now())
             
@@ -204,7 +201,10 @@ def statementofacc_pdf(request, statementofacc):
     heightafteraddress = heightcustaddress - ( linecount * addressline )
     contactlineheight = 15;
     p.drawString(margin, heightafteraddress - (contactlineheight * 1), "Tel        " + customer.contact)
-    p.drawString(margin, heightafteraddress - (contactlineheight * 2), "Fax        " + customer.fax)
+    customerfax = '';
+    if customer.fax:
+        customerfax = customer.fax
+    p.drawString(margin, heightafteraddress - (contactlineheight * 2), "Fax        " + customerfax)
     lineheight = heightafteraddress - (contactlineheight * 2) - 5
     p.line(margin, lineheight, totalwidth-margin, lineheight)
     # Body

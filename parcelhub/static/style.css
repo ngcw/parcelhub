@@ -6,6 +6,10 @@ body
 	padding-right:5px;
 	padding:0px;
 }
+input[type=text], input[type=email]
+{
+	width: 200px;
+}
 input:focus, select:focus, textarea:focus {
   background: lightgreen;
   outline: black solid;
@@ -558,4 +562,12 @@ input:disabled, select:disabled, textarea:disabled
 {
 	background-color: #DA93A9;
 	width: 100%;
+}
+.even .subtotal,.even  .discountvalue,.even  .gst,.even  .total,.even  .payment,.even .total, .even .totalamount, .even .paidamount, .even .outstandindamount
+{
+	text-align: right;
+}
+.odd .subtotal,.odd  .discountvalue,.odd  .gst,.odd  .total,.odd  .payment,.odd .total, .odd .totalamount, .odd .paidamount, .odd .outstandindamount
+{
+	text-align: right;
 }

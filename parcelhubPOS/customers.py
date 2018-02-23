@@ -67,7 +67,7 @@ def customerlist(request):
                 'title' : 'Customer',
                 'isedit' : True,
                 'issuperuser' : loguser.is_superuser,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': 'Customer',
                 'issearchempty': issearchempty,
