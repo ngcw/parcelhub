@@ -4,7 +4,7 @@
 	
 	<form method="post" action="">{% csrf_token %}
 		<table class="inputtable">
-		{{ formset.as_table}}  
+		{{ sku_form.as_table}}  
 	    </table>
 	    <input type="submit" value="Save" />
 	    <a href="/parcelhubPOS/sku/" class="deletebutton"><button type="button">Back</button></a>

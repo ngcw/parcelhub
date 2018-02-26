@@ -406,12 +406,15 @@ def autocompleteskudetail(request):
             sku_json = {}
             sku = skubranch.sku
             sku_json['skucode'] = sku.sku_code
-            sku_json['couriervendor'] = sku.couriervendor.id
             sku_json['producttype'] = sku.product_type.name
             sku_json['zonetype'] = sku.zone_type.name
-            sku_json['zone'] = sku.zone
             sku_json['tax'] = sku.tax_code.id
             sku_json['description'] = sku.description
+            try:
+                sku_json['couriervendor'] = sku.couriervendor.id
+                sku_json['zone'] = sku.zone
+            except:
+                pass
             skuprice = 0.0
             if iswalkinspecial:
                 skuprice = skubranch.walkin_special_override
@@ -438,12 +441,17 @@ def autocompleteskudetail(request):
     
             sku_json = {}
             sku_json['skucode'] = sku.sku_code
-            sku_json['couriervendor'] = sku.couriervendor.id
+            
             sku_json['zonetype'] = sku.zone_type.name
             sku_json['producttype'] = sku.product_type.name
-            sku_json['zone'] = sku.zone
+            
             sku_json['tax'] = sku.tax_code.id
             sku_json['description'] = sku.description
+            try:
+                sku_json['couriervendor'] = sku.couriervendor.id
+                sku_json['zone'] = sku.zone
+            except:
+                pass
             skuprice = 0.0
             if iswalkinspecial:
                 skuprice = sku.walkin_special_price
@@ -469,17 +477,17 @@ def autocompleteskudetail(request):
 @csrf_exempt
 def autocompletezone(request):
     results = []
-    zonetype = 'Domestic'
     
-    zone_list = ZoneDomestic.objects.all()
-    zonetypename = request.GET.get('zonetypename');
+    zone_list = None
+    zonetype = request.GET.get('zonetypename');
     postcode_country = request.GET.get('postcode_country') ;
     prodtypename = request.GET.get('prodtypename');
     courier = request.GET.get('courier');
-    if zonetypename:
-        zonetype = zonetypename
+    if zonetype:
         if zonetype == 'International':
-            zone_list = ZoneInternational.objects.filter(couriervendor__id =courier)
+            zone_list = ZoneInternational.objects.filter(couriervendor__id = courier)
+        else:
+            zone_list = ZoneDomestic.objects.all()
     if postcode_country:
         if zonetype == 'Domestic':
             if len(postcode_country) > 3:
@@ -489,7 +497,7 @@ def autocompletezone(request):
                     zone_list =  zone_list.filter(zone = postcode_country)
                 except:
                     zone_list =  zone_list.filter(zone= -1)
-        else:
+        elif zonetype == 'International':
             zone_list = zone_list.filter(country = postcode_country)
     for zone in zone_list:
         zone_json = {}
@@ -501,7 +509,7 @@ def autocompletezone(request):
                         zone_json['zone'] = str(zone.zone_doc);
                     elif prodtype.ismerchandise:
                         zone_json['zone'] = str(zone.zone_mer);
-        else:
+        elif zonetype == 'Domestic':
             zone_json['zone'] = str(zone.zone);
         results.append(zone_json)
     data = json.dumps(results)

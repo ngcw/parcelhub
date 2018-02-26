@@ -114,7 +114,7 @@ def editSKU(request, skucode):
         formset = SKUForm(instance=skuqueryset)
     
     context = {
-                'formset': formset,
+                'sku_form': formset,
                 'headerselectiondisabled' : True,
                 'isedit' : isedit,
                 'nav_bar' : sorted(menubar.items()),

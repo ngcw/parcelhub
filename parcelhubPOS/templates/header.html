@@ -109,7 +109,43 @@
 		       {% block content %}{% endblock %}
 		  </div>
 		  <script>
-		  
+		  function SetParentVisibility( id, show ) {
+  			var selection = document.getElementById(id);
+  			if( show)
+ 				{
+  				selection.parentNode.parentNode.style.display = ""; 
+  				selection.disabled = false;
+  				
+ 				}
+  			else
+  			{
+  				selection.parentNode.parentNode.style.display = "none"; 
+  				selection.disabled = true;
+  			}
+  		}
+  		function SetVisibility( id, show ) {
+  			var selection = document.getElementById(id);
+  			if( selection )
+  			{
+	    			if( show )
+	   				{
+	    				selection.style.display = ""; 
+	    				selection.disabled = false;
+	   				}
+	    			else
+	    			{
+	    				selection.style.display = "none"; 
+	    				selection.disabled = true;
+	    			}
+  			}
+  		}
+  		function SetRequired( id, required ) {
+  			var selection = document.getElementById(id);
+  			if( selection )
+  			{
+	    		selection.required = required
+  			}
+  		}
 		  function startTime() {
 			    var dt = new Date();
 			    var hours = dt.getHours() > 12 ? dt.getHours() - 12 : dt.getHours();
@@ -619,6 +655,7 @@
 		               								dataobj[i]['tax'],
 		               								dataobj[i]['gst'],
 		               								dataobj[i]['price']);
+		               		 		
 		               		 		UpdateTotal()
 		              		 	}
 		               		}
@@ -753,36 +790,7 @@
 				document.getElementById('confirm_payment').innerHTML = parseFloat(payment).toFixed(2);
 				document.getElementById('confirm_total').innerHTML = document.getElementById('total').innerHTML
     		};
-    		function SetParentVisibility( id, show ) {
-    			var selection = document.getElementById(id);
-    			if( show)
-   				{
-    				selection.parentNode.parentNode.style.display = ""; 
-    				selection.disabled = false;
-    				
-   				}
-    			else
-    			{
-    				selection.parentNode.parentNode.style.display = "none"; 
-    				selection.disabled = true;
-    			}
-    		}
-    		function SetVisibility( id, show ) {
-    			var selection = document.getElementById(id);
-    			if( selection )
-    			{
-	    			if( show )
-	   				{
-	    				selection.style.display = ""; 
-	    				selection.disabled = false;
-	   				}
-	    			else
-	    			{
-	    				selection.style.display = "none"; 
-	    				selection.disabled = true;
-	    			}
-    			}
-    		}
+    		
     		function HideShowCashType() { 
 	    	    var value = document.getElementById('id_invoicetype').value.trim();
 	    	    var selectedinvoicetype = [];
@@ -1225,6 +1233,21 @@
 	    	}
     		{% endif %}
 	    	{% endif %}
+	      {% if sku_form %}
+	      function HideShowSKUFields() { 
+	    	    var value = document.getElementById('id_zone_type').value.trim();
+	    	    var visible = value != 'Others'
+              	SetParentVisibility( 'id_couriervendor', visible); 
+              	SetParentVisibility( 'id_zone', visible); 
+              	SetParentVisibility( 'id_weight_start', visible); 
+              	SetParentVisibility( 'id_weight_end', visible);
+              	SetRequired('id_couriervendor', visible )
+              	SetRequired('id_zone', visible )
+              	SetRequired('id_weight_start', visible )
+              	SetRequired('id_weight_end', visible )
+       		 		
+	    	};
+	      {% endif %}
 		  </script>
           {% block jsscript %}{% endblock %}
 

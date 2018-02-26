@@ -23,7 +23,7 @@ class UserCreateForm(UserCreationForm):
 class SKUForm(forms.ModelForm):                                      
     class Meta:
         model = SKU
-        fields = ('sku_code', 'description', 'couriervendor', 'product_type', 'zone_type',
+        fields = ('sku_code', 'description','zone_type', 'product_type', 'couriervendor', 
                   'zone', 'weight_start', 'weight_end', 'tax_code', 'is_gst_inclusive','corporate_price',
                   'walkin_special_price', 'walkin_price')
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,10 @@ class SKUForm(forms.ModelForm):
         instance = getattr(self, 'instance', None)
         if instance and instance.sku_code:
             self.fields['sku_code'].widget.attrs['readonly'] = True
-
+        self.fields['zone_type'].widget.attrs\
+            .update({
+                'onchange': 'HideShowSKUFields()'
+            })
     def clean_sku_code(self):
         instance = getattr(self, 'instance', None)
         if instance and instance.pk:
@@ -40,25 +43,28 @@ class SKUForm(forms.ModelForm):
             return self.cleaned_data['sku_code']
     def clean(self):
         cleaned_data = super(SKUForm, self).clean()
-        if cleaned_data['weight_start'] > cleaned_data['weight_end']:
-            raise forms.ValidationError("Weight end must be larger than weight start")
         try:
-            weightstart = cleaned_data.get('weight_start')
-            weightend = cleaned_data.get('weight_end')
-            overlap1 = SKU.objects.filter(couriervendor=self.cleaned_data['couriervendor'],
-                                        product_type=self.cleaned_data['product_type'],
-                                        zone=self.cleaned_data['zone'],
-                                        weight_start__lte=weightstart,
-                                        weight_end__gte=weightstart ).exclude(sku_code=self.cleaned_data['sku_code'])
-            overlap2 = SKU.objects.filter(couriervendor=self.cleaned_data['couriervendor'],
-                                        product_type=self.cleaned_data['product_type'],
-                                        zone=self.cleaned_data['zone'],
-                                        weight_start__lte=weightend,
-                                        weight_end__gte=weightend ).exclude(sku_code=self.cleaned_data['sku_code'])
-            if overlap1 or overlap2:
-                raise forms.ValidationError("SKU with same courier, prouct type, zone and weight range exist already!")
-        except SKU.DoesNotExist:
-          #because we didn't get a match
+            if cleaned_data['weight_start'] > cleaned_data['weight_end']:
+                raise forms.ValidationError("Weight end must be larger than weight start")
+            try:
+                weightstart = cleaned_data.get('weight_start')
+                weightend = cleaned_data.get('weight_end')
+                overlap1 = SKU.objects.filter(couriervendor=self.cleaned_data['couriervendor'],
+                                            product_type=self.cleaned_data['product_type'],
+                                            zone=self.cleaned_data['zone'],
+                                            weight_start__lte=weightstart,
+                                            weight_end__gte=weightstart ).exclude(sku_code=self.cleaned_data['sku_code'])
+                overlap2 = SKU.objects.filter(couriervendor=self.cleaned_data['couriervendor'],
+                                            product_type=self.cleaned_data['product_type'],
+                                            zone=self.cleaned_data['zone'],
+                                            weight_start__lte=weightend,
+                                            weight_end__gte=weightend ).exclude(sku_code=self.cleaned_data['sku_code'])
+                if overlap1 or overlap2:
+                    raise forms.ValidationError("SKU with same courier, prouct type, zone and weight range exist already!")
+            except SKU.DoesNotExist:
+              #because we didn't get a match
+                pass
+        except:
             pass
         return cleaned_data
 
