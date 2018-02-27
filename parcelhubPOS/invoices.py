@@ -407,10 +407,11 @@ def autocompleteskudetail(request):
             sku = skubranch.sku
             sku_json['skucode'] = sku.sku_code
             sku_json['producttype'] = sku.product_type.name
-            sku_json['zonetype'] = sku.zone_type.name
+            
             sku_json['tax'] = sku.tax_code.id
             sku_json['description'] = sku.description
             try:
+                sku_json['zonetype'] = sku.zone_type.name
                 sku_json['couriervendor'] = sku.couriervendor.id
                 sku_json['zone'] = sku.zone
             except:
@@ -441,13 +442,11 @@ def autocompleteskudetail(request):
     
             sku_json = {}
             sku_json['skucode'] = sku.sku_code
-            
-            sku_json['zonetype'] = sku.zone_type.name
             sku_json['producttype'] = sku.product_type.name
-            
             sku_json['tax'] = sku.tax_code.id
             sku_json['description'] = sku.description
             try:
+                sku_json['zonetype'] = sku.zone_type.name
                 sku_json['couriervendor'] = sku.couriervendor.id
                 sku_json['zone'] = sku.zone
             except:
@@ -499,19 +498,20 @@ def autocompletezone(request):
                     zone_list =  zone_list.filter(zone= -1)
         elif zonetype == 'International':
             zone_list = zone_list.filter(country = postcode_country)
-    for zone in zone_list:
-        zone_json = {}
-        if zonetype == 'International':
-            if prodtypename:
-                prodtype = ProductType.objects.get(name=prodtypename);
-                if prodtype:
-                    if prodtype.isdocument:
-                        zone_json['zone'] = str(zone.zone_doc);
-                    elif prodtype.ismerchandise:
-                        zone_json['zone'] = str(zone.zone_mer);
-        elif zonetype == 'Domestic':
-            zone_json['zone'] = str(zone.zone);
-        results.append(zone_json)
+    if zone_list:
+        for zone in zone_list:
+            zone_json = {}
+            if zonetype == 'International':
+                if prodtypename:
+                    prodtype = ProductType.objects.get(name=prodtypename);
+                    if prodtype:
+                        if prodtype.isdocument:
+                            zone_json['zone'] = str(zone.zone_doc);
+                        elif prodtype.ismerchandise:
+                            zone_json['zone'] = str(zone.zone_mer);
+            elif zonetype == 'Domestic':
+                zone_json['zone'] = str(zone.zone);
+            results.append(zone_json)
     data = json.dumps(results)
     return JsonResponse(data, safe=False)
 

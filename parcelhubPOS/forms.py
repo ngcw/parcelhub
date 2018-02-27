@@ -31,7 +31,7 @@ class SKUForm(forms.ModelForm):
         instance = getattr(self, 'instance', None)
         if instance and instance.sku_code:
             self.fields['sku_code'].widget.attrs['readonly'] = True
-        self.fields['zone_type'].widget.attrs\
+        self.fields['product_type'].widget.attrs\
             .update({
                 'onchange': 'HideShowSKUFields()'
             })
@@ -154,15 +154,15 @@ class InvoiceItemForm(forms.ModelForm):
             })
         self.fields['zone_type'].widget.attrs\
             .update({
-                'onchange': 'DefaultProductType(this.id);AutoCompleteSKU(this.id);ValidateTrackingCode(this.id);SetDescriptionAvailability(this.id)'
+                'onchange': 'DefaultProductType(this.id);AutoCompleteSKU(this.id);ValidateTrackingCode(this.id)'
             })
         self.fields['zone'].widget.attrs\
             .update({
-                'onchange': 'AutoCompleteSKU(this.id);AutoCompleteZone(this.id)'
+                'onchange': 'AutoCompleteSKU(this.id);AutoCompleteZone(this.id);ValidateTrackingCode(this.id)'
             })
         self.fields['producttype'].widget.attrs\
             .update({
-                'onchange': 'AutoCompleteZone(this.id);AutoCompleteSKU(this.id)',
+                'onchange': 'AutoCompleteZone(this.id);AutoCompleteSKU(this.id);SetDescriptionAvailability(this.id);ValidateTrackingCode(this.id)',
             })
 
         self.fields['weight'].widget.attrs\

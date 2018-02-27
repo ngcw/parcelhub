@@ -579,7 +579,7 @@
 	                		weightele.setAttribute('title', '');
 	                		dimweightele.setAttribute('title', '');
                 		}
-	                	else if ( selectedzonetype == 'Others')
+	                	else if ( selectedprodtype == 'Services')
 	                	{
 	                		if (skuinput.value == '')
 	                		{
@@ -645,7 +645,8 @@
 	                	{
 		                	for (var i = 0; i < dataobj.length; i++){
 		               			// look for the entry with a matching `code` value
-		               		 	if (dataobj[i]['skucode'] == value){
+		               		 	if (dataobj[i]['skucode'] == value ){
+		               		 		
 		               		 		PopulateFields( count, 
 		               		 						dataobj[i]['description'],
 		               		 					   	dataobj[i]['couriervendor'],
@@ -933,17 +934,17 @@
 		    	    var count = inputstr[1]
 		    	    var dimweightid = "id_form-" + count + "-dimension_weight";
 		    	    var dimweightelement = document.getElementById(dimweightid)
-		    	    var zonetypeid = "id_form-" + count + "-zone_type";
-		    	    var zonetypesel = document.getElementById(zonetypeid);
-		    	    var selectedzonetype = zonetypesel.options[zonetypesel.selectedIndex].value;
+		    	   	var producttypeid = "id_form-" + count + "-producttype";
+	    	    	var producttypesel = document.getElementById(producttypeid);
+	    	    	var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
 		    	    var zoneid = "id_form-" + count + "-zone";
 		    	    var zoneelement = document.getElementById(zoneid)
 		    	    rowempty = i + 1;
-			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && selectedzonetype !== 'Others' )
+			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && selectedproducttype !== 'Services' )
 			        {
 			        	cansubmitweight = false;
 			       	}
-		    	    if( zoneelement.value.length == 0  && selectedzonetype !== 'Others' )
+		    	    if( zoneelement.value.length == 0  && selectedproducttype !== 'Services' )
 	    	    	{
 	    	    	 	cansubmitzone = false;
 	    	    	}
@@ -1052,9 +1053,9 @@
 	    		var value = document.getElementById(inputid).value.trim();
 	    		var inputstr = inputid.split("-");
 	    	    var count = inputstr[1]
-	    	    var zonetypeid = "id_form-" + count + "-zone_type";
-	    	    var zonetypesel = document.getElementById(zonetypeid);
-	    	    var selectedzonetype = zonetypesel.options[zonetypesel.selectedIndex].value;
+	    	    var producttypeid = "id_form-" + count + "-producttype";
+	    	    var producttypesel = document.getElementById(producttypeid);
+	    	    var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
 	    	    var descriptionid = "id_form-" + count + "-skudescription";
 	    	    var skudescription = document.getElementById(descriptionid);
 	    	    var priceid = "id_form-" + count + "-price";
@@ -1063,7 +1064,7 @@
 	    	    var dimweight = document.getElementById(dimweightid)
 	    	    var courierid = "id_form-" + count + "-courier";
 	    	    var couriersel = document.getElementById(courierid);
-	    	    if (selectedzonetype == 'Others')
+	    	    if (selectedproducttype == 'Services')
 	    	    {
 	    	    	skudescription.readOnly = false;
 	    	    	price.readOnly = false;
@@ -1080,6 +1081,7 @@
 	    	    		dimweight.classList.remove('lastInput')
 	    	    	}
 	    	    	couriersel.value = ''
+	    	    	AutoCompleteSKU(inputid)
 	    	    }
 	    	    else
 	    	    {
@@ -1235,8 +1237,8 @@
 	    	{% endif %}
 	      {% if sku_form %}
 	      function HideShowSKUFields() { 
-	    	    var value = document.getElementById('id_zone_type').value.trim();
-	    	    var visible = value != 'Others'
+	    	    var value = document.getElementById('id_product_type').value.trim();
+	    	    var visible = value != 'Services'
               	SetParentVisibility( 'id_couriervendor', visible); 
               	SetParentVisibility( 'id_zone', visible); 
               	SetParentVisibility( 'id_weight_start', visible); 

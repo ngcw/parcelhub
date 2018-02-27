@@ -164,7 +164,7 @@ def cashup_pdf(request, cashupreport):
     p.drawCentredString(center, totalheight - topmargin- (linecount * 2), contactinfo)
     
     p.setFont(CONST_fontbold, 14)
-    p.drawCentredString(center, totalheight - topmargin- (linecount * 4) - topmargin, "Till Balance")
+    p.drawCentredString(center, totalheight - topmargin- (linecount * 4) - topmargin, "Cash Up Report")
     p.setFont(CONST_fontbold, 9)
     p.drawString(margin, totalheight - topmargin- (linecount * 9), "Drawer")
     p.drawString(margin, totalheight - topmargin- (linecount * 10), "Transactions")
