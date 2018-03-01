@@ -176,8 +176,15 @@ def editInvoice(request, invoiceid):
         
         invoice = None;
         haspayment = False
-    defaultcourier = CourierVendor.objects.filter().first()
-    invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'zone_type': 'Domestic', 'producttype':'Parcel', 'courier': defaultcourier.id}])
+    defaultproduct = ProductType.objects.filter(name = 'Parcel').first()
+    defaultzonetype = ''
+    defaultcourier = ''
+    if defaultproduct:
+        if defaultproduct.default_zonetype:
+            defaultzonetype = defaultproduct.default_zonetype
+        if defaultproduct.default_courier:
+            defaultcourier = defaultproduct.default_courier
+    invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'producttype':defaultproduct,'zone_type': defaultzonetype, 'courier': defaultcourier}])
     
     #printing
     if request.method == 'POST':
@@ -195,7 +202,15 @@ def editInvoice(request, invoiceid):
             formdatainvoice = invoice_form.cleaned_data
             gsttotal = 0;
             #calculation only
+            discountval = formdatainvoice.get('discount')
             
+            invoice.discount = discountval
+            discountmode = request.POST["discountoption"]
+            invoice.discountmode = discountmode
+            if discountmode == '%':
+                discount = 0;
+            else:
+                discount = discountval;
             for form in invoice_item_formset.forms:
                 invoice_item = form.save(commit=False)
                 formdata = form.cleaned_data
@@ -204,18 +219,21 @@ def editInvoice(request, invoiceid):
                 price = formdata.get('price') 
                 gsttotal = gsttotal + formdata.get('gst') 
                 subtotal = subtotal + price 
+                if discountmode == '%':
+                    skucode = formdata.get('sku')
+                    sku = SKU.objects.filter(sku_code=skucode).first()
+                    if sku:
+                        if sku.is_gst_inclusive:
+                            discount = discount + ( ( discountval / 100 ) * (subtotal ) )
+                        else:
+                            discount = discount + ( ( discountval / 100 ) * (subtotal + gsttotal) )
             if not invoice_form.instance.id:
                 invoice.invoiceno = gen_invoice_number(request)
                 invoice.createtimestamp = timezone.now()
             invoice.updatetimestamp = timezone.now()
             invoice.subtotal = subtotal
             invoice.created_by = user
-            discount = formdatainvoice.get('discount')
-            invoice.discount = discount
-            discountmode = request.POST["discountoption"]
-            invoice.discountmode = discountmode
-            if discountmode == '%':
-                discount = ( discount / 100 ) * (subtotal + gsttotal)
+            
             invoice.discountvalue = discount
             invoice.total = round_to_05(subtotal - discount)
             payment = formdatainvoice.get('payment')
@@ -391,7 +409,7 @@ def autocompleteskudetail(request):
     iswalkinspecial = False;
     iscorporate = False;
     customerid = request.GET.get('customerid') ;
-    if customerid:
+    if invoicetype != 'Cash' and customerid:
         try:
             customersel = Customer.objects.get(id=customerid)
             if customersel:
@@ -548,6 +566,24 @@ def hideshowcustomer(request):
     data = json.dumps(results)
     return JsonResponse(data, safe=False)
 
+@csrf_exempt
+def setdefaultforproduct(request):
+    results = []
+    producttypename = request.GET.get('producttype');
+    default_json = {}
+    default_json['zonetype'] = '';
+    default_json['courier'] = '';
+    if producttypename:
+        producttype = ProductType.objects.get(name=producttypename)
+        if producttype:
+            if producttype.default_zonetype:
+                default_json['zonetype'] = producttype.default_zonetype.name;
+            if producttype.default_courier:
+                default_json['courier'] = producttype.default_courier.id;
+    results.append(default_json)
+    data = json.dumps(results)
+    return JsonResponse(data, safe=False)
+    
 @csrf_exempt
 def validatetrackingcode(request):
     results = []

@@ -495,32 +495,26 @@
 			{
 				$( "#id_form-" + count + "-zone" ).val( zone )
 			}
+	    	function PopulateZoneType( count, zonetype )
+			{
+				$( "#id_form-" + count + "-zone_type" ).val( zonetype )
+			}
+	    	function PopulateCourier( count, courier )
+			{
+				$( "#id_form-" + count + "-courier" ).val( courier )
+			}
 	    	function PopulateFields( count, description, courier, zonetype, prodtype, zone, tax, gst, price ){
 	    		PopulateZone( count, zone)
 	    		$( "#id_form-" + count + "-skudescription" ).val( description )
-	    		$( "#id_form-" + count + "-courier" ).val( courier )
-	    		$( "#id_form-" + count + "-zone_type" ).val( zonetype )
+	    		PopulateCourier( count, courier )
+	    		PopulateZoneType( count, zonetype )
 	    		$( "#id_form-" + count + "-producttype" ).val( prodtype )
 	    		$( "#id_form-" + count + "-tax" ).val( tax )
 	    		$( "#id_form-" + count + "-gst" ).val( gst ).trigger('input');
 	    		$( "#id_form-" + count + "-price" ).val( price ).trigger('input');
 	    		ValidateTrackingCode("id_form-" + count + "-courier")
 	    	};
-	    	function DefaultProductType(inputid)
-	    	{
-	    		var value = document.getElementById(inputid).value.trim();
-	    		var inputstr = inputid.split("-");
-	    	    var count = inputstr[1]
-	    	    var zonetypeid = "id_form-" + count + "-zone_type";
-	    	    var zonetypesel = document.getElementById(zonetypeid);
-	    	    var selectedzonetype = zonetypesel.options[zonetypesel.selectedIndex].value;
-	    	    if( selectedzonetype == 'Domestic')
-	    	    	{
-		    	    	var prodtypeid = "id_form-" + count + "-producttype";
-			    	    var prodtypesel = document.getElementById(prodtypeid);
-			    	    prodtypesel.value = 'Parcel'
-	    	    	}
-	    	}
+
 	    	function AutoCompleteSKU( inputid ) { 
 	    	    var value = document.getElementById(inputid).value.trim();
 	    		var inputstr = inputid.split("-");
@@ -689,20 +683,24 @@
 	                contentType: "application/json",
 	                success: function(data){
 	                	var dataobj = JSON.parse(data)
-	                	if( dataobj[0] !== null && dataobj[0] != undefined && dataobj.length != 0 )
-                		{
-	                		PopulateZone( count, 
-         		 					      dataobj[0]['zone']); 
-	                		zoneinput.style.backgroundColor = ''
-	                		zoneinput.setAttribute('title', '');
-	                		
-                		}
-	                	else 
+	                	if( selectedprodtype == 'Document' || selectedprodtype == 'Parcel')
 	                	{
-	                		
-	                		zoneinput.style.backgroundColor = 'red'
-	                		zoneinput.setAttribute('title', 'No zone found');
+	                		if( dataobj[0] !== null && dataobj[0] != undefined && dataobj.length != 0 )
+	                		{
+		                		PopulateZone( count, 
+	         		 					      dataobj[0]['zone']); 
+		                		zoneinput.style.backgroundColor = ''
+		                		zoneinput.setAttribute('title', '');
+		                		
+	                		}
+		                	else 
+		                	{
+		                		
+		                		zoneinput.style.backgroundColor = 'red'
+		                		zoneinput.setAttribute('title', 'No zone found');
+		                	}
 	                	}
+	                	
            		 		
 	                }
 	            });
@@ -840,7 +838,32 @@
 	    		  {% endif %}
 	    		  
 	    		};
-    		
+    		function SetDefaultZoneTypeAndCourier(inputid)
+    		{
+    			var inputstr = inputid.split("-");
+	    	    var count = inputstr[1]
+	    	    var producttypeid = "id_form-" + count + "-producttype";
+	    	    var producttypesel = document.getElementById(producttypeid);
+	    	    var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
+	    	    var producttypedefault = [];
+	    	    var mystring = JSON.stringify(producttypedefault);
+	    	    $.ajax({
+	                url:"/parcelhubPOS/setdefaultforproduct/?producttype="+selectedproducttype,
+	                type:"POST",
+	                data:mystring,
+	                dataType: "json",
+	                contentType: "application/json",
+	                success: function(data){
+	                	var dataobj = JSON.parse(data)
+	                	if( dataobj[0] !== null && dataobj[0] != undefined )
+                		{
+	                		PopulateZoneType( count, dataobj[0]['zonetype'] )
+	                		PopulateCourier( count,  dataobj[0]['courier'] )
+                		}
+           		 		
+	                }
+	            });
+    		};
     		function ValidateTrackingCode(inputid) { 
     			var inputstr = inputid.split("-");
 	    	    var count = inputstr[1]
@@ -870,8 +893,9 @@
 	                	var cinputvalue
 	                	for (i = 0; i < inputcount && duplicated == false; i++) { 
 	                		ctrackcodeid = "id_form-" + i + "-tracking_code"
+	                		
 	                		cinputvalue = document.getElementById(ctrackcodeid).value.trim()
-	                		if( cinputvalue )
+	                		if( cinputvalue && selectedcourier != '' )
 	                		{
 		                		if( i != count && value)
 		                		{
@@ -909,12 +933,7 @@
 			    for(var i=0;i<arr.length && cansubmittc;i++)
 				{
 			    	var rowcount = i+1
-			        if(arrval.indexOf(arr[i].value) > -1 )
-			        {
-			        	var matchingrow = arrval.indexOf(arr[i].value) + 1
-			        	rowduplicated = String(matchingrow) + " and " + String(rowcount)
-			        	cansubmittc = false;
-			       	}
+
 			        if( arr[i].style.backgroundColor == 'red')
 			        {
 			        	rowduplicated = String(rowcount)
@@ -1226,6 +1245,7 @@
 
 				
     		};
+    		
     		{% if isview  %}
     		
     		{% else %}
@@ -1238,11 +1258,18 @@
 	      {% if sku_form %}
 	      function HideShowSKUFields() { 
 	    	    var value = document.getElementById('id_product_type').value.trim();
-	    	    var visible = value != 'Services'
+	    	    var visible = false;
+	    	    
+	    	    if( value == 'Document' || value == 'Parcel' )
+	    	    {
+	    	    	visible = true;
+	    	    }
               	SetParentVisibility( 'id_couriervendor', visible); 
+	    	    SetParentVisibility( 'id_zone_type', visible); 
               	SetParentVisibility( 'id_zone', visible); 
               	SetParentVisibility( 'id_weight_start', visible); 
               	SetParentVisibility( 'id_weight_end', visible);
+              	SetRequired('id_zone_type', visible )
               	SetRequired('id_couriervendor', visible )
               	SetRequired('id_zone', visible )
               	SetRequired('id_weight_start', visible )

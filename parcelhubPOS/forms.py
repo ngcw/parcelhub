@@ -23,7 +23,7 @@ class UserCreateForm(UserCreationForm):
 class SKUForm(forms.ModelForm):                                      
     class Meta:
         model = SKU
-        fields = ('sku_code', 'description','zone_type', 'product_type', 'couriervendor', 
+        fields = ('sku_code', 'description', 'product_type','zone_type', 'couriervendor', 
                   'zone', 'weight_start', 'weight_end', 'tax_code', 'is_gst_inclusive','corporate_price',
                   'walkin_special_price', 'walkin_price')
     def __init__(self, *args, **kwargs):
@@ -123,7 +123,7 @@ class InvoiceItemForm(forms.ModelForm):
     #sku = forms.ModelChoiceField(queryset=SKU.objects.all())
     class Meta: 
         model = InvoiceItem
-        fields = ("tracking_code", 'zone_type', "producttype", 'zone', 'weight',"height", 'length', 'width',  "dimension_weight", "courier", 'sku', 'skudescription', 'price','gst')
+        fields = ("tracking_code", "producttype", 'zone_type', 'zone', 'weight',"height", 'length', 'width',  "dimension_weight", "courier", 'sku', 'skudescription', 'price','gst')
         exclude = ('id',)
         widgets = {'gst': forms.HiddenInput()}
  
@@ -154,7 +154,7 @@ class InvoiceItemForm(forms.ModelForm):
             })
         self.fields['zone_type'].widget.attrs\
             .update({
-                'onchange': 'DefaultProductType(this.id);AutoCompleteSKU(this.id);ValidateTrackingCode(this.id)'
+                'onchange': 'AutoCompleteSKU(this.id);ValidateTrackingCode(this.id)'
             })
         self.fields['zone'].widget.attrs\
             .update({
@@ -162,7 +162,7 @@ class InvoiceItemForm(forms.ModelForm):
             })
         self.fields['producttype'].widget.attrs\
             .update({
-                'onchange': 'AutoCompleteZone(this.id);AutoCompleteSKU(this.id);SetDescriptionAvailability(this.id);ValidateTrackingCode(this.id)',
+                'onchange': 'AutoCompleteZone(this.id);AutoCompleteSKU(this.id);SetDescriptionAvailability(this.id);ValidateTrackingCode(this.id);SetDefaultZoneTypeAndCourier(this.id)',
             })
 
         self.fields['weight'].widget.attrs\

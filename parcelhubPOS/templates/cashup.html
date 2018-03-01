@@ -3,11 +3,11 @@
 
 {% block content %}
 	{% if isall %}
+	
+	{% else %}
 	<form class="searchform" action="/parcelhubPOS/cashupreport/viewcur/" method="POST" target="_blank">{% csrf_token %}
         <input type="submit" value="Generate cash up report" id="generatecur"/>
     </form>
-	{% else %}
-	
     {% endif %}
     {% if statusmsg %}
 	<div class="statusspacing"></div>

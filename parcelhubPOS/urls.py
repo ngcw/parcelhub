@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^validateweightrange/$',views.validateweightrange, name='validateweightrange'),
     url(r'^autocompleteweight/$',views.autocompleteweight, name='autocompleteweight'),
     url(r'^hideshowcustomer/$',views.hideshowcustomer, name='hideshowcustomer'),
+    url(r'^setdefaultforproduct/$',views.setdefaultforproduct, name='setdefaultforproduct'),
     url(r'^sku/$', views.SKUlist, name='sku'),
     url(r'^sku/editsku(?P<skucode>\w{0,50})/$', views.editSKU, name='editsku'),
     url(r'^sku/deletesku(?P<dskucode>\w{0,50})/$', views.deleteSKU, name='deletesku'),

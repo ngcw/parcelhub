@@ -40,17 +40,6 @@ class ZoneType(models.Model):
     class Meta:
         ordering = ['name']   
 
-class ProductType(models.Model):
-    name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name') 
-    isdocument = models.BooleanField()
-    ismerchandise = models.BooleanField() 
-    
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['name'] 
-        
 class CourierVendor(models.Model):
     name = models.CharField(max_length=50, verbose_name='*Name')
     zone_type = models.ForeignKey(ZoneType, verbose_name='*Zone type')
@@ -62,6 +51,20 @@ class CourierVendor(models.Model):
     class Meta:
         ordering = ['name']
         #unique_together = ["user", "branch"]
+        
+class ProductType(models.Model):
+    name = models.CharField(max_length=50, primary_key=True, unique=True, verbose_name='*Name') 
+    isdocument = models.BooleanField()
+    ismerchandise = models.BooleanField() 
+    default_zonetype = models.ForeignKey(ZoneType, verbose_name='Default zone type', blank=True, null=True)
+    default_courier = models.ForeignKey(CourierVendor, verbose_name='Default courier', blank=True, null=True)
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name'] 
+        
+
 
 class ZoneDomestic(models.Model):
     state = models.CharField(max_length=25, verbose_name='*State')

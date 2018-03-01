@@ -11,20 +11,26 @@
         <input class="searchbutton" type="image" src="/static/img/search_button.png" id="searchbutton" title="Search"/> 
         <input type="image" src="/static/img/clear_button.png" id="searchbutton" title="Clear search" onclick="clearSearch()"/> 
     </form>
-    {% if isedit and isall %}
+    {% if isedit %}
+    	{% if isall %}
+    	{% else %}
 	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">
     	<input type="submit" value="Add" />
 	</form>
+		{% endif %}
 	{% endif %}
 	{% if statusmsg %}
 	<div class="statusspacing"></div>
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table customer %}
-	{% if isedit and isall %}
+	{% if isedit %}
+    	{% if isall %}
+    	{% else %}
 	<form action="/parcelhubPOS/customer/editcustomer/?customerid=">
     	<input type="submit" value="Add" />
 	</form>
+		{% endif %}
 	{% endif %}
 {% endblock %}
 
