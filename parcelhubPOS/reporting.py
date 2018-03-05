@@ -85,18 +85,29 @@ def viewcashupreport(request):
             
         if invoicelist or paymentinvoicelist:
             earliestinvoice = invoicelist.order_by('invoiceno').first().invoiceno
-            epaymentinvoiceid = paymentinvoicelist.order_by('invoice').first().invoice.invoiceno
-            if epaymentinvoiceid < earliestinvoice:
-                earliestinvoice = epaymentinvoiceid
-            
+            try:
+                epaymentinvoiceid = paymentinvoicelist.order_by('invoice').first().invoice.invoiceno
+                if epaymentinvoiceid < earliestinvoice:
+                    earliestinvoice = epaymentinvoiceid
+            except:
+                pass
             latestinvoice = invoicelist.order_by('-invoiceno').first().invoiceno
-            lpaymentinvoiceid = paymentinvoicelist.order_by('-invoice').first().invoice.invoiceno
-            if lpaymentinvoiceid > latestinvoice:
-                latestinvoice = lpaymentinvoiceid
+            try:
+                lpaymentinvoiceid = paymentinvoicelist.order_by('-invoice').first().invoice.invoiceno
+                if lpaymentinvoiceid > latestinvoice:
+                    latestinvoice = lpaymentinvoiceid
+            except:
+                pass
             totalpaymentinvoice = invoicelist.aggregate(Sum('payment')).get('payment__sum', 0.00)
             totalpaymentpayment = paymentlist.aggregate(Sum('total')).get('total__sum', 0.00)
             
-            totalamt = totalpaymentinvoice + totalpaymentpayment + terminal.float
+            totalamt = 0; 
+            if totalpaymentinvoice:
+                totalamt = totalamt + totalpaymentinvoice 
+            if totalpaymentpayment:
+                totalamt = totalamt + totalpaymentpayment 
+            if terminal and terminal.float:
+                totalamt = totalamt + terminal.float
             cureport = CashUpReport(branch=selectedbranch, created_by = loguser,
                                      sessiontimestamp = sessionstart, createtimestamp = timezone.now(), 
                                      invoicenofrom=earliestinvoice, invoicenoto=latestinvoice,

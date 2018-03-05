@@ -238,7 +238,7 @@ def invoice_pdf(request, invoiceid):
     gstwidth = p.stringWidth(gst, CONST_font, 10)
     p.drawString(end - gstwidth, 123, gst)
     p.drawString(310, 108, 'Rounding')
-    roundingvalue = (float(invoice.total) - (float(invoice.subtotal) - float(invoice.discount)))
+    roundingvalue = float(invoice.total) - (float(invoice.subtotal) - float(invoice.discountvalue) + float(invoice.gst))
     rounding = "%.2f" % roundingvalue
     roundingwidth = p.stringWidth(rounding, CONST_font, 10)
     p.drawString(end - roundingwidth, 108, rounding)

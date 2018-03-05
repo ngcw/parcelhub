@@ -217,11 +217,16 @@ def editInvoice(request, invoiceid):
                 invoice_item.list = invoice
                 invoice_item.invoice = invoice
                 price = formdata.get('price') 
-                gsttotal = gsttotal + formdata.get('gst') 
-                subtotal = subtotal + price 
+                gstvalue = formdata.get('gst') 
+                gsttotal = gsttotal + gstvalue
+                skucode = formdata.get('sku')
+                sku = SKU.objects.filter(sku_code=skucode).first()
+                if sku:
+                    if sku.is_gst_inclusive:
+                        subtotal = subtotal + price - gstvalue
+                    else:
+                        subtotal = subtotal + price
                 if discountmode == '%':
-                    skucode = formdata.get('sku')
-                    sku = SKU.objects.filter(sku_code=skucode).first()
                     if sku:
                         if sku.is_gst_inclusive:
                             discount = discount + ( ( discountval / 100 ) * (subtotal ) )
@@ -235,7 +240,7 @@ def editInvoice(request, invoiceid):
             invoice.created_by = user
             
             invoice.discountvalue = discount
-            invoice.total = round_to_05(subtotal - discount)
+            invoice.total = round_to_05(subtotal + gsttotal - discount)
             payment = formdatainvoice.get('payment')
             if not payment:
                 payment = 0;

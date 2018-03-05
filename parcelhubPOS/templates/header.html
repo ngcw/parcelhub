@@ -573,7 +573,7 @@
 	                		weightele.setAttribute('title', '');
 	                		dimweightele.setAttribute('title', '');
                 		}
-	                	else if ( selectedprodtype == 'Services')
+	                	else if ( selectedprodtype == 'Services' || selectedprodtype == 'Packaging')
 	                	{
 	                		if (skuinput.value == '')
 	                		{
@@ -768,7 +768,7 @@
 				var subtotalfinal = parseFloat(subtotal) - gst;
 				if( discountmode == "%")
 				{
-					discount = ( discount / 100 ) * (subtotalfinal + parseFloat(gst))
+					discount = ( discount / 100 ) * (subtotalfinal )
 				}
 				var finaltotalb4rounding = subtotalfinal + parseFloat(gst) - parseFloat(discount)
 				var finaltotal = (Math.round(parseFloat(finaltotalb4rounding)*20)/20).toFixed(2)
@@ -859,6 +859,7 @@
                 		{
 	                		PopulateZoneType( count, dataobj[0]['zonetype'] )
 	                		PopulateCourier( count,  dataobj[0]['courier'] )
+	                		AutoCompleteSKU( inputid )
                 		}
            		 		
 	                }
@@ -959,11 +960,11 @@
 		    	    var zoneid = "id_form-" + count + "-zone";
 		    	    var zoneelement = document.getElementById(zoneid)
 		    	    rowempty = i + 1;
-			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && selectedproducttype !== 'Services' )
+			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && ( selectedproducttype !== 'Services' && selectedproducttype !== 'Packaging' ) )
 			        {
 			        	cansubmitweight = false;
 			       	}
-		    	    if( zoneelement.value.length == 0  && selectedproducttype !== 'Services' )
+		    	    if( zoneelement.value.length == 0  && ( selectedproducttype !== 'Services' && selectedproducttype !== 'Packaging' ))
 	    	    	{
 	    	    	 	cansubmitzone = false;
 	    	    	}
@@ -1083,7 +1084,7 @@
 	    	    var dimweight = document.getElementById(dimweightid)
 	    	    var courierid = "id_form-" + count + "-courier";
 	    	    var couriersel = document.getElementById(courierid);
-	    	    if (selectedproducttype == 'Services')
+	    	    if (selectedproducttype == 'Services' || selectedproducttype == 'Packaging')
 	    	    {
 	    	    	skudescription.readOnly = false;
 	    	    	price.readOnly = false;

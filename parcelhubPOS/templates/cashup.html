@@ -6,7 +6,7 @@
 	
 	{% else %}
 	<form class="searchform" action="/parcelhubPOS/cashupreport/viewcur/" method="POST" target="_blank">{% csrf_token %}
-        <input type="submit" value="Generate cash up report" id="generatecur"/>
+        <input type="submit" value="Generate cash up report" id="generatecur" onclick="return confirm('Are you sure you want to generate a new cash up report?')"/>
     </form>
     {% endif %}
     {% if statusmsg %}
