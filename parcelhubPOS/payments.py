@@ -31,10 +31,6 @@ def paymentlist(request, custid):
         payment_list = Payment.objects.all()
     else:
         payment_list = Payment.objects.filter(customer__branch__id=branchid)
-        try:
-            payment_list = payment_list.filter(customer__id=custid.strip())
-        except:
-            pass
         
     formdata = {'customername':'',
                 'date':'',
@@ -136,13 +132,14 @@ def editpayment(request, paymentid):
             invoicetopay = invoicetopay.filter(payment__lt=models.F('total'))
         if invoicetopay:
             paymentqueryset = Payment(customer=selectedcustomer, created_by=user );
+            paymentqueryset.id = selectedcustomer.id + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p") 
             paymentqueryset.save()
             payment_form = PaymentForm(instance=paymentqueryset)
             for inv in invoicetopay:
                 remainding = float(inv.total);
                 if inv.total and inv.payment:
                     remainding = float(inv.total) - float(inv.payment)
-                paymentinv = PaymentInvoice(payment=paymentqueryset, invoice=inv, remainder = remainding)
+                paymentinv = PaymentInvoice(payment=paymentqueryset, invoice=inv, remainder = remainding, id=paymentqueryset.id + '_' + inv.invoiceno)
                 paymentinv.save()
         else:
             msg = 'There are no available invoice to be paid for customer "%s".' % selectedcustomer.name

@@ -43,7 +43,7 @@ def loginuser(request):
         
         if loguser is not None:
             branchaccess = UserBranchAccess.objects.filter(user=loguser)
-            if branchaccess.count() == 0:
+            if branchaccess.count() == 0 and not loguser.is_superuser:
                 return render(request, CONST_loginhtml, {'branchaccess_error': '1'})
             login(request, loguser)
             request.session['userid'] = loguser.id 

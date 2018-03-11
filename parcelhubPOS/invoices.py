@@ -221,11 +221,8 @@ def editInvoice(request, invoiceid):
                 gsttotal = gsttotal + gstvalue
                 skucode = formdata.get('sku')
                 sku = SKU.objects.filter(sku_code=skucode).first()
-                if sku:
-                    if sku.is_gst_inclusive:
-                        subtotal = subtotal + price - gstvalue
-                    else:
-                        subtotal = subtotal + price
+
+                subtotal = subtotal + price - gstvalue
                 if discountmode == '%':
                     if sku:
                         if sku.is_gst_inclusive:
@@ -246,10 +243,11 @@ def editInvoice(request, invoiceid):
                 payment = 0;
             invoice.payment = payment
             invoice.gst = gsttotal
+            invoice.id = str(branchid) + '_' + str(invoice.invoiceno)
             invoice.save()
             
             # save invoice item
-            trackingcodes = []
+            invoiceitemid = []
             for form in invoice_item_formset.forms:
                 invoice_item = form.save(commit=False)
                 formdata = form.cleaned_data
@@ -257,9 +255,11 @@ def editInvoice(request, invoiceid):
                 invoice_item.list = invoice
                 invoice_item.invoice = invoice
                 price = formdata.get('price') 
+                nrofitem = InvoiceItem.objects.all()
+                invoice_item.id = invoice.id +'_' + str(len(nrofitem) + 1)
                 invoice_item.save()
-                trackingcodes.append(invoice_item.tracking_code)
-            itemstodelete = InvoiceItem.objects.filter(invoice__id=invoice.id).exclude(tracking_code__in=trackingcodes)
+                invoiceitemid.append(invoice_item.id)
+            itemstodelete = InvoiceItem.objects.filter(invoice__id=invoice.id).exclude(id__in=invoiceitemid)
             for item in itemstodelete:
                 item.delete()
                 
@@ -307,6 +307,8 @@ def CustomerCreatePopup(request):
     form = CustomerForm(request.POST or None, initial={'branch': branchid})
 
     if form.is_valid():
+        customerinstance = form.save(commit=False)
+        customerinstance.id = str(branchid) + '_' + request.POST['form-0-identificationno']
         instance = form.save()
 
         ## Change the value of the "#id_author". This is the element id in the form

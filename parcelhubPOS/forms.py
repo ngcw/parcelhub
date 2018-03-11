@@ -236,6 +236,7 @@ class PaymentInvoiceForm(forms.ModelForm):
                 'class': 'paymentinput',
                 'onchange' : 'UpdateTotalAndRemaining()'
             })   
+
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer

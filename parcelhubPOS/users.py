@@ -24,8 +24,11 @@ def userlist(request):
     if branchid == '-1':
         isedit = True
     else:
-        branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
-        isedit = branchaccess.access_level != 'Cashier'
+        try:
+            branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+            isedit = branchaccess.access_level != 'Cashier'
+        except:
+            isedit = True
     currentuser = User.objects.get(id=request.session['userid'])
     if currentuser.is_superuser:
         user_list = User.objects.all();
@@ -198,8 +201,11 @@ def userbranchaccess( request, user_id):
     if branchid == '-1':
         isedit = True
     else:
-        branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
-        isedit = branchaccess.access_level != 'Cashier'
+        try:
+            branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+            isedit = branchaccess.access_level != 'Cashier' or loguser.is_superuser
+        except:
+            isedit = True
     branchaccesslevel = UserBranchAccess.objects.filter(user__id = user_id)
     final_branchaccesslevel_table = UserBranchAccessTable(branchaccesslevel)
     
@@ -258,12 +264,13 @@ def edituserbranchaccess(request, userbranch_id):
         if userbainstance:
             userbainstance.branch_id = submitted_branchid
             userbainstance.access_level = submitted_access_level
+            userbainstance.id = str(user_id) + '_' + str(submitted_branchid)
             userbainstance.save()
         else:
             userbainstance = UserBranchAccess( user = userselected,
                                                branch_id = submitted_branchid,
                                                access_level = submitted_access_level )
-        
+            userbainstance.id = str(user_id) + '_' + str(submitted_branchid)
             userbainstance.save()
         branch = Branch.objects.get(id= submitted_branchid)
         if title == 'New user access':

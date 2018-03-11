@@ -112,6 +112,7 @@ def viewcashupreport(request):
                                      sessiontimestamp = sessionstart, createtimestamp = timezone.now(), 
                                      invoicenofrom=earliestinvoice, invoicenoto=latestinvoice,
                                      total = totalamt)
+            cureport.id = str(branchid) +'_' + createtimestamp.strftime("%d/%m/%Y %H:%M%p") 
             cureport.save()
             paymenttypes = PaymentType.objects.all()
             totalfrominvoice = totalamt - terminal.float
@@ -131,11 +132,13 @@ def viewcashupreport(request):
                                                              total = totalpayment,
                                                              percentage = percentagept,
                                                              count = totalcount)
+                    cashupreportpt.id = cureport.id + '_' + paymenttype.id
                     cashupreportpt.save()
         else:
             cureport = CashUpReport(branch=selectedbranch, created_by = loguser,
                                      sessiontimestamp = timezone.now(), createtimestamp = timezone.now(),
                                      total = terminal.float)
+            cureport.id = str(branchid) +'_' + createtimestamp.strftime("%d/%m/%Y %H:%M%p") 
             cureport.save()
     cur_pdf = cashup_pdf(request, cureport)
     return HttpResponse(cur_pdf, content_type='application/pdf')

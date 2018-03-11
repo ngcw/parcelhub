@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from .tables import CustomerTable, CustomerTable2
 from .commons import *
 from .models import Customer, UserBranchAccess
-
+from .forms import CustomerForm
 
 CONST_branchid = 'branchid'
 #method to retrieve Courier skuoverride list
@@ -85,26 +85,29 @@ def editcustomer(request, customerid):
     title = "New customer"
     if customerid:
         title = "Edit customer"
-    customerqueryset = Customer.objects.filter(id=customerid)
-    CustomerFormSet = modelformset_factory(Customer, fields=('branch', 'name', 'contact', 'email', 'fax', 'customertype', 'identificationno', 'addressline1', 'addressline2', 'addressline3', 'addressline4'), 
-                                            max_num=1,
-                                            exclude= ('id',)) 
+    try:
+        customerqueryset = Customer.objects.get(id=customerid)
+    except:
+        customerqueryset = None
+    CustomerFormSet = CustomerForm(instance=customerqueryset)
     if request.method == "POST":
-        formset = CustomerFormSet(request.POST, request.FILES,
-                                   queryset=customerqueryset,
-                                   initial=[{'branch': branchid}])
+        formset = CustomerForm(request.POST, request.FILES,
+                                   instance=customerqueryset,
+                                   initial={'branch': branchid})
         if formset.is_valid():
-            customername = request.POST['form-0-name'] 
+            customername = request.POST['name'] 
             if title == 'New customer':
                 msg = 'Customer "%s" have been created successfully.' % customername
             else:
                 msg = 'Customer "%s" have been updated successfully.' % customername
-            formset.save()
+            customerinstance = formset.save(commit=False)
+            customerinstance.id = str(branchid) + '_' + request.POST['identificationno']
+            customerinstance.save()
 
             return HttpResponseRedirect("/parcelhubPOS/customer/?msg=%s" % msg)#customerlist(request)
     else:
-        formset = CustomerFormSet(queryset=customerqueryset,
-                                   initial=[{'branch': branchid}])
+        formset = CustomerForm(instance=customerqueryset,
+                                   initial={'branch': branchid})
     
     context = {
                 'formset': formset,

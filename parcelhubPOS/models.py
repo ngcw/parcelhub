@@ -27,6 +27,7 @@ class Branch(models.Model):
         ordering = ['name']
 
 class UserBranchAccess(models.Model):
+    id = models.CharField(max_length=50, primary_key=True, unique=True)  
     user = models.ForeignKey(User, blank=False, null=False,on_delete=models.CASCADE, verbose_name='*User')
     branch = models.ForeignKey(Branch, blank=False, null=False, on_delete=models.CASCADE, verbose_name='*Branch')
     access_level = models.CharField(max_length=20, verbose_name='*Access level')
@@ -134,6 +135,7 @@ class CustomerType(models.Model):
         ordering = ['name']   
              
 class Customer(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='*Branch')
     name = models.CharField(max_length=50, verbose_name='*Name')
     contact = models.CharField(max_length=25, verbose_name='*Contact')
@@ -150,8 +152,9 @@ class Customer(models.Model):
 
     class Meta:
         ordering = ['branch', 'name']
-    
+        unique_together = (('branch', 'identificationno'),)
 class SKUBranch(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE, verbose_name='*SKU')
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, verbose_name='*Branch')
     customer = models.ForeignKey(Customer, models.SET_NULL, blank=True, null=True)
@@ -178,6 +181,7 @@ class PaymentType(models.Model):
     class Meta:
         ordering = ['name']        
 class Invoice(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     invoiceno = models.CharField(max_length=25, verbose_name='Invoice No.')
     invoicetype =models.ForeignKey(InvoiceType, verbose_name='*Type')
@@ -200,6 +204,7 @@ class Invoice(models.Model):
         unique_together = (("branch", "invoiceno"),)
         
 class InvoiceItem(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     tracking_code = models.CharField(max_length=100, verbose_name='Track code', blank=True, null=True)
     courier = models.ForeignKey(CourierVendor, models.SET_NULL, blank=True, null=True)
@@ -217,6 +222,7 @@ class InvoiceItem(models.Model):
     price = models.DecimalField(max_digits=30, decimal_places=2)
     
 class Payment(models.Model):
+    id = models.CharField(max_length=200, primary_key=True, unique=True)  
     customer = models.ForeignKey(Customer, verbose_name='*Customer')
     total = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
     payment_paymenttype = models.ForeignKey(PaymentType,blank=True, null=True, verbose_name="Payment method")
@@ -224,6 +230,7 @@ class Payment(models.Model):
     created_by = models.ForeignKey(User,blank=True, null=True)
 
 class PaymentInvoice(models.Model):
+    id = models.CharField(max_length=200, primary_key=True, unique=True)  
     payment = models.ForeignKey(Payment, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     remainder = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Remainder',blank=True, null=True)
@@ -231,6 +238,7 @@ class PaymentInvoice(models.Model):
     
     
 class CashUpReport(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
     sessiontimestamp = models.DateTimeField('session timestamp')
@@ -240,6 +248,7 @@ class CashUpReport(models.Model):
     created_by = models.ForeignKey(User)
     
 class CashUpReportPaymentType(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     cashupreport = models.ForeignKey(CashUpReport, on_delete=models.CASCADE)
     payment_type  = models.ForeignKey(PaymentType, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=30, decimal_places=2)
@@ -247,6 +256,7 @@ class CashUpReportPaymentType(models.Model):
     count = models.IntegerField()
     
 class StatementOfAccount(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='*Customer')
     datefrom = models.DateField('*Date from')
     dateto = models.DateField('*Date to')
@@ -261,6 +271,7 @@ class StatementOfAccount(models.Model):
     def get_year(self):
         return self.createtimestamp.year
 class StatementOfAccountInvoice(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, unique=True)  
     soa = models.ForeignKey(StatementOfAccount, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 

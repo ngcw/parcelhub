@@ -145,13 +145,16 @@ def editskubranch(request, skubranchid):
             else:
                 sku_code = request.POST['skuselected'] 
                 try:
-                    customernamemsg = ' and customer "' + customerselected.name + '"'
+                    customername = customerselected.name
+                    customernamemsg = ' and customer "' + customername + '"'
                 except:
+                    customername = ''
                     customernamemsg = ''
                 if title == 'New SKU branch':
                     msg = 'SKU override for "%s"%s have been created successfully.' % (sku_code, customernamemsg )
                 else:
                     msg = 'SKU override for "%s"%s have been updated successfully.' % (sku_code, customernamemsg )
+                skubranch.id = str(branchid) + '_' + sku_code + '_' + customername
                 skubranch.save()
                 return HttpResponseRedirect("/parcelhubPOS/skubranch/?msg=%s" % msg)#
     skucodeselected = skuselected.sku_code

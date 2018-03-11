@@ -118,7 +118,7 @@ def viewstatementofacc(request):
         invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)      
         user = User.objects.get(id = request.session.get('userid'))
         statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now())
-            
+        statementofacc.id = selectedcustomer.id + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")     
         statementofacc.save()
         totalamt = 0.0;
         paidamt = 0.0;
@@ -132,6 +132,7 @@ def viewstatementofacc(request):
                 payment = 0.0;
             paidamt = paidamt + max( [payment, totalamt] )
             soainv = StatementOfAccountInvoice(soa=statementofacc, invoice=inv)
+            soainv.id = statementofacc.id + '_' + inv.invoiceno
             soainv.save()
         outstandingamt = totalamt - paidamt;
         statementofacc.totalamount = totalamt
@@ -216,8 +217,7 @@ def statementofacc_pdf(request, statementofacc):
     p.drawString( margin + 400, lineheight - (linecount * 1), "Terms")
     p.drawString( margin + 520, lineheight - (linecount * 1), "Date")
     p.setFont(CONST_fontbold, 11)
-    
-    custacc = "CUST%06d" % customer.id
+    custacc = customer.branch.branch_code + customer.identificationno
     p.drawString( margin, lineheight - (linecount * 2), custacc)
     
     username = statementofacc.created_by.last_name + ' ' +statementofacc.created_by.first_name

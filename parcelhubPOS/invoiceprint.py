@@ -56,13 +56,7 @@ def invoice_pdf(request, invoiceid):
                 currentpage = page
             currentsku = item.sku
             itemdict['items'] = []
-            
-            
-            try:
-                sku = SKU.objects.get(sku_code=currentsku)
-                itemdict['description'] = sku.description 
-            except:
-                pass
+            itemdict['description'] = item.skudescription 
             invoiceitemdict.append(itemdict)
         itemdict['items'].append(item.tracking_code) 
         if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount == 53) or itemcount == 72 or remainingitem == 0:
@@ -185,7 +179,10 @@ def invoice_pdf(request, invoiceid):
                 itemcount += 1;
                 
                 dy = topy - (count * 10)
-                p.drawString(155, dy, 'S/No: ' + trackcode )
+                if trackcode:
+                    p.drawString(155, dy, 'S/No: ' + trackcode )
+                else:
+                    p.drawString(155, dy, 'S/No: ' + '-' )
                 count += 1
             
         
@@ -288,11 +285,7 @@ def invoice_thermal(request, invoiceid):
             itemdict['items'] = []
             itemdict['sku'] = currentsku
             itemdict['price'] = item.price
-            try:
-                sku = SKU.objects.get(sku_code=currentsku)
-                itemdict['description'] = sku.description 
-            except:
-                pass
+            itemdict['description'] = item.skudescription
             invoiceitemdict.append(itemdict)
         itemdict['items'].append(item.tracking_code)
     buffer = BytesIO()
@@ -385,7 +378,10 @@ def invoice_thermal(request, invoiceid):
         for trackcode in item['items']:
             count += 1
             dy = topy - (count * linespace)
-            p.drawString(marginleft, dy, ' S/No. ' + trackcode )
+            trackcodeval = '-'
+            if trackcode:
+                trackcodeval = trackcode
+            p.drawString(marginleft, dy, ' S/No. ' + trackcodeval )
         # price string
         pricestring = str(item['price'])
         pricewidth = p.stringWidth(pricestring, CONST_fontr, 9)
