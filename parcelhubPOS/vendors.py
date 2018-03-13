@@ -72,12 +72,12 @@ def editvendor(request, vendorid):
         title = "Edit vendor"
     vendorqueryset = CourierVendor.objects.filter(id=vendorid)
     
-    VendorFormSet = modelformset_factory(CourierVendor, fields=('name', 'zone_type', 'formula'), max_num=1)
+    VendorFormSet = modelformset_factory(CourierVendor, fields=('id', 'zone_type', 'formula'), max_num=1)
     if request.method == "POST":
         formset = VendorFormSet(request.POST, request.FILES,
                              queryset=vendorqueryset)
         if formset.is_valid():
-            name = request.POST['form-0-name'] 
+            name = request.POST['form-0-id'] 
             if title == 'New vendor':
                 msg = 'Courier vendor "%s" have been created successfully.' % name
             else:
@@ -102,7 +102,7 @@ def editvendor(request, vendorid):
 def deletevendor(request, dvendorid ):
     dvendorid = request.GET.get('dvendorid')
     vendor = CourierVendor.objects.filter(id = dvendorid )
-    msg = 'Tax "%s" have been deleted successfully.' % vendor.first().name
+    msg = 'Courier vendor "%s" have been deleted successfully.' % vendor.first().id
     if vendor:
         vendor.delete()
     return HttpResponseRedirect("/parcelhubPOS/vendor/?msg=%s" % msg)

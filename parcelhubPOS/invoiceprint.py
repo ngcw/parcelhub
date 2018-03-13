@@ -50,7 +50,7 @@ def invoice_pdf(request, invoiceid):
             if currentsku != item.sku:
                 skuselected = SKU.objects.get(sku_code=item.sku)
                 itemdict['sku'] = item.sku
-                itemdict['tax'] = skuselected.tax_code.tax_code
+                itemdict['tax'] = skuselected.tax_code.id
                 itemdict['price'] = item.price
             if currentpage != page:
                 currentpage = page
@@ -314,7 +314,7 @@ def invoice_thermal(request, invoiceid):
         if tax:
             gstvalue = tax.gst
             gstvaluetxt =  "%.0f" % gstvalue
-            gsttitletxt = tax.tax_code + ' @ ' + gstvaluetxt + '%'
+            gsttitletxt = tax.id + ' @ ' + gstvaluetxt + '%'
         if gsttitletxt != '' and gsttitletxt not in gstsummary:
             gstsummary[gsttitletxt] = [0.0, 0.0]
         gstsummary[gsttitletxt][0] = gstsummary[gsttitletxt][0] + float(item.price) - float(item.gst)

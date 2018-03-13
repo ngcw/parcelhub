@@ -195,8 +195,7 @@ class InvoiceItemForm(forms.ModelForm):
 
         self.fields['price'].widget.attrs\
             .update({
-                'readOnly': 'True',
-                'class': 'toAdd',
+                'class': 'toAdd lastInput',
                 'onchange': 'UpdateTotal()',
                 'tabindex':'-1'
             })
@@ -209,7 +208,6 @@ class InvoiceItemForm(forms.ModelForm):
             })
         self.fields['skudescription'].widget.attrs\
             .update({
-                'readOnly': 'True',
                 'class': 'skudescription'
             })
 class PaymentForm(forms.ModelForm):

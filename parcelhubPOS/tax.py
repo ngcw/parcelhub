@@ -22,7 +22,7 @@ def taxlist(request):
         submitted_taxcode = request.GET.get('taxcode') 
         if submitted_taxcode:
             formdata['taxcode'] = submitted_taxcode
-            tax_list =  tax_list.filter(tax_code__icontains=submitted_taxcode)
+            tax_list =  tax_list.filter(id__icontains=submitted_taxcode)
     final_Tax_table = TaxTable(tax_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_Tax_table)
@@ -62,12 +62,12 @@ def edittax(request, taxid):
         title = "Edit tax"
     taxqueryset = Tax.objects.filter(id=taxid)
     
-    TaxFormSet = modelformset_factory(Tax, fields=('tax_code', 'gst'), max_num=1)
+    TaxFormSet = modelformset_factory(Tax, fields=('id', 'gst'), max_num=1)
     if request.method == "POST":
         formset = TaxFormSet(request.POST, request.FILES,
                              queryset=taxqueryset)
         if formset.is_valid():
-            tax_code_name = request.POST['form-0-tax_code'] 
+            tax_code_name = request.POST['form-0-id'] 
             if title == 'New tax':
                 msg = 'Tax "%s" have been created successfully.' % tax_code_name
             else:
@@ -92,7 +92,7 @@ def edittax(request, taxid):
 def deletetax(request, dtaxid ):
     dtaxid = request.GET.get('dtaxid')
     tax = Tax.objects.filter(id = dtaxid )
-    msg = 'Tax "%s" have been deleted successfully.' % tax.first().tax_code
+    msg = 'Tax "%s" have been deleted successfully.' % tax.first().id
     if tax:
         tax.delete()
     return HttpResponseRedirect("/parcelhubPOS/tax/?msg=%s" % msg)

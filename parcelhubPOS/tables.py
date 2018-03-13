@@ -133,8 +133,7 @@ class VendorTable(tables.Table):
         model = CourierVendor
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('name', 'zone_type', 'formula' ,'edit','delete')
-        exclude = {'id'}
+        sequence = ('id', 'zone_type', 'formula' ,'edit','delete')
         empty_text = "There are no courier vendor matching the search criteria..."
         
 deletelinktax = '''{% if isedit and record.sku_set.count <= 0%}<a href="/parcelhubPOS/tax/deletetax?dtaxid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete tax {{record.tax_code}}?')">Delete</a>
@@ -150,8 +149,7 @@ class TaxTable(tables.Table):
         model = Tax
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('tax_code', 'gst','edit','delete')
-        exclude = {'id'}
+        sequence = ('id', 'gst','edit','delete')
         empty_text = "There are no tax matching the search criteria..."
         
 deletelinkzonedomestic = '''{% if isedit %}<a href="/parcelhubPOS/zonedomestic/deletezonedomestic?dzonedomesticid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete domestic zone for state {{ record.state }} from {{ record.postcode_start}} to {{ record.postcode_end}}?')">Delete</a>

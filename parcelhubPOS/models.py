@@ -42,15 +42,15 @@ class ZoneType(models.Model):
         ordering = ['name']   
 
 class CourierVendor(models.Model):
-    name = models.CharField(max_length=50, verbose_name='*Name')
+    id = models.CharField(max_length=50, verbose_name='*Name', primary_key=True)
     zone_type = models.ForeignKey(ZoneType, verbose_name='*Zone type')
     formula = models.CharField(max_length=254, verbose_name='*Formula')
     
     def __str__(self):
-        return self.name
+        return self.id
 
     class Meta:
-        ordering = ['name']
+        ordering = ['id']
         #unique_together = ["user", "branch"]
         
 class ProductType(models.Model):
@@ -92,14 +92,14 @@ class ZoneInternational(models.Model):
 
 
 class Tax(models.Model):
-    tax_code = models.CharField(max_length=25, verbose_name='*Tax code')
+    id = models.CharField(max_length=25, verbose_name='*Tax code', primary_key=True)
     gst = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='*GST(%)')
 
     def __str__(self):
-        return self.tax_code
+        return self.id
 
     class Meta:
-        ordering = ['tax_code']
+        ordering = ['id']
         
 class SKU(models.Model):
     sku_code = models.CharField(max_length=20,  unique=True, verbose_name='*SKU')
