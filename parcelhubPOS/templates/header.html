@@ -573,7 +573,7 @@
 	                		weightele.setAttribute('title', '');
 	                		dimweightele.setAttribute('title', '');
                 		}
-	                	else if ( selectedprodtype == 'Services' || selectedprodtype == 'Packaging')
+	                	else if ( selectedprodtype !== 'Document' && selectedprodtype !== 'Parcel')
 	                	{
 	                		if (skuinput.value == '')
 	                		{
@@ -960,11 +960,11 @@
 		    	    var zoneid = "id_form-" + count + "-zone";
 		    	    var zoneelement = document.getElementById(zoneid)
 		    	    rowempty = i + 1;
-			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && ( selectedproducttype !== 'Services' && selectedproducttype !== 'Packaging' ) )
+			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && ( selectedproducttype == 'Document' || selectedproducttype !== 'Parcel' ) )
 			        {
 			        	cansubmitweight = false;
 			       	}
-		    	    if( zoneelement.value.length == 0  && ( selectedproducttype !== 'Services' && selectedproducttype !== 'Packaging' ))
+		    	    if( zoneelement.value.length == 0  && ( selectedproducttype == 'Document' || selectedproducttype !== 'Parcel' ))
 	    	    	{
 	    	    	 	cansubmitzone = false;
 	    	    	}
@@ -1084,7 +1084,7 @@
 	    	    var dimweight = document.getElementById(dimweightid)
 	    	    var courierid = "id_form-" + count + "-courier";
 	    	    var couriersel = document.getElementById(courierid);
-	    	    if (selectedproducttype == 'Services' || selectedproducttype == 'Packaging')
+	    	    if ( selectedproducttype !== 'Document' && selectedproducttype !== 'Parcel')
 	    	    {
 	    	    	//skudescription.readOnly = false;
 	    	    	//price.readOnly = false;

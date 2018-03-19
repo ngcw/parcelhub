@@ -39,7 +39,7 @@ def SKUlist(request):
         submitted_courier = request.GET.get('courier')
         if submitted_courier:
             formdata['courier'] = submitted_courier;
-            sku_list = sku_list.filter( couriervendor__name__icontains=submitted_courier)
+            sku_list = sku_list.filter( couriervendor__id__icontains=submitted_courier)
         submitted_weight = request.GET.get('weight') 
         if submitted_weight:
             submitted_weight = float( submitted_weight ) 
