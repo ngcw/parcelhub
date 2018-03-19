@@ -1259,6 +1259,9 @@
     		{% endif %}
 	    	{% endif %}
 	      {% if sku_form %}
+	      window.onload = function () {
+	    	  HideShowSKUFields();
+	    	}
 	      function HideShowSKUFields() { 
 	    	    var value = document.getElementById('id_product_type').value.trim();
 	    	    var visible = false;
