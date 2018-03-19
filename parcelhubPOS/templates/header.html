@@ -873,6 +873,9 @@
 	    	    var value = inputelement.value.trim();
 	    	    var courierid = "id_form-" + count + "-courier";
 	    	    var couriersel = document.getElementById(courierid);
+	    	    var producttypeid = "id_form-" + count + "-producttype";
+	    	    var producttypesel = document.getElementById(producttypeid);
+	    	    var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
 	    	    var selectedcourier = ''
 	    	    if (couriersel != null)
 	    	    	{
@@ -882,7 +885,7 @@
 	    	    var trackingcodeinput = [];
 	    	    var mystring = JSON.stringify(trackingcodeinput);
 	    	    $.ajax({
-	                url:"/parcelhubPOS/validatetrackingcode/?trackcode="+value+"&courier="+selectedcourier{% if invoice%}+"&invoiceid={{ invoice.id }}" {% endif %},
+	                url:"/parcelhubPOS/validatetrackingcode/?trackcode="+value+"&prodtype="+selectedproducttype+"&courier="+selectedcourier{% if invoice%}+"&invoiceid={{ invoice.id }}" {% endif %},
 	                type:"POST",
 	                data:mystring,
 	                dataType: "json",
@@ -960,11 +963,11 @@
 		    	    var zoneid = "id_form-" + count + "-zone";
 		    	    var zoneelement = document.getElementById(zoneid)
 		    	    rowempty = i + 1;
-			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && ( selectedproducttype == 'Document' || selectedproducttype !== 'Parcel' ) )
+			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && ( selectedproducttype == 'Document' || selectedproducttype == 'Parcel' ) )
 			        {
 			        	cansubmitweight = false;
 			       	}
-		    	    if( zoneelement.value.length == 0  && ( selectedproducttype == 'Document' || selectedproducttype !== 'Parcel' ))
+		    	    if( zoneelement.value.length == 0  && ( selectedproducttype == 'Document' || selectedproducttype == 'Parcel' ))
 	    	    	{
 	    	    	 	cansubmitzone = false;
 	    	    	}
@@ -1100,7 +1103,6 @@
 	    	    	{
 	    	    		dimweight.classList.remove('lastInput')
 	    	    	}
-	    	    	couriersel.value = ''
 	    	    	AutoCompleteSKU(inputid)
 	    	    }
 	    	    else
