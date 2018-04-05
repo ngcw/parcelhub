@@ -17,7 +17,7 @@ def SKUlist(request):
     branchselectlist = branchselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
-    branchaccess = UserBranchAccess.objects.get(user__id=request.session.get('userid'), branch__id = request.session.get(CONST_branchid))
+    
     sku_list = SKU.objects.all()
     zonetype_list = ZoneType.objects.all()
     producttype_list = ProductType.objects.all()
