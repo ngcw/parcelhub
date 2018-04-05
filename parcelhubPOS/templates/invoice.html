@@ -15,20 +15,28 @@
     </form>
      
     
-    {% if isedit and isall %}
+     {% if isedit %}
+		{% if isall %}
+		{% else %}
+
     <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
     	<input type="submit" value="Add" />
 	</form>
+		{% endif %}
 	{% endif %}
 	{% if statusmsg %}
 	<div class="statusspacing"></div>
    	<div class="statusmsg">{{ statusmsg }}</div>
     {% endif %}
 	{% render_table invoice %}
-	{% if isedit and isall %}
+	{% if isedit %}
+		{% if isall %}
+		{% else %}
+
     <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
     	<input type="submit" value="Add" />
 	</form>
+		{% endif %}
 	{% endif %}
 {% endblock %}
 

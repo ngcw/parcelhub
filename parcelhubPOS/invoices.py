@@ -107,7 +107,7 @@ def retrieveInvoice(request):
                 'deadlinetime': deadlinedatetime,
                 'title' : 'Invoice',
                 'isedit' : True,
-                'isall': branchid != '-1',
+                'isall': branchid == '-1',
                 'statusmsg' : request.GET.get('msg'),
                 'header': 'Invoice list',
                 'issearchempty': issearchempty,
