@@ -23,6 +23,7 @@ from textwrap import wrap
 from django.utils import timezone
 from num2words import num2words
 from datetime import timedelta, datetime
+
 CONST_branchid = 'branchid'
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'

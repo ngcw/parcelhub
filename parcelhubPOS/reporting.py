@@ -23,7 +23,6 @@ from decimal import Decimal
 from textwrap import wrap
 from django.utils import timezone
 from num2words import num2words
-from nt import terminal_size
 CONST_branchid = 'branchid'
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'
