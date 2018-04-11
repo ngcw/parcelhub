@@ -151,8 +151,10 @@ def editInvoice(request, invoiceid):
     branchid = request.session.get(CONST_branchid)
     if branchid == '-1':
         sel_branch = Branch.objects.all().first()
+        
     else:
         sel_branch = Branch.objects.filter(id=branchid).first()
+    sel_terminal = Terminal.objects.filter(branch = sel_branch, isactive = True ).first()
     user = User.objects.get(id = request.session.get('userid'))
     if invoiceid:
         InvoiceItemFormSet = modelformset_factory(InvoiceItem, form = InvoiceItemForm, extra=0)
@@ -171,7 +173,8 @@ def editInvoice(request, invoiceid):
                                                                                   'invoice_date': timezone.now().date(),
                                                                                   'invoicetype': 'Cash',
                                                                                   'payment_type': 'Cash',
-                                                                                  'branch': sel_branch.id,}
+                                                                                  'branch': sel_branch.id,
+                                                                                  'terminal': sel_terminal.id,}
                                    )
         
         invoice = None;

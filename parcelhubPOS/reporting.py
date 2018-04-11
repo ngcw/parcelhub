@@ -23,6 +23,7 @@ from decimal import Decimal
 from textwrap import wrap
 from django.utils import timezone
 from num2words import num2words
+from nt import terminal_size
 CONST_branchid = 'branchid'
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'
@@ -71,14 +72,14 @@ def viewcashupreport(request):
         pass
     elif request.method == "POST":
 
-        latestcashupreport = CashUpReport.objects.filter(branch__id=branchid).order_by('-createtimestamp').first()
+        latestcashupreport = CashUpReport.objects.filter(branch__id=branchid, terminal__id = terminal.id).order_by('-createtimestamp').first()
         if latestcashupreport:
-            invoicelist = Invoice.objects.filter(branch__id = branchid, createtimestamp__gte = latestcashupreport.createtimestamp, invoicetype__name="Cash")
+            invoicelist = Invoice.objects.filter(branch__id = branchid, terminal__id = terminal.id, createtimestamp__gte = latestcashupreport.createtimestamp, invoicetype__name="Cash")
             paymentlist = Payment.objects.filter(customer__branch__id = branchid, createtimestamp__gte = latestcashupreport.createtimestamp)
             paymentinvoicelist = PaymentInvoice.objects.filter(payment__in=paymentlist) 
             sessionstart = latestcashupreport.createtimestamp
         else:
-            invoicelist = Invoice.objects.filter(branch__id = branchid, invoicetype__name="Cash")
+            invoicelist = Invoice.objects.filter(branch__id = branchid, terminal__id = terminal.id, invoicetype__name="Cash")
             paymentlist = Payment.objects.filter(customer__branch__id = branchid)
             paymentinvoicelist = PaymentInvoice.objects.filter(payment__in=paymentlist) 
             sessionstart = invoicelist.order_by('createtimestamp').first().createtimestamp
@@ -108,11 +109,13 @@ def viewcashupreport(request):
                 totalamt = totalamt + totalpaymentpayment 
             if terminal and terminal.float:
                 totalamt = totalamt + terminal.float
-            cureport = CashUpReport(branch=selectedbranch, created_by = loguser,
+            cureport = CashUpReport(branch=selectedbranch, 
+                                    terminal = terminal,
+                                    created_by = loguser,
                                      sessiontimestamp = sessionstart, createtimestamp = timezone.now(), 
                                      invoicenofrom=earliestinvoice, invoicenoto=latestinvoice,
                                      total = totalamt)
-            cureport.id = str(branchid) +'_' + createtimestamp.strftime("%d/%m/%Y %H:%M%p") 
+            cureport.id = str(branchid) +'_' + cureport.createtimestamp.strftime("%d/%m/%Y %H:%M%p") 
             cureport.save()
             paymenttypes = PaymentType.objects.all()
             totalfrominvoice = totalamt - terminal.float
@@ -132,13 +135,13 @@ def viewcashupreport(request):
                                                              total = totalpayment,
                                                              percentage = percentagept,
                                                              count = totalcount)
-                    cashupreportpt.id = cureport.id + '_' + paymenttype.id
+                    cashupreportpt.id = cureport.id + '_' + paymenttype.name
                     cashupreportpt.save()
         else:
-            cureport = CashUpReport(branch=selectedbranch, created_by = loguser,
+            cureport = CashUpReport(branch=selectedbranch, terminal = terminal, created_by = loguser,
                                      sessiontimestamp = timezone.now(), createtimestamp = timezone.now(),
                                      total = terminal.float)
-            cureport.id = str(branchid) +'_' + createtimestamp.strftime("%d/%m/%Y %H:%M%p") 
+            cureport.id = str(branchid) +'_' + cureport.createtimestamp.strftime("%d/%m/%Y %H:%M%p") 
             cureport.save()
     cur_pdf = cashup_pdf(request, cureport)
     return HttpResponse(cur_pdf, content_type='application/pdf')

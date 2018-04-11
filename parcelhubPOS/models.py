@@ -26,6 +26,12 @@ class Branch(models.Model):
     class Meta:
         ordering = ['name']
 
+class Terminal(models.Model):
+    name = models.CharField(max_length=50, verbose_name='*Name')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    float = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
+    isactive = models.BooleanField()
+    
 class UserBranchAccess(models.Model):
     id = models.CharField(max_length=50, primary_key=True, unique=True)  
     user = models.ForeignKey(User, blank=False, null=False,on_delete=models.CASCADE, verbose_name='*User')
@@ -183,6 +189,7 @@ class PaymentType(models.Model):
 class Invoice(models.Model):
     id = models.CharField(max_length=100, primary_key=True, unique=True)  
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    terminal = models.ForeignKey(Terminal, on_delete=models.CASCADE)
     invoiceno = models.CharField(max_length=25, verbose_name='Invoice No.')
     invoicetype =models.ForeignKey(InvoiceType, verbose_name='*Type')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
@@ -240,6 +247,7 @@ class PaymentInvoice(models.Model):
 class CashUpReport(models.Model):
     id = models.CharField(max_length=100, primary_key=True, unique=True)  
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    terminal = models.ForeignKey(Terminal, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
     sessiontimestamp = models.DateTimeField('session timestamp')
     invoicenofrom = models.CharField(max_length=100, verbose_name='Invoice from',blank=True, null=True)
@@ -257,7 +265,8 @@ class CashUpReportPaymentType(models.Model):
     
 class StatementOfAccount(models.Model):
     id = models.CharField(max_length=100, primary_key=True, unique=True)  
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='*Customer')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='*Customer', blank=True, null=True)
     datefrom = models.DateField('*Date from')
     dateto = models.DateField('*Date to')
     totalamount = models.DecimalField(max_digits=30, decimal_places=2,verbose_name='Total amt', blank=True, null=True )
@@ -278,8 +287,3 @@ class StatementOfAccountInvoice(models.Model):
 class GlobalParameter(models.Model):
     invoice_lockin_date = models.DateField('*Invoice lock in date' )
     
-class Terminal(models.Model):
-    name = models.CharField(max_length=50, verbose_name='*Name')
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    float = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
-    isactive = models.BooleanField()

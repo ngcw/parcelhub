@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import StatementOfAccountTable
 from .commons import *
-from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer, UserBranchAccess
+from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer, UserBranchAccess, Branch
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import HttpResponseRedirect, HttpResponse
@@ -22,6 +22,7 @@ from decimal import Decimal
 from textwrap import wrap
 from django.utils import timezone
 from num2words import num2words
+from datetime import timedelta, datetime
 CONST_branchid = 'branchid'
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'
@@ -113,12 +114,25 @@ def viewstatementofacc(request):
         customerid = request.GET.get('customerinput')
         date_from = request.GET.get('datefrom')
         date_to = request.GET.get('dateto')
+        date_to = datetime.strptime(date_to, '%Y-%m-%d')
+        date_to = date_to + timedelta(days=1) - timedelta(seconds=1);
         statementoption = request.GET.get('soaoptioninput')
+
         selectedcustomer =  Customer.objects.get(id=customerid)
-        invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)      
+        newcustid = customerid
+        invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
+        if statementoption == 'unpaid':
+            invoicelist = invoicelist.filter(payment__gte=models.F('total'))      
         user = User.objects.get(id = request.session.get('userid'))
         statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now())
-        statementofacc.id = selectedcustomer.id + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")     
+        statementofacc.id = newcustid + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")  
+        branchid = request.session.get(CONST_branchid)
+
+        if branchid == '-1':
+            pass
+        else:
+            selectedbranch = Branch.objects.get(id=branchid)
+            statementofacc.branch = selectedbranch
         statementofacc.save()
         totalamt = 0.0;
         paidamt = 0.0;
@@ -139,12 +153,13 @@ def viewstatementofacc(request):
         statementofacc.paidamount = paidamt
         statementofacc.outstandindamount = outstandingamt
         statementofacc.save(update_fields=["totalamount", 'paidamount', 'outstandindamount']) 
-        soa_pdf = statementofacc_pdf(request, statementofacc)
+    soa_pdf = statementofacc_pdf(request, statementofacc)
     return HttpResponse(soa_pdf, content_type='application/pdf')
 
 def statementofacc_pdf(request, statementofacc):
     response = HttpResponse(content_type='application/pdf')
-    filename = 'Statement_' + statementofacc.customer.name + '_' + statementofacc.createtimestamp.strftime('%Y-%m-%d') 
+    customername = statementofacc.customer.name
+    filename = 'Statement_' + customername + '_' + statementofacc.createtimestamp.strftime('%Y-%m-%d') 
     response['Content-Disposition'] = 'attachment; filename="'+filename+'.pdf"'
     soaitem = StatementOfAccountInvoice.objects.filter(soa=statementofacc).order_by('invoice')
     

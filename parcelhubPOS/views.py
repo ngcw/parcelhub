@@ -52,7 +52,10 @@ def loginuser(request):
             request.session['issuperuser'] = loguser.is_superuser
             sessiondict.append(loguser.id)
             request.session['loggedusers'] = sessiondict
-            
+            if 'branchterminal' in request.session:
+                branchterminal = request.session['branchterminal'].split(',')
+                request.session['branchname'] = branchterminal[0]
+                request.session['terminalname'] = branchterminal[1]
             if loguser.is_superuser:
                 return dashboard(request)
             else:

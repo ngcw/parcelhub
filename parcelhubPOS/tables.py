@@ -15,7 +15,7 @@ class InvoiceTable(tables.Table):
         fields = ('createtimestamp', 'invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp' )
         attrs = {'class': 'paleblue'
                  }
-        exclude = {'invoicetype', 'discount'}
+        exclude = {'invoicetype', 'discount', 'terminal'}
         empty_text = "There are no invoice matching the search criteria..."
 
 class InvoiceTable2(tables.Table):
@@ -24,10 +24,10 @@ class InvoiceTable2(tables.Table):
     customer = tables.Column(default='Cash')
     class Meta:
         model = Invoice
-        fields = ('createtimestamp', 'branch', 'invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp' )
+        fields = ('createtimestamp', 'branch','invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp' )
         attrs = {'class': 'paleblue'
                  }
-        exclude = {'invoicetype', 'discount'}
+        exclude = {'invoicetype', 'discount', 'terminal'}
         empty_text = "There are no invoice matching the search criteria..."
         
 deletelinksku = '''{% if isedit %}
@@ -300,6 +300,6 @@ class CashUpReportTable(tables.Table):
         model = CashUpReport
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('sessiontimestamp', 'createtimestamp', 'branch','invoicenofrom', 'invoicenoto','total', 'view')
+        sequence = ('sessiontimestamp', 'createtimestamp', 'branch', 'terminal', 'invoicenofrom', 'invoicenoto','total', 'view')
         exclude = {'id', 'created_by'}
         empty_text = "There are no cash up report generate yet..."

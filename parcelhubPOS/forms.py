@@ -88,11 +88,12 @@ class GlobalParameterForm(forms.ModelForm):
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
-        fields = ( "branch","createtimestamp", "invoicetype",  "customer", "remarks", 'discount', "payment", 'payment_type')
+        fields = ( "branch", "terminal","createtimestamp", "invoicetype",  "customer", "remarks", 'discount', "payment", 'payment_type')
         widgets = {
             'remarks': Textarea(attrs={'cols': 25, 'rows': 3}),
             "invoice_date": DateInput(),
             'branch': HiddenInput(),
+            'terminal': HiddenInput(),
         }
     def clean_customer(self):
         return self.cleaned_data['customer'] or None

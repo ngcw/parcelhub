@@ -6,7 +6,7 @@
 		<div>
 		<label for="customerselection">Customer:</label>
 			<select name="customerinput" id="customerselection" required>
-				<option value="" ></option>
+				<option value="-1" >All</option>
 				{% for customer in customerlist %}
 					<option value="{{customer.id}}" {% if customer.id == formdata.customerinput %} selected {% endif %}>{{customer.name}}</option>
 				{% endfor %}
@@ -14,7 +14,13 @@
 		</div>
 		<div>Date from:<input type="date" name="datefrom" maxlength ="50" required/></div>
 		<div>Date to:<input type="date" name="dateto" maxlength ="50" required/></div>
-
+		<div>
+-		<label for="statementoption">Option:</label>
+-			<select name="soaoptioninput" id="statementoption" >
+-				<option value="all" >All</option>
+-				<option value="Unpaid" >Unpaid only</option>
+-			</select>
+-		</div>
     	<input type="submit" value="Generate statement" id="generatestatement"/>
 	</form>
 {% endblock %}
