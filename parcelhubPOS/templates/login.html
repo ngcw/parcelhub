@@ -7,7 +7,7 @@
         <title>ParcelHub Invoicing</title>
 		<link rel="stylesheet" type="text/css" href="{% static 'style_login.css' %}" />
 	</head>
-	<body>
+	<body onload="getdata();showdata();">
 		<div id='parent' align="center">
 			<h3><img src="{% static '/img/companylogo.png' %}" alt="companylogo" title="companylogo" width="400" height="60"/></h3>
 		    <form method="post" action="/parcelhubPOS/" id='form_login'>
@@ -30,32 +30,10 @@
 		       </table>
 		
 		       <input type="hidden" name="next" value="/rates/" />
-		       <input type="text" name="branchterminal" value="" id='fileInput'/>
 		       <br/>
 		       <input type="submit" value="login" />
 		   </form>
 		</div>
-		<script>
-			var fileDisplayArea = document.getElementById('fileInput');
-			function readTextFile(file)
-			{
-			    var rawFile = new XMLHttpRequest();
-			    rawFile.open("GET", file, false);
-			    rawFile.onreadystatechange = function ()
-			    {
-			        if(rawFile.readyState === 4)
-			        {
-			            if(rawFile.status === 200 || rawFile.status == 0)
-			            {
-			                var allText = rawFile.responseText;
-			                fileDisplayArea.value = allText 
-			            }
-			        }
-			    }
-			    rawFile.send(null);
-			}
-			
-			readTextFile("file:///C:/Projects/parcelhub.txt");
-		</script>
+
 	</body>
 </html>
