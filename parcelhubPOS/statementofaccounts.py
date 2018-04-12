@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.forms import modelformset_factory
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from .tables import StatementOfAccountTable
 from .commons import *
 from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer, UserBranchAccess, Branch, Payment
@@ -88,6 +89,10 @@ def statementofaccnew(request):
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
+    formdata = {'customerinput':'',
+                    'datefrom': '',
+                    'dateto': '',
+                    }
     if branchid == '-1':
         customerlist = Customer.objects.all()
     else:
