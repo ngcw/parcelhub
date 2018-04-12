@@ -18,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from .invoiceprint import *
 from io import StringIO
+
+CONST_terminalid = 'terminalid'
 @login_required
 def invoice(request):
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -38,6 +40,7 @@ def retrieveInvoice(request):
         deadlinedatetime = timezone.now() - timedelta(days=1); 
     
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     loguser = User.objects.get(id=request.session.get('userid'))
     branchid = request.session.get(CONST_branchid)
@@ -101,6 +104,7 @@ def retrieveInvoice(request):
                 'invoice': final_invoice_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'branchselectionaction': '/parcelhubPOS/invoice/',
                 'formdata' : formdata,
@@ -143,8 +147,10 @@ def round_to_05(n):
 def editInvoice(request, invoiceid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     invoiceid = request.GET.get('invoiceid')
+    terminalid = request.session.get(CONST_terminalid)
     title = 'New invoice'
     if invoiceid:
         title = "Edit invoice"
@@ -154,7 +160,7 @@ def editInvoice(request, invoiceid):
         
     else:
         sel_branch = Branch.objects.filter(id=branchid).first()
-    sel_terminal = Terminal.objects.filter(branch = sel_branch, isactive = True ).first()
+    sel_terminal = Terminal.objects.filter(id= terminalid ).first()
     user = User.objects.get(id = request.session.get('userid'))
     if invoiceid:
         InvoiceItemFormSet = modelformset_factory(InvoiceItem, form = InvoiceItemForm, extra=0)
@@ -292,6 +298,7 @@ def editInvoice(request, invoiceid):
                  'nav_bar' : sorted(menubar.items()),
                  'loggedusers' : loggedusers,
                  'branchselection': branchselectlist,
+                 'terminalselection': terminallist, 
                  'invoice': invoice,
                  'invoicetitle': title,
                  'isedit' : isedit,

@@ -216,6 +216,9 @@ class PaymentForm(forms.ModelForm):
         model = Payment
         fields = ( "customer", "payment_paymenttype")
         exclude = ("total", "createtimestamp", "updatetimestamp", "created_by",)
+        widgets = {
+            'terminal': HiddenInput(),
+        }
     def __init__(self, *args, **kwargs):
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.fields['customer'].widget.attrs\

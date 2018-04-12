@@ -13,6 +13,7 @@ CONST_branchid = 'branchid'
 def skubranchlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     if branchid == '-1':
@@ -56,6 +57,7 @@ def skubranchlist(request):
                 'skubranch': final_SKUBranch_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': 'SKU per branch',
@@ -73,6 +75,7 @@ def skubranchlist(request):
 def editskubranch(request, skubranchid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     branch = Branch.objects.get(id=branchid)
@@ -190,6 +193,7 @@ def editskubranch(request, skubranchid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'sku_list': sku_list,

@@ -1,9 +1,10 @@
-from .models import User, Branch, UserBranchAccess
+from .models import User, Branch, UserBranchAccess, Terminal
 from django.http.response import HttpResponse
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth import login
 CONST_branchid = 'branchid'
+CONST_terminalid = 'terminalid'
 CONST_username = 'Username'
 CONST_invoice = '1Invoice'
 CONST_custacc = '2Customer Account'
@@ -51,23 +52,47 @@ def branchselection(request):
             request.session[CONST_branchid] = selectedbranch
     return branches
     
+def terminalselection(request):
+    selectedbranch = request.session.get(CONST_branchid)
+    selectedterminal = request.session.get(CONST_terminalid)
+    if selectedbranch == '-1':
+        terminals = None
+        request.session[CONST_terminalid] = ''
+    else:
+        branch = Branch.objects.get(id=selectedbranch)
+        terminals = Terminal.objects.filter(branch=branch)
+        if not selectedterminal:
+            terminal = terminals.first()
+            if terminal:
+                terminalid = terminal.id 
+                request.session[CONST_terminalid] = terminalid 
+        if request.method == "POST" and 'terminalselection' in request.POST:
+            selectedterminal = request.POST.get('terminalselection') 
+            if selectedterminal:
+                request.session[CONST_terminalid] = selectedterminal
+    return terminals
 
 def navbar(request):
     loguser = User.objects.get(id=request.session.get('userid'))
     branchid = request.session.get(CONST_branchid)
+    terminalid = request.session.get(CONST_terminalid)
     sel_branch = Branch.objects.filter(id=branchid)
     branchaccess = UserBranchAccess.objects.filter(user=loguser, branch=sel_branch).first()
     menudict = {}
     if loguser.is_superuser or branchaccess:
         #Everyone access feature
-        if branchid == '-1':
+        if branchid == '-1' or terminalid == '-1':
             menudict[CONST_invoice] =[('New invoice (F9)',''),('Invoice list','/parcelhubPOS/invoice')]
         else:
             menudict[CONST_invoice] =[('New invoice (F9)','/parcelhubPOS/invoice/editinvoice/?invoiceid='),('Invoice list','/parcelhubPOS/invoice')]
         menudict[CONST_custacc] =[]
-        menudict[CONST_payment] =[('Payment overview','/parcelhubPOS/payment/?custid=""'),
-                                    ('Payment receive','/parcelhubPOS/makepayment'),
-                                      ]   
+        if terminalid and terminalid != '-1' :
+            menudict[CONST_payment] =[('Payment overview','/parcelhubPOS/payment/?custid=""'),
+                                        ('Payment receive','/parcelhubPOS/makepayment'),
+                                          ]   
+        else:
+            menudict[CONST_payment] =[('Payment overview','/parcelhubPOS/payment/?custid=""'),
+                                          ]   
         menudict[CONST_soa] =[
                                   ('New statement of account','/parcelhubPOS/statementofaccount_new'),
                                       ]   

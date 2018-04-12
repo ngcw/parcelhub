@@ -31,7 +31,11 @@ class Terminal(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     float = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
     isactive = models.BooleanField()
-    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
 class UserBranchAccess(models.Model):
     id = models.CharField(max_length=50, primary_key=True, unique=True)  
     user = models.ForeignKey(User, blank=False, null=False,on_delete=models.CASCADE, verbose_name='*User')
@@ -231,6 +235,7 @@ class InvoiceItem(models.Model):
 class Payment(models.Model):
     id = models.CharField(max_length=200, primary_key=True, unique=True)  
     customer = models.ForeignKey(Customer, verbose_name='*Customer')
+    terminal = models.ForeignKey(Terminal, on_delete=models.CASCADE, verbose_name='*Terminal')
     total = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
     payment_paymenttype = models.ForeignKey(PaymentType,blank=True, null=True, verbose_name="Payment method")
     createtimestamp = models.DateTimeField('create timestamp', default=timezone.now)
@@ -267,11 +272,11 @@ class StatementOfAccount(models.Model):
     id = models.CharField(max_length=100, primary_key=True, unique=True)  
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, null=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='*Customer', blank=True, null=True)
-    datefrom = models.DateField('*Date from')
+    datefrom = models.DateField('Date from', blank=True, null=True)
     dateto = models.DateField('*Date to')
     totalamount = models.DecimalField(max_digits=30, decimal_places=2,verbose_name='Total amt', blank=True, null=True )
     paidamount = models.DecimalField(max_digits=30, decimal_places=2,verbose_name='Paid amt', blank=True, null=True)
-    outstandindamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Outstanding amt', blank=True, null=True)
+    outstandindamount = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Balance', blank=True, null=True)
     created_by = models.ForeignKey(User)
     createtimestamp = models.DateTimeField('create timestamp')
     
@@ -282,7 +287,11 @@ class StatementOfAccount(models.Model):
 class StatementOfAccountInvoice(models.Model):
     id = models.CharField(max_length=100, primary_key=True, unique=True)  
     soa = models.ForeignKey(StatementOfAccount, on_delete=models.CASCADE)
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    date = models.DateField('Date from')
+    reference = models.CharField(max_length=250,blank=True, null=True) 
+    description = models.CharField(max_length=254, verbose_name='Description',blank=True, null=True)
+    debit = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
+    credit = models.DecimalField(max_digits=30, decimal_places=2,blank=True, null=True)
 
 class GlobalParameter(models.Model):
     invoice_lockin_date = models.DateField('*Invoice lock in date' )

@@ -69,11 +69,13 @@ def dashboard(request):
     branchaccess = UserBranchAccess.objects.filter(user=loguser).first()
     if request.method == "POST" and 'branchselection' in request.POST:
         branchlist = branchselection(request)
+        terminallist = terminalselection(request)
         menubar = navbar(request)
         
         context = {
                     'nav_bar' : sorted(menubar.items()),
                     'branchselection': branchlist,
+                    'terminalselection': terminallist, 
                     'loggedusers' : loggedusers,
                     'branchselectionaction': '/parcelhubPOS/dashboard/',
                     'issuperuser': loguser.is_superuser,
@@ -89,9 +91,11 @@ def dashboard(request):
             pass
         menubar = navbar(request)
         branchlist = branchselection(request)
+        terminallist = terminalselection(request)
         context = {
                     'nav_bar' : sorted(menubar.items()),
                     'branchselection': branchlist,
+                    'terminalselection': terminallist, 
                     'loggedusers' : loggedusers,
                     'branchselectionaction': '/parcelhubPOS/dashboard/',
                     'issuperuser': loguser.is_superuser,
@@ -105,6 +109,7 @@ def dashboard(request):
 def globalparameter(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     
     title = "Update global parameter"
@@ -126,6 +131,7 @@ def globalparameter(request):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'issuperuser' : loguser.is_superuser,
                 'title' : title,

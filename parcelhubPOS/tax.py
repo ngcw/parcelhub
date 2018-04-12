@@ -14,6 +14,7 @@ CONST_branchid = 'branchid'
 def taxlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     branchid = request.session.get(CONST_branchid)
     menubar = navbar(request)
     tax_list = Tax.objects.all()
@@ -38,6 +39,7 @@ def taxlist(request):
                 'tax': final_Tax_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': "Tax",
@@ -55,6 +57,7 @@ def taxlist(request):
 def edittax(request, taxid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     taxid = request.GET.get('taxid')
     title = "New tax"
@@ -82,6 +85,7 @@ def edittax(request, taxid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title' : title,
                 'header': title

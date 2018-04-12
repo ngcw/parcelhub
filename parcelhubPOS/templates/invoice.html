@@ -16,7 +16,7 @@
      
     
      {% if isedit %}
-		{% if isall %}
+		{% if isall or request.session.terminalid == '-1'%}
 		{% else %}
 
     <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">
@@ -30,7 +30,7 @@
     {% endif %}
 	{% render_table invoice %}
 	{% if isedit %}
-		{% if isall %}
+		{% if isall or request.session.terminalid == '-1'%}
 		{% else %}
 
     <form action="/parcelhubPOS/invoice/editinvoice/?invoiceid=">

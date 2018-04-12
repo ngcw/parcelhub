@@ -14,6 +14,7 @@ CONST_branchid = 'branchid'
 def zonedomesticlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     zonedomestic_list = ZoneDomestic.objects.all()
@@ -50,6 +51,7 @@ def zonedomesticlist(request):
                 'zonedomestic': final_ZoneDomestic_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': 'Domestic zone',
@@ -67,6 +69,7 @@ def zonedomesticlist(request):
 def editzonedomestic(request, zonedomesticid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     zonedomesticid = request.GET.get('zonedomesticid')
     title = "New domestic zone"
@@ -94,6 +97,7 @@ def editzonedomestic(request, zonedomesticid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': title,
                 'header': title
@@ -113,6 +117,7 @@ def deletezonedomestic(request, dzonedomesticid ):
 def zoneinternationallist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     zoneinternational_list = ZoneInternational.objects.all()
@@ -154,6 +159,7 @@ def zoneinternationallist(request):
                 'zoneinternational': final_ZoneInternational_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': "International zone",
@@ -171,6 +177,7 @@ def zoneinternationallist(request):
 def editzoneinternational(request, zoneinternationalid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     zoneinternationalid = request.GET.get('zoneinternationalid')
     title = "New international zone"
@@ -199,6 +206,7 @@ def editzoneinternational(request, zoneinternationalid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': title,
                 'header': title

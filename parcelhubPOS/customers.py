@@ -15,6 +15,7 @@ CONST_branchid = 'branchid'
 def customerlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -62,6 +63,7 @@ def customerlist(request):
                 'customer': final_Customer_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title' : 'Customer',
@@ -79,6 +81,7 @@ def customerlist(request):
 def editcustomer(request, customerid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     customerid = request.GET.get('customerid')
@@ -114,6 +117,7 @@ def editcustomer(request, customerid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'iscustomer' : True,
                 'header': title

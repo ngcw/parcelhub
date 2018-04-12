@@ -16,6 +16,7 @@ CONST_branchid = 'branchid'
 def branchlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branch_list = Branch.objects.all()
     final_branch_table = BranchTable(branch_list)
@@ -25,6 +26,7 @@ def branchlist(request):
                 'branch': final_branch_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': 'Branch',
                 'isedit' : loguser.is_superuser,
@@ -39,6 +41,7 @@ def editbranch(request, ebranchid):
     loggedusers = userselection(request)
     menubar = navbar(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     ebranchid = request.GET.get('ebranchid')
     title = "New branch"
     if ebranchid:
@@ -67,6 +70,7 @@ def editbranch(request, ebranchid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': title,
                 'header': title,

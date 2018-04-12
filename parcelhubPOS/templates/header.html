@@ -56,7 +56,25 @@
 			  		</select>
 		  		</form>
 	  		</div>	
-	  		
+	  		<div class="header1">|</div>
+	  		<div class="header">Terminal: </div>
+	  		<div class="header2">
+	  			
+		  		<form action='{{ branchselectionaction }}' method="post" >
+		  		{% csrf_token %}
+			  		<select name="terminalselection" id="branchselection" onChange="this.form.submit();" {% if headerselectiondisabled %}disabled{% endif %}>
+			  			<option value='-1'>All</option>
+			  			{% for terminal in terminalselection %}
+			  				{% if terminal.id == request.session.terminalid|add:"0" %}
+			  					<option value='{{ terminal.id }}' selected>{{terminal.name}}</option>
+			  				{% else %}
+			  					<option value='{{ terminal.id}}'>{{terminal.name}}</option>
+			  				{% endif %}
+			  			{% endfor %}
+			  			
+			  		</select>
+		  		</form>
+	  		</div>	
 	  		
 	  		<div class='header1' id='logout_button'>
 	  			<a href="/parcelhubPOS/logout/" >
@@ -80,8 +98,8 @@
 	   				<div class="dropdown-content" id="myDropdown{{ menu.0.split|join:'_' }}">
 		        	{% for submenu in menu.1 %}
 		        	{% if submenu.1 == "" %}
-		        	    {% if isall %}
-		        		<a class="disabledmenu" title="you are not authorized to perform this action with 'All' branch selected.">{{ submenu.0 }}</a>
+		        	    {% if isall or request.session.terminalid == '-1'%}
+		        		<a class="disabledmenu" title="you are not authorized to perform this action with 'All' branch/terminal selected.">{{ submenu.0 }}</a>
 		        		{% else %}
 		        		<a class="disabledmenu" title="you are not authorized to access this page.">{{ submenu.0 }}</a>
 		        		{% endif %}
@@ -1283,6 +1301,7 @@
        		 		
 	    	};
 	      {% endif %}
+	      document.getElementById('soadateto').valueAsDate  = new Date()
 		  </script>
           {% block jsscript %}{% endblock %}
 

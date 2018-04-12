@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import StatementOfAccountTable
 from .commons import *
-from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer, UserBranchAccess, Branch
+from .models import StatementOfAccount, StatementOfAccountInvoice, Invoice, Customer, UserBranchAccess, Branch, Payment
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import HttpResponseRedirect, HttpResponse
@@ -23,7 +23,7 @@ from textwrap import wrap
 from django.utils import timezone
 from num2words import num2words
 from datetime import timedelta, datetime
-
+from django.db.models import Sum
 CONST_branchid = 'branchid'
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'
@@ -32,6 +32,7 @@ CONST_fontbold = CONST_font + '-Bold'
 def statementofacclist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -65,6 +66,7 @@ def statementofacclist(request):
                 'statementofacc': final_StatementOfAccount_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': "Statement of account",
@@ -82,6 +84,7 @@ def statementofacclist(request):
 def statementofaccnew(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -89,71 +92,117 @@ def statementofaccnew(request):
         customerlist = Customer.objects.all()
     else:
         customerlist = Customer.objects.filter(branch__id=branchid)
-
+    if request.method == 'POST':
+        customerid = request.POST['customerinput']
+        date_from = request.POST['datefrom']
+        date_to = request.POST['dateto']
+        formdata = {'customerinput':customerid,
+                    'datefrom': date_from,
+                    'dateto': date_to,
+                    }
+        date_to = datetime.strptime(date_to, '%Y-%m-%d')
+        date_to = date_to + timedelta(days=1)
+        
+        if customerid == 'all' or customerid == 'outstanding':
+            if branchid == '-1':
+                oldstatements = StatementOfAccount.objects.all()
+                selectedcustomers = Customer.objects.all()
+            else:
+                oldstatements = StatementOfAccount.objects.filter(branch__id=branchid)
+                selectedcustomers = Customer.objects.filter(branch__id=branchid)
+        else:
+            oldstatements = StatementOfAccount.objects.filter(branch__id=branchid)
+            selectedcustomers =  Customer.objects.filter(id=customerid)
+        for statement in oldstatements:
+            statement.delete()
+        for selectedcustomer in selectedcustomers:
+            newcustid = selectedcustomer.id
+            if date_from:
+                invoicelist1 = Invoice.objects.filter(customer__id = newcustid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)  
+                invoicelist2 = Invoice.objects.filter(customer__id = newcustid, createtimestamp__lte=date_from)
+                invoicelist2 = invoicelist2.filter(payment__lt=models.F('total'))
+                invoicelist = (invoicelist1|invoicelist2)
+                paymentlist = Payment.objects.filter(customer=selectedcustomer, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
+            else:
+                invoicelist = Invoice.objects.filter(customer__id = newcustid, createtimestamp__lte=date_to)
+                invoicelist = invoicelist.filter(payment__lt=models.F('total'))
+                paymentlist= None
+            user = User.objects.get(id = request.session.get('userid'))
+            if date_from:
+                statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now(), branch=selectedcustomer.branch)
+            else:
+                statementofacc = StatementOfAccount(customer=selectedcustomer, dateto=date_to, created_by=user, createtimestamp=timezone.now(), branch=selectedcustomer.branch)
+            statementofacc.id = newcustid + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")  
+            statementofacc.save()
+            totalamt = 0.0;
+            paidamt = 0.0;
+            
+            for inv in invoicelist:
+                totalamt = totalamt + float(inv.total)
+                
+                try:
+                    payment = float(inv.payment)
+                except:
+                    payment = 0.0;
+                paidamt = paidamt + max( [payment, 0] )
+                soainv = StatementOfAccountInvoice(soa=statementofacc)
+                soainv.id = statementofacc.id + '_' + inv.invoiceno
+                soainv.date = inv.createtimestamp.date()
+                soainv.reference = inv.invoiceno
+                soainv.description = inv.remarks
+                if date_from:
+                    soainv.debit = inv.total
+                else:
+                    soainv.debit = float(inv.total) - payment
+                soainv.credit = 0
+                soainv.save()
+            outstandingamt = totalamt - paidamt;
+            statementofacc.totalamount = totalamt
+            statementofacc.paidamount = paidamt
+            statementofacc.outstandindamount = outstandingamt
+            statementofacc.save(update_fields=["totalamount", 'paidamount', 'outstandindamount']) 
+            if paymentlist:
+                for pmt in paymentlist:
+                    soainv = StatementOfAccountInvoice(soa=statementofacc)
+                    soainv.id = statementofacc.id + '_' + pmt.id
+                    soainv.date = pmt.createtimestamp.date()
+                    soainv.reference = pmt.id
+                    soainv.description = pmt.payment_paymenttype.name
+                    soainv.debit = 0
+                    soainv.credit = pmt.total
+                    soainv.save()
+            
+        if customerid == 'outstanding':
+            nonoutstandingsoa = StatementOfAccount.objects.filter(outstandindamount=0)
+            for soa in nonoutstandingsoa:
+                soa.delete()
+    if branchid == '-1':
+        statementofacc_list = StatementOfAccount.objects.all()
+    else:
+        statementofacc_list = StatementOfAccount.objects.filter(customer__branch__id=branchid)
+    final_StatementOfAccount_table = StatementOfAccountTable(statementofacc_list)
+    
+    RequestConfig(request, paginate={'per_page': 25}).configure(final_StatementOfAccount_table)
     context = {
+                'formdata' : formdata,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'customerlist':customerlist,
-                'title': "Generate statement of account",
+                'title': "Statement of account",
                 'isedit' : True,
                 'issuperuser' : loguser.is_superuser,
                 'isall': branchid != '-1',
-                'header': "Generate statement of account",
+                'header': "Statement of account",
+                'statementofacc': final_StatementOfAccount_table,
                 }
     return render(request, 'statementofaccount_new.html', context)
 @login_required
 def viewstatementofacc(request):
-    try:
-        soaid = request.GET.get('soaid')
-        statementofacc = StatementOfAccount.objects.get(id=soaid)
-    except:
-        statementofacc = None;
-    if statementofacc:
-        pass
-    elif request.method == "GET" and 'customerinput' in request.GET:
-        customerid = request.GET.get('customerinput')
-        date_from = request.GET.get('datefrom')
-        date_to = request.GET.get('dateto')
-        date_to = datetime.strptime(date_to, '%Y-%m-%d')
-        date_to = date_to + timedelta(days=1) - timedelta(seconds=1);
-        statementoption = request.GET.get('soaoptioninput')
+    soaid = request.GET.get('soaid')
+    statementofacc = StatementOfAccount.objects.get(id=soaid)
 
-        selectedcustomer =  Customer.objects.get(id=customerid)
-        newcustid = customerid
-        invoicelist = Invoice.objects.filter(customer__id = customerid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
-        if statementoption == 'unpaid':
-            invoicelist = invoicelist.filter(payment__gte=models.F('total'))      
-        user = User.objects.get(id = request.session.get('userid'))
-        statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now())
-        statementofacc.id = newcustid + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")  
-        branchid = request.session.get(CONST_branchid)
-
-        if branchid == '-1':
-            pass
-        else:
-            selectedbranch = Branch.objects.get(id=branchid)
-            statementofacc.branch = selectedbranch
-        statementofacc.save()
-        totalamt = 0.0;
-        paidamt = 0.0;
-        
-        for inv in invoicelist:
-            totalamt = totalamt + float(inv.total)
-            
-            try:
-                payment = float(inv.payment)
-            except:
-                payment = 0.0;
-            paidamt = paidamt + max( [payment, totalamt] )
-            soainv = StatementOfAccountInvoice(soa=statementofacc, invoice=inv)
-            soainv.id = statementofacc.id + '_' + inv.invoiceno
-            soainv.save()
-        outstandingamt = totalamt - paidamt;
-        statementofacc.totalamount = totalamt
-        statementofacc.paidamount = paidamt
-        statementofacc.outstandindamount = outstandingamt
-        statementofacc.save(update_fields=["totalamount", 'paidamount', 'outstandindamount']) 
     soa_pdf = statementofacc_pdf(request, statementofacc)
     return HttpResponse(soa_pdf, content_type='application/pdf')
 
@@ -162,9 +211,20 @@ def statementofacc_pdf(request, statementofacc):
     customername = statementofacc.customer.name
     filename = 'Statement_' + customername + '_' + statementofacc.createtimestamp.strftime('%Y-%m-%d') 
     response['Content-Disposition'] = 'attachment; filename="'+filename+'.pdf"'
-    soaitem = StatementOfAccountInvoice.objects.filter(soa=statementofacc).order_by('invoice')
-    
-    
+    soaitem = StatementOfAccountInvoice.objects.filter(soa=statementofacc).order_by('date', 'reference')
+    middle = 34
+    up = 13
+    down = 9
+    lastpage = middle + up
+    pages = 1
+    if len(soaitem) <= middle:
+        pass
+    elif len(soaitem) < 91:
+        pages = pages + 1
+    else:
+        pages = 3;
+        remainingitem = len(soaitem) - 91
+        pages = pages + floor(remainingitem/56)
         
     margin = 25;
     totalwidth = 590;
@@ -224,6 +284,40 @@ def statementofacc_pdf(request, statementofacc):
     p.drawString(margin, heightafteraddress - (contactlineheight * 2), "Fax        " + customerfax)
     lineheight = heightafteraddress - (contactlineheight * 2) - 5
     p.line(margin, lineheight, totalwidth-margin, lineheight)
+    
+    #Statement of account box
+    height = heightafteraddress - (contactlineheight * 2) + 10
+    p.rect(totalwidth - 250,height, 220, 90, stroke=True, fill=False) 
+    
+    p.setFont(CONST_font, 16)
+    soatextheight = height + 75 ;
+    centerbox = totalwidth - 250 + 110
+    p.drawCentredString(centerbox, soatextheight, "Statement of Account")
+    p.line(totalwidth - 250, soatextheight - 7, totalwidth - 30, soatextheight - 7)
+    p.setFont(CONST_font, 11)
+    debititems = soaitem.filter(debit__gt = 0)
+    debitsum = 0
+    for item in soaitem:
+        debitsum += item.debit
+    p.drawString(totalwidth - 240, soatextheight - (linecount * 2.5 ), 'Total Debit (%d)' % len(debititems))
+    debitstring = "{:,.2f}".format(round(debitsum, 2 ))
+    debitstringwidth = p.stringWidth(debitstring, CONST_font, 11)
+    p.drawString(totalwidth - 35 - debitstringwidth, soatextheight - (linecount * 2.5 ), debitstring)
+    credititems = soaitem.filter(credit__gt = 0)
+    creditsum = 0
+    for item in soaitem:
+        creditsum += item.credit
+    creditstring = "{:,.2f}".format(round(creditsum, 2 ))
+    creditstringwidth = p.stringWidth(creditstring, CONST_font, 11)
+    p.drawString(totalwidth - 35 - creditstringwidth, soatextheight - (linecount * 3.5 ), creditstring)
+    p.drawString(totalwidth - 240, soatextheight - (linecount * 3.5 ), 'Total Credit (%d)' % len(credititems))
+    p.setLineWidth(3)
+    p.line( totalwidth - 245, soatextheight - (linecount * 4 ), totalwidth - 35, soatextheight - (linecount * 4 ))
+    balancesum = debitsum - creditsum
+    balancestring = "{:,.2f}".format(round(balancesum, 2 ))
+    balancestringwidth = p.stringWidth(balancestring, CONST_font, 11)
+    p.drawString(totalwidth - 35 - balancestringwidth, soatextheight - (linecount * 5.5 ), balancestring)
+    p.drawString(totalwidth - 240, soatextheight - (linecount * 5.5 ), 'Closing Balance')
     # Body
     p.setFont(CONST_font, 8)
     p.drawString( margin, lineheight - (linecount * 1), "Customer Account")
@@ -242,7 +336,7 @@ def statementofacc_pdf(request, statementofacc):
     p.drawString( margin + 150 + attendantstringwidth - usernamewidth, lineheight - (linecount * 2), username)
     currencywidth = p.stringWidth("Currency", CONST_font, 8)
     p.drawString( margin + 200 + currencywidth - 15, lineheight - (linecount * 2), "RM")
-    pageno = "1/1"
+    pageno = "1/%s" %(pages)
     pagenowidth = p.stringWidth(pageno, CONST_fontbold, 11)
     pagenostringwidth = p.stringWidth("Page No", CONST_font, 8)
     p.drawString( margin + 300 + pagenostringwidth - pagenowidth, lineheight - (linecount * 2), pageno)
@@ -271,26 +365,77 @@ def statementofacc_pdf(request, statementofacc):
     cummulativecredit = 0.00;
     creditcount = 0;
     cummulativebalance = 0.00;
+    currentpage = 1;
+    rowcount = 1;
     for item in soaitem:
-        invoiceitem = item.invoice
-        p.drawString( margin, itemheight - (linecount * itemcount), invoiceitem.createtimestamp.strftime("%d/%m/%Y"))
-        p.drawString( margin + 70, itemheight - (linecount * itemcount), invoiceitem.invoiceno)
-        if invoiceitem.remarks:
-            remarks = invoiceitem.remarks
+        if ( currentpage == 1 and rowcount > 43 ) or ( currentpage > 1 and rowcount > 56):
+            p.showPage()
+            currentpage += 1
+            nlinecount = 12
+            rowcount = 1
+            nlineheight = totalheight - topmargin 
+            itemheight = nlineheight - (nlinecount * 4)
+            p.line(margin, nlineheight, totalwidth-margin, nlineheight)
+            p.setFont(CONST_font, 8)
+            p.drawString( margin, nlineheight - (nlinecount * 1), "Customer Account")
+            p.drawString( margin + 150, nlineheight - (nlinecount * 1), "Attendant")
+            p.drawString( margin + 200, nlineheight - (nlinecount * 1), "Currency")
+            p.drawString( margin + 300, nlineheight - (nlinecount * 1), "Page No")
+            p.drawString( margin + 400, nlineheight - (nlinecount * 1), "Terms")
+            p.drawString( margin + 520, nlineheight - (nlinecount * 1), "Date")
+            p.setFont(CONST_fontbold, 11)
+            custacc = customer.branch.branch_code + customer.identificationno
+            p.drawString( margin, nlineheight - (nlinecount * 2), custacc)
+            
+            username = statementofacc.created_by.last_name + ' ' +statementofacc.created_by.first_name
+            usernamewidth = p.stringWidth(username, CONST_fontbold, 11)
+            attendantstringwidth = p.stringWidth("Attendant", CONST_font, 8)
+            p.drawString( margin + 150 + attendantstringwidth - usernamewidth, nlineheight - (nlinecount * 2), username)
+            currencywidth = p.stringWidth("Currency", CONST_font, 8)
+            p.drawString( margin + 200 + currencywidth - 15, nlineheight - (nlinecount * 2), "RM")
+            pageno = "%s/%s" %(currentpage, pages)
+            pagenowidth = p.stringWidth(pageno, CONST_fontbold, 11)
+            pagenostringwidth = p.stringWidth("Page No", CONST_font, 8)
+            p.drawString( margin + 300 + pagenostringwidth - pagenowidth, nlineheight - (nlinecount * 2), pageno)
+            terms = "30 days"
+            termswidth = p.stringWidth(terms, CONST_fontbold, 11)
+            termsstringwidth = p.stringWidth("Terms", CONST_font, 8)
+            p.drawString( margin + 400 + termsstringwidth - termswidth, nlineheight - (nlinecount * 2), terms)
+            datestring = statementofacc.createtimestamp.strftime("%d/%m/%Y")
+            datestringwidth = p.stringWidth(datestring, CONST_fontbold, 11)
+            p.drawString( totalwidth - margin - datestringwidth, nlineheight - (nlinecount * 2), datestring)
+            
+            nlineheight = nlineheight - (nlinecount * 2) - 7
+            p.line(margin, nlineheight, totalwidth-margin, nlineheight)
+            
+            p.setFont(CONST_font, 8)
+            p.drawString( margin, nlineheight - (nlinecount * 1), "Date")
+            p.drawString( margin + 70, nlineheight - (nlinecount * 1), "Reference")
+            p.drawString( margin + 160, nlineheight - (nlinecount * 1), "Transaction Description")
+            p.drawString( margin + 350, nlineheight - (nlinecount * 1), "Debit")
+            p.drawString( margin + 425, nlineheight - (nlinecount * 1), "Credit")
+            p.drawString( margin + 500, nlineheight - (nlinecount * 1), "Balance")
+            p.setFont(CONST_font, 11)
+            
+        p.drawString( margin, itemheight - (linecount * rowcount), item.date.strftime("%d/%m/%Y"))
+        p.drawString( margin + 70, itemheight - (linecount * rowcount), item.reference)
+        if item.description:
+            remarks = item.description
         else:
             remarks = ''
-        p.drawString( margin + 160, itemheight - (linecount * itemcount), remarks)
-        debitvalue = round(float(invoiceitem.total), 2 )
+        p.drawString( margin + 160, itemheight - (linecount * rowcount), remarks)
+        debitvalue = round(float(item.debit), 2 )
         debit = "{:,.2f}".format(debitvalue)
+        if debitvalue > 0.00:
+            pass
+        else:
+            debit = ''
         cummulativedebit = cummulativedebit + debitvalue
         debitwidth = p.stringWidth(debit, CONST_font, 11)
         debitstringwidth = p.stringWidth("Debit", CONST_font, 8)
-        p.drawString( margin + 350 + debitstringwidth - debitwidth, itemheight - (linecount * itemcount), debit)
-        try:
-            payment = float(invoiceitem.payment)
-        except:
-            payment = 0.00;
-        creditvalue = round(payment, 2 )
+        p.drawString( margin + 350 + debitstringwidth - debitwidth, itemheight - (linecount * rowcount), debit)
+
+        creditvalue = round(float(item.credit), 2 )
         
         cummulativecredit = cummulativecredit + creditvalue
         credit = "{:,.2f}".format(creditvalue)
@@ -300,18 +445,19 @@ def statementofacc_pdf(request, statementofacc):
             credit = ''
         creditwidth = p.stringWidth(credit, CONST_font, 11)
         creditstringwidth = p.stringWidth("Credit", CONST_font, 8)
-        p.drawString( margin + 425 + creditstringwidth - creditwidth, itemheight - (linecount * itemcount), credit)
+        p.drawString( margin + 425 + creditstringwidth - creditwidth, itemheight - (linecount * rowcount), credit)
         
-        balancevalue = float(invoiceitem.total) - payment
-        
-        
-        
+        balancevalue = float(item.debit) - float(item.credit)
+
         cummulativebalance = cummulativebalance + balancevalue
         balance = "{:,.2f}".format(round(cummulativebalance, 2 ))
         balancewidth = p.stringWidth(balance, CONST_font, 11)
         balancestringwidth = p.stringWidth("Balance", CONST_font, 8)
-        p.drawString( margin + 500 + balancestringwidth - balancewidth, itemheight - (linecount * itemcount), balance)
+        p.drawString( margin + 500 + balancestringwidth - balancewidth, itemheight - (linecount * rowcount), balance)
         itemcount += 1;
+        rowcount += 1;
+    if( (currentpage == 1 and rowcount > 34) or (currentpage > 1 and currentpage == page and rowcount > 47) ):
+        p.showPage()
     #Footer
     btmmargin = 40;
     
@@ -340,32 +486,7 @@ def statementofacc_pdf(request, statementofacc):
     p.drawString(50, btmmargin + (linecount * 2), "We shall be grateful if you will let us have payment as soon as possible. Any discrepancy in this statement must be reported to us in writing")
     p.drawString(50, btmmargin + (linecount * 1), "within 10 days.")
     
-    #Statement of account box
-    height = heightafteraddress - (contactlineheight * 2) + 10
-    p.rect(totalwidth - 250,height, 220, 90, stroke=True, fill=False) 
     
-    p.setFont(CONST_font, 16)
-    soatextheight = height + 75 ;
-    centerbox = totalwidth - 250 + 110
-    p.drawCentredString(centerbox, soatextheight, "Statement of Account")
-    p.line(totalwidth - 250, soatextheight - 7, totalwidth - 30, soatextheight - 7)
-    p.setFont(CONST_font, 11)
-    p.drawString(totalwidth - 240, soatextheight - (linecount * 2.5 ), 'Total Debit (%d)' % itemcount)
-    debitstring = "{:,.2f}".format(round(cummulativedebit, 2 ))
-    debitstringwidth = p.stringWidth(debitstring, CONST_font, 11)
-    p.drawString(totalwidth - 35 - debitstringwidth, soatextheight - (linecount * 2.5 ), debitstring)
-    
-    creditstring = "{:,.2f}".format(round(cummulativecredit, 2 ))
-    creditstringwidth = p.stringWidth(creditstring, CONST_font, 11)
-    p.drawString(totalwidth - 35 - creditstringwidth, soatextheight - (linecount * 3.5 ), creditstring)
-    p.drawString(totalwidth - 240, soatextheight - (linecount * 3.5 ), 'Total Credit (%d)' % creditcount)
-    p.setLineWidth(3)
-    p.line( totalwidth - 245, soatextheight - (linecount * 4 ), totalwidth - 35, soatextheight - (linecount * 4 ))
-    
-    balancestring = "{:,.2f}".format(round(cummulativebalance, 2 ))
-    balancestringwidth = p.stringWidth(balancestring, CONST_font, 11)
-    p.drawString(totalwidth - 35 - balancestringwidth, soatextheight - (linecount * 5.5 ), balancestring)
-    p.drawString(totalwidth - 240, soatextheight - (linecount * 5.5 ), 'Closing Balance')
     
     # Monthly summary box
     p.setLineWidth(1)
@@ -395,32 +516,32 @@ def statementofacc_pdf(request, statementofacc):
     p.rect(boxmargin + (boxwidth * 4 ) ,boxytop, boxwidth, 15, stroke=True, fill=False) 
     p.rect(boxmargin + (boxwidth * 5 ) ,boxytop, boxwidth, 15, stroke=True, fill=False) 
     
-    currentmonthitem = soaitem.filter(invoice__createtimestamp__month = statementofacc.get_month(),
-                                      invoice__createtimestamp__year = statementofacc.get_year())
+    currentmonthitem = soaitem.filter(date__month = statementofacc.get_month(),
+                                      date__year = statementofacc.get_year())
     currentmonthbalance = calculate_soabalance(currentmonthitem)
     p.drawRightString( boxmargin + (boxwidth * 1 ) - 2, boxytop + 3, str(round(currentmonthbalance, 2)))
     
     month1 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 1)
-    month1item = soaitem.filter(invoice__createtimestamp__month = month1[0],
-                                invoice__createtimestamp__year =  month1[1])
+    month1item = soaitem.filter(date__month = month1[0],
+                                date__year =  month1[1])
     month1balance = calculate_soabalance(month1item)
     p.drawRightString( boxmargin + (boxwidth * 2 ) - 2, boxytop + 3, str(round(month1balance, 2)))
     
     month2 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 2)
-    month2item = soaitem.filter(invoice__createtimestamp__month = month2[0],
-                                invoice__createtimestamp__year =  month2[1])
+    month2item = soaitem.filter(date__month = month2[0],
+                                date__year =  month2[1])
     month2balance = calculate_soabalance(month2item)
     p.drawRightString( boxmargin + (boxwidth * 3 ) - 2, boxytop + 3, str(round(month2balance, 2)))
     
     month3 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 3)
-    month3item = soaitem.filter(invoice__createtimestamp__month = month3[0],
-                                invoice__createtimestamp__year =  month3[1])
+    month3item = soaitem.filter(date__month = month3[0],
+                                date__year =  month3[1])
     month3balance = calculate_soabalance(month3item)
     p.drawRightString( boxmargin + (boxwidth * 4 ) - 2, boxytop + 3, str(round(month3balance, 2)))
     
     month4 = get_month_year_value(statementofacc.get_month(), statementofacc.get_year(), 4)
-    month4item = soaitem.filter(invoice__createtimestamp__month = month4[0],
-                                invoice__createtimestamp__year =  month4[1])
+    month4item = soaitem.filter(date__month = month4[0],
+                                date__year =  month4[1])
     month4balance = calculate_soabalance(month4item)
     p.drawRightString( boxmargin + (boxwidth * 5 ) - 2, boxytop + 3, str(round(month4balance, 2)))
     
@@ -443,12 +564,11 @@ def calculate_soabalance(soaitem):
     balance = 0.00;
     
     for item in soaitem:
-        invoiceitem = item.invoice
         try:
-            payment = float(invoiceitem.payment)
+            payment = float(item.credit)
         except:
             payment = 0.00
-        balancevalue = float(invoiceitem.total) - payment
+        balancevalue = float(item.debit) - payment
         balance = balance + balancevalue
     return balance
 @login_required

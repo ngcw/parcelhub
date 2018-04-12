@@ -19,6 +19,7 @@ CONST_username = 'Username'
 def userlist(request):
     loggedusers = userselection(request)
     branchlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     if branchid == '-1':
@@ -73,6 +74,7 @@ def userlist(request):
                 'userlist': final_user_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' :formdata,
                 'title': "User",
@@ -90,6 +92,7 @@ def userlist(request):
 def edituser(request, user_id):
     loggedusers = userselection(request)
     branchlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     user_id = request.GET.get('user_id')
     title = "Edit user"
@@ -116,6 +119,7 @@ def edituser(request, user_id):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'user_id': user_id,
                 'title' : title,
@@ -127,6 +131,7 @@ def edituser(request, user_id):
 def change_password(request, user_id):
     loggedusers = userselection(request)
     branchlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     user_id = request.GET.get('user_id')
     userqueryset = User.objects.get(id=user_id)
@@ -146,6 +151,7 @@ def change_password(request, user_id):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': "Change password"
                 }
@@ -155,6 +161,7 @@ def change_password(request, user_id):
 def adduser(request):
     loggedusers = userselection(request)
     branchlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
@@ -173,6 +180,7 @@ def adduser(request):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': "New user",
                 'header': "New user"
@@ -192,6 +200,7 @@ def deleteuser(request, duser_id ):
 def userbranchaccess( request, user_id):
     loggedusers = userselection(request)
     branchlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     user_id = request.GET.get('user_id')
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -216,6 +225,7 @@ def userbranchaccess( request, user_id):
                 CONST_branchid : branchid,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': "User branch access",
                 'isedit' : isedit,
@@ -231,6 +241,7 @@ def edituserbranchaccess(request, userbranch_id):
     #header info
     loggedusers = userselection(request)
     branchlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     # page info
     userbranchanduser_id = request.GET.get('userbranch_id')
@@ -285,6 +296,7 @@ def edituserbranchaccess(request, userbranch_id):
                 'nav_bar' : sorted(menubar.items()),
                 'headerselectiondisabled' : True,
                 'branchselection': branchlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'next' : next,
                 'userid' : user_id,

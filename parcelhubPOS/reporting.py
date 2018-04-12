@@ -24,6 +24,7 @@ from textwrap import wrap
 from django.utils import timezone
 from num2words import num2words
 CONST_branchid = 'branchid'
+CONST_terminalid = 'terminalid'
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'
 #method to retrieve Courier statementofacc list
@@ -31,14 +32,23 @@ CONST_fontbold = CONST_font + '-Bold'
 def cashuplist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
+    terminalid = request.session.get(CONST_terminalid)
     if branchid == '-1':
         cashupreport_list = CashUpReport.objects.all()
     else:
-        cashupreport_list = CashUpReport.objects.filter(branch__id=branchid)
-
+        if terminalid:
+            if terminalid == '-1':
+                cashupreport_list = CashUpReport.objects.filter(branch__id=branchid)
+            else:    
+                cashupreport_list = CashUpReport.objects.filter(branch__id=branchid, terminal__id = terminalid)
+        else:
+            cashupreport_list = CashUpReport.objects.filter(branch__id=branchid)
+        
+        
     final_CashUpReport_table = CashUpReportTable(cashupreport_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_CashUpReport_table)
@@ -46,6 +56,7 @@ def cashuplist(request):
                 'cashupreport': final_CashUpReport_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title': "Cash up report",
                 'isedit' : True,
@@ -61,7 +72,8 @@ def viewcashupreport(request):
     branchid = request.session.get(CONST_branchid)
     selectedbranch = Branch.objects.get(id=branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
-    terminal = Terminal.objects.filter(branch=selectedbranch, isactive=True).first()
+    terminalid = request.session.get(CONST_terminalid)
+    terminal = Terminal.objects.filter(id=terminalid).first()
     try:
         curid = request.GET.get('curid')
         cureport = CashUpReport.objects.get(id=curid)
@@ -71,27 +83,40 @@ def viewcashupreport(request):
         pass
     elif request.method == "POST":
 
-        latestcashupreport = CashUpReport.objects.filter(branch__id=branchid, terminal__id = terminal.id).order_by('-createtimestamp').first()
+        latestcashupreport = CashUpReport.objects.filter(branch__id=branchid, terminal__id = terminalid).order_by('-createtimestamp').first()
         if latestcashupreport:
-            invoicelist = Invoice.objects.filter(branch__id = branchid, terminal__id = terminal.id, createtimestamp__gte = latestcashupreport.createtimestamp, invoicetype__name="Cash")
-            paymentlist = Payment.objects.filter(customer__branch__id = branchid, createtimestamp__gte = latestcashupreport.createtimestamp)
+            invoicelist = Invoice.objects.filter(branch__id = branchid,  createtimestamp__gte = latestcashupreport.createtimestamp, invoicetype__name="Cash")
+            paymentlist = Payment.objects.filter(customer__branch__id = branchid, terminal__id = terminalid, createtimestamp__gte = latestcashupreport.createtimestamp)
             paymentinvoicelist = PaymentInvoice.objects.filter(payment__in=paymentlist) 
             sessionstart = latestcashupreport.createtimestamp
         else:
-            invoicelist = Invoice.objects.filter(branch__id = branchid, terminal__id = terminal.id, invoicetype__name="Cash")
-            paymentlist = Payment.objects.filter(customer__branch__id = branchid)
-            paymentinvoicelist = PaymentInvoice.objects.filter(payment__in=paymentlist) 
-            sessionstart = invoicelist.order_by('createtimestamp').first().createtimestamp
+            invoicelist = Invoice.objects.filter(branch__id = branchid, terminal__id = terminalid, invoicetype__name="Cash")
+            paymentlist = Payment.objects.filter(customer__branch__id = branchid, terminal__id = terminalid)
+            paymentinvoicelist = PaymentInvoice.objects.filter(payment__in=paymentlist)
+            if invoicelist:
+                sessionstart = invoicelist.order_by('createtimestamp').first().createtimestamp
+            else:
+                paymentinvoice = paymentinvoicelist.first()
+                sessionstart = paymentinvoice.invoice.createtimestamp
             
         if invoicelist or paymentinvoicelist:
-            earliestinvoice = invoicelist.order_by('invoiceno').first().invoiceno
+            if invoicelist:
+                earliestinvoice = invoicelist.order_by('invoiceno').first().invoiceno
+            else:
+                firstpayment = paymentinvoicelist.order_by('invoice__invoiceno').first()
+                earliestinvoice = firstpayment.invoice.invoiceno
             try:
                 epaymentinvoiceid = paymentinvoicelist.order_by('invoice').first().invoice.invoiceno
                 if epaymentinvoiceid < earliestinvoice:
                     earliestinvoice = epaymentinvoiceid
             except:
                 pass
-            latestinvoice = invoicelist.order_by('-invoiceno').first().invoiceno
+            if invoicelist:
+                latestinvoice = invoicelist.order_by('-invoiceno').first().invoiceno
+            else:
+                lastpayment = paymentinvoicelist.order_by('-invoice__invoiceno').first()
+                latestinvoice = firstpayment.invoice.invoiceno
+            
             try:
                 lpaymentinvoiceid = paymentinvoicelist.order_by('-invoice').first().invoice.invoiceno
                 if lpaymentinvoiceid > latestinvoice:
@@ -187,7 +212,7 @@ def cashup_pdf(request, cashupreport):
     p.drawString(margin, totalheight - topmargin- (linecount * 11), "Session Opened")
     p.drawString(margin, totalheight - topmargin- (linecount * 12), "Report Run")
     
-    terminal = Terminal.objects.filter(branch=branch, isactive=True).first()
+    terminal = cashupreport.terminal
     p.setFont(CONST_font, 9)
     p.drawString(margin+ 100, totalheight - topmargin- (linecount * 9), terminal.name)
     invoicerange = ''

@@ -12,10 +12,10 @@ class InvoiceTable(tables.Table):
     customer = tables.Column(default='Cash')
     class Meta:
         model = Invoice
-        fields = ('createtimestamp', 'invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp' )
+        fields = ('createtimestamp', 'invoiceno', 'customer','remarks', 'subtotal', 'discountvalue', 'gst', 'total', 'payment','updatetimestamp', 'terminal' )
         attrs = {'class': 'paleblue'
                  }
-        exclude = {'invoicetype', 'discount', 'terminal'}
+        exclude = {'invoicetype', 'discount'}
         empty_text = "There are no invoice matching the search criteria..."
 
 class InvoiceTable2(tables.Table):
@@ -269,25 +269,23 @@ class PaymentTable(tables.Table):
         model = Payment
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('createtimestamp','customer', 'branch','total', 'payment_paymenttype', 'created_by', 'view')
+        sequence = ('createtimestamp','customer', 'branch', 'terminal', 'total', 'payment_paymenttype', 'created_by', 'view')
         exclude = {'id'}
         empty_text = "There are no payment matching the search criteria..."
         
 deletelinksoa = '''{% if isedit %}<a href="/parcelhubPOS/statementofaccount/deletesoa?dsoaid={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete statement of account for {{record.customer}} from {{ record.datefrom}} to {{record.dateto}}?')">Delete</a>
                         {% endif %}'''
-viewlinksoa = '<a href="/parcelhubPOS/statementofaccount/viewsoa?soaid={{record.id}}">View</a>'
+viewlinksoa = '<a href="/parcelhubPOS/statementofaccount/viewsoa?soaid={{record.id}}" target="_blank">View</a>'
 class StatementOfAccountTable(tables.Table):
     view = tables.TemplateColumn(viewlinksoa,
                                       orderable = False)
-    delete = tables.TemplateColumn( deletelinksoa,
-                                    orderable = False );
     branch = tables.Column(accessor='customer.branch')
     class Meta:
         model = StatementOfAccount
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('createtimestamp', 'customer', 'branch','datefrom', 'dateto','totalamount', 'paidamount', 'outstandindamount', 'view', 'delete')
-        exclude = {'id', 'created_by'}
+        sequence = ('customer','datefrom', 'dateto','totalamount', 'paidamount','outstandindamount', 'view')
+        exclude = {'id', 'created_by','createtimestamp', 'branch', }
         empty_text = "There are no statement of account matching the search criteria..."
 
 

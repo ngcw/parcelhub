@@ -15,6 +15,7 @@ CONST_branchid = 'branchid'
 def vendorlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -47,6 +48,7 @@ def vendorlist(request):
                 'vendor': final_Vendor_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'zonetype_list' : zonetype_list,
                 'formdata' : formdata,
@@ -65,6 +67,7 @@ def vendorlist(request):
 def editvendor(request, vendorid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     vendorid = request.GET.get('vendorid')
     title = "New vendor"
@@ -92,6 +95,7 @@ def editvendor(request, vendorid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'title' : title,
                 'header': title

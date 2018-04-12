@@ -15,6 +15,7 @@ CONST_branchid = 'branchid'
 def SKUlist(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     
@@ -69,6 +70,7 @@ def SKUlist(request):
                 'sku': final_SKU_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'zonetype_list' :zonetype_list,
                 'producttype_list' : producttype_list,
@@ -88,6 +90,7 @@ def SKUlist(request):
 def editSKU(request, skucode):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     skucode = request.GET.get('skucode')
     title = "New SKU"
@@ -119,6 +122,7 @@ def editSKU(request, skucode):
                 'isedit' : isedit,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'header': title
                 }

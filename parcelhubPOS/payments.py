@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import PaymentTable
 from .commons import *
-from .models import Payment, ZoneType, Customer, Invoice, PaymentInvoice, UserBranchAccess
+from .models import Payment, ZoneType, Customer, Invoice, PaymentInvoice, UserBranchAccess, Terminal
 from django.http import HttpResponseRedirect
 from django.db import models
 from .forms import PaymentForm, PaymentInvoiceForm
@@ -18,20 +18,28 @@ register = template.Library()
 def minus(value, arg):
     return value - arg
 CONST_branchid = 'branchid'
+CONST_terminalid = 'terminalid'
 #method to retrieve Courier payment list
 @login_required
 def paymentlist(request, custid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
+    terminalid = request.session.get(CONST_terminalid)
     custid = request.GET.get('custid')
     loguser = User.objects.get(id=request.session.get('userid'))
     if branchid == '-1':
         payment_list = Payment.objects.all()
     else:
-        payment_list = Payment.objects.filter(customer__branch__id=branchid)
-        
+        if terminalid:
+            if terminalid == '-1':
+                payment_list = Payment.objects.filter(customer__branch__id=branchid)
+            else:    
+                payment_list = Payment.objects.filter(customer__branch__id=branchid, terminal__id = terminalid)
+        else:
+            payment_list = Payment.objects.filter(customer__branch__id=branchid)
     formdata = {'customername':'',
                 'date':'',
                 'invoiceno': ''}
@@ -64,6 +72,7 @@ def paymentlist(request, custid):
                 'payment': final_Payment_table,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'formdata' : formdata,
                 'title': 'Payment overview',
@@ -82,6 +91,7 @@ def paymentlist(request, custid):
 def paymentreceive(request):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     branchid = request.session.get(CONST_branchid)
     loguser = User.objects.get(id=request.session.get('userid'))
@@ -92,6 +102,7 @@ def paymentreceive(request):
     context = {
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'customerlist':customerlist,
                 'title': 'Payment receive',
@@ -104,13 +115,30 @@ def paymentreceive(request):
                 }
     return render(request, 'paymentreceive.html', context)
 
+def gen_payment_number(customerselected):
+    branch = customerselected.branch
+    last_payment = Payment.objects.filter(customer=customerselected).order_by('id').last()
+    paymentcode = branch.branch_code + 'P'
+    if not last_payment:
+         return  paymentcode + '000001'
+    paymentid = last_payment.id
+    payment_int = int(paymentid.split(paymentcode)[-1])
+    new_payment_int = payment_int + 1
+    length_int = len(str(new_payment_int))
+    paddingnumber = max([6,length_int])
+    paddingstr = '%0' + str(paddingnumber) +'d'
+    new_payment_no = paymentcode + paddingstr % new_payment_int
+    return new_payment_no
+
 @login_required
 def editpayment(request, paymentid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
+    terminallist = terminalselection(request)
     menubar = navbar(request)
     user = User.objects.get(id = request.session.get('userid'))
     paymentid = request.GET.get('paymentid')
+    terminalid = request.session.get(CONST_terminalid)
     title = "New payment"
     if paymentid:
         title = "View payment"
@@ -131,8 +159,9 @@ def editpayment(request, paymentid):
         if paymentoption == 'Unpaid':
             invoicetopay = invoicetopay.filter(payment__lt=models.F('total'))
         if invoicetopay:
-            paymentqueryset = Payment(customer=selectedcustomer, created_by=user );
-            paymentqueryset.id = selectedcustomer.id + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p") 
+            selectedterminal = Terminal.objects.get(id=terminalid)
+            paymentqueryset = Payment(customer=selectedcustomer, created_by=user, terminal= selectedterminal);
+            paymentqueryset.id = gen_payment_number(selectedcustomer)
             paymentqueryset.save()
             payment_form = PaymentForm(instance=paymentqueryset)
             for inv in invoicetopay:
@@ -212,6 +241,7 @@ def editpayment(request, paymentid):
                 'headerselectiondisabled' : True,
                 'nav_bar' : sorted(menubar.items()),
                 'branchselection': branchselectlist,
+                'terminalselection': terminallist, 
                 'loggedusers' : loggedusers,
                 'paymentid': paymentqueryset.id,
                 'title': title,
