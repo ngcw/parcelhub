@@ -221,13 +221,12 @@ def editpayment(request, paymentid):
                     invoicetoupdate.save()
                 payment.total = total;
                 
-               
-                
                 customername = request.POST['customer'] 
+                customer = Customer.objects.get(id=customername)
                 if title == 'New payment':
-                    msg = 'Payment for "%s" have been created successfully.' % customername
+                    msg = 'Payment for "%s" have been created successfully.' % customer.name
                 else:
-                    msg = 'Payment for "%s" have been updated successfully.' % customername
+                    msg = 'Payment for "%s" have been updated successfully.' % customer.name
                 payment.save()
                 return HttpResponseRedirect('/parcelhubPOS/payment?custid=""&msg=%s' %msg)
         elif request.POST['action'] == 'Cancel payment':

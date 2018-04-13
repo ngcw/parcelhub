@@ -182,9 +182,9 @@ def statementofaccnew(request):
             for soa in nonoutstandingsoa:
                 soa.delete()
     if branchid == '-1':
-        statementofacc_list = StatementOfAccount.objects.all()
+        statementofacc_list = StatementOfAccount.objects.all('customer__name')
     else:
-        statementofacc_list = StatementOfAccount.objects.filter(customer__branch__id=branchid)
+        statementofacc_list = StatementOfAccount.objects.filter(customer__branch__id=branchid).order_by('customer__name')
     final_StatementOfAccount_table = StatementOfAccountTable(statementofacc_list)
     
     RequestConfig(request, paginate={'per_page': 25}).configure(final_StatementOfAccount_table)
