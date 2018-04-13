@@ -91,7 +91,7 @@ def statementofaccnew(request):
     loguser = User.objects.get(id=request.session.get('userid'))
     formdata = {'customerinput':'',
                     'datefrom': '',
-                    'dateto': '',
+                    'dateto': datetime.now().strftime('%Y-%m-%d') ,
                     }
     if branchid == '-1':
         customerlist = Customer.objects.all()
