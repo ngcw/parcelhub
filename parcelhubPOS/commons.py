@@ -57,7 +57,7 @@ def terminalselection(request):
     selectedterminal = request.session.get(CONST_terminalid)
     if selectedbranch == '-1':
         terminals = None
-        request.session[CONST_terminalid] = ''
+        request.session[CONST_terminalid] = '-1'
     else:
         branch = Branch.objects.get(id=selectedbranch)
         terminals = Terminal.objects.filter(branch=branch)
@@ -66,10 +66,19 @@ def terminalselection(request):
             if terminal:
                 terminalid = terminal.id 
                 request.session[CONST_terminalid] = terminalid 
+            else:
+                request.session[CONST_terminalid] = '-1'
+        else:
+            terminal = Terminal.objects.filter(branch=branch,id=selectedterminal)
+            if terminal:
+                pass
+            else:
+                request.session[CONST_terminalid] = '-1'
         if request.method == "POST" and 'terminalselection' in request.POST:
             selectedterminal = request.POST.get('terminalselection') 
             if selectedterminal:
                 request.session[CONST_terminalid] = selectedterminal
+        
     return terminals
 
 def navbar(request):
