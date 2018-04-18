@@ -106,6 +106,7 @@ def navbar(request):
                                           ]   
         else:
             menudict[CONST_payment] =[('Payment overview','/parcelhubPOS/payment/?custid=""'),
+                                      ('Payment receive',''),
                                           ]   
         menudict[CONST_soa] =[
                                   ('New statement of account','/parcelhubPOS/statementofaccount_new'),
