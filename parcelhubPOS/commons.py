@@ -73,7 +73,12 @@ def terminalselection(request):
             if terminal:
                 pass
             else:
-                request.session[CONST_terminalid] = '-1'
+                terminal = terminals.first()
+                if terminal:
+                    terminalid = terminal.id 
+                    request.session[CONST_terminalid] = terminalid 
+                else:
+                    request.session[CONST_terminalid] = '-1'
         if request.method == "POST" and 'terminalselection' in request.POST:
             selectedterminal = request.POST.get('terminalselection') 
             if selectedterminal:
