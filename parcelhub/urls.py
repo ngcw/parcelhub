@@ -17,7 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^parcelhubPOS/', include('parcelhubPOS.urls')),
+    url(r'^', include('parcelhubPOS.urls')),
     url(r'^parcelhubWeb/', include('parcelhubWeb.urls')),
     url(r'^admin/', admin.site.urls),
 ]
