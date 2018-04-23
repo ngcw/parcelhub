@@ -19,5 +19,5 @@ from django.views.generic.base import RedirectView
 urlpatterns = [
     url(r'^parcelhubPOS/', include('parcelhubPOS.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^.*$', RedirectView.as_view(url='parcelhubPOS/', permanent=False), name='index')
+    url(r'^$', RedirectView.as_view(url='parcelhubPOS/', permanent=False), name='index')
 ]
