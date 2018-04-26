@@ -73,7 +73,6 @@ def terminalselection(request):
             if terminal:
                 pass
             else:
-                terminal = terminals.first()
                 if terminal:
                     terminalid = terminal.id 
                     request.session[CONST_terminalid] = terminalid 

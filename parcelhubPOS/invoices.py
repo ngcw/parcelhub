@@ -44,10 +44,15 @@ def retrieveInvoice(request):
     menubar = navbar(request)
     loguser = User.objects.get(id=request.session.get('userid'))
     branchid = request.session.get(CONST_branchid)
+    terminalid = request.session.get(CONST_terminalid)
     if branchid == "-1":
         invoice_list = Invoice.objects.all();
     else:
-        invoice_list = Invoice.objects.filter(branch_id=branchid )
+        if terminalid:
+            if terminalid == '-1':
+                invoice_list = Invoice.objects.filter(branch_id=branchid)
+            else:    
+                invoice_list = Invoice.objects.filter(branch_id=branchid, terminal_id=terminalid)
     formdata = {'invoicenumber':'',
                 'fromdate':'',
                 'todate':'',
