@@ -151,7 +151,7 @@ def editpayment(request, paymentid):
         date_to = request.GET.get('dateto')
         paymentoption = request.GET.get('paymentoptioninput')
         selectedcustomer =  Customer.objects.get(id=customerid)
-        invoicetopay = Invoice.objects.filter(customer__id = customerid)
+        invoicetopay = Invoice.objects.filter(customer = selectedcustomer)
         if date_from:
             invoicetopay = invoicetopay.filter(createtimestamp__gte = date_from)
         if date_to:
