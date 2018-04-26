@@ -279,7 +279,7 @@ def invoice_thermal(request, invoiceid):
     for item in invoiceitem:
         linecount += 1
         if currentsku != item.sku:
-            linecount += 1
+            linecount += 2
             itemdict = {}
             currentsku = item.sku
             itemdict['items'] = []

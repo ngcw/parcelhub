@@ -197,6 +197,15 @@ def editInvoice(request, invoiceid):
     
     #printing
     if request.method == 'POST':
+        if 'action' in request.POST and request.POST['action'] == 'Print delivery order':
+            doprint = deliveryorder_pdf(request, invoice.id)
+            return HttpResponse(doprint, content_type='application/pdf')
+        elif 'action' in request.POST and request.POST['action'] == 'Preview':
+            if invoice.invoicetype.name == 'Cash':
+                invoiceprint = invoice_thermal(request, invoice.id)
+            else:
+                invoiceprint = invoice_pdf(request, invoice.id) 
+            return HttpResponse(invoiceprint, content_type='application/pdf')
         invoicebranch = branchid
         if invoicequeryset:
             invoicebranch = invoicequeryset.branch.id
@@ -270,14 +279,9 @@ def editInvoice(request, invoiceid):
                 item.delete()
                 
             if 'action' in request.POST and request.POST['action'] == 'Print delivery order':
-                doprint = deliveryorder_pdf(request, invoice.id)
-                return HttpResponse(doprint, content_type='application/pdf')
+                pass
             elif 'action' in request.POST and request.POST['action'] == 'Preview':
-                if invoice.invoicetype.name == 'Cash':
-                    invoiceprint = invoice_thermal(request, invoice.id)
-                else:
-                    invoiceprint = invoice_pdf(request, invoice.id) 
-                return HttpResponse(invoiceprint, content_type='application/pdf')
+                pass
             else:
                 if invoice.invoicetype.name == 'Cash':
                     invoiceprint = invoice_thermal(request, invoice.id)
@@ -290,8 +294,11 @@ def editInvoice(request, invoiceid):
     globalparam = GlobalParameter.objects.all().first();
     isnotlocked = True;
     if invoicequeryset and globalparam:
-         isnotlocked = invoicequeryset.createtimestamp.date() >= globalparam.invoice_lockin_date
-    isedit = isnotlocked and not haspayment
+        isnotlocked = invoicequeryset.createtimestamp.date() >= globalparam.invoice_lockin_date
+    iscashedit = False;
+    if invoicequeryset:
+        iscashedit = invoicequeryset.invoicetype.name == 'Cash'
+    isedit = isnotlocked and not haspayment and not iscashedit
     context = {'invoice_form': invoice_form,
                  'invoice_item_formset': invoice_item_formset,
                  'headerselectiondisabled' : True,
@@ -365,6 +372,7 @@ def getskulist(request):
         except:
             pass
     if weightinput:
+        weightinput = round(float(weightinput), 2)
         skubranch_list = skubranch_list.filter(sku__weight_start__lte=weightinput,sku__weight_end__gte=weightinput )
     if customerid:
         skubranch_list = skubranch_list.filter(customer__id = customerid)
@@ -389,6 +397,7 @@ def getskulist(request):
         except:
             pass
     if weightinput:
+        weightinput = round(float(weightinput), 2)
         sku_list = sku_list.filter(weight_start__lte=weightinput,weight_end__gte=weightinput )
     for sku in sku_list:
         sku_json = {}
