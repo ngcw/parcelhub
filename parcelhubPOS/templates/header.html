@@ -291,6 +291,16 @@
 	    	        return false;
 	    	    }
 	    	});
+	    	$(document).on('keypress', 'input,select', function (e) {
+	    	    if (e.which == 13) {
+	    	        e.preventDefault();
+	    	        // Get all focusable elements on the page
+	    	        var $canfocus = $(':focusable');
+	    	        var index = $canfocus.index(this) + 1;
+	    	        if (index >= $canfocus.length) index = 0;
+	    	        $canfocus.eq(index).focus();
+	    	    }
+	    	});
 	    	{% if customerlist %}
 	    	$(document).ready(function() {
 	    	    $('#customerselection').select2({ width: '150px' });
@@ -388,13 +398,13 @@
     	         		
     	         		if($(row).find(".item_input_dimensional").length == 0)
     	         		{
-    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(cm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(cm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(cm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
+    	         			var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(cm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensioninput"><label style="margin-right:7px;">Length(cm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensioninput"><label style="margin-right:15px;">Width(cm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensioninput"></div>'
 
         	            	row.innerHTML +=theElement
     	         		}
 					}
 					catch(err) {
-						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(cm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:7px;">Length(cm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"><label style="margin-right:15px;">Width(cm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensionalinput"></div>'
+						var theElement = '<div data-role="popup" class="item_input_dimensional" id="id_form-0-height_popup" title="Dimensional weight"><label style="margin-right:10px;">Height(cm):</label><input type="number" name="form-0-height" id="id_form-0-height" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensioninput"><label style="margin-right:7px;">Length(cm):</label><input type="number" name="form-0-length" id="id_form-0-length" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensioninput"><label style="margin-right:15px;">Width(cm):</label><input type="number" name="form-0-width" id="id_form-0-width" step="0.001" onchange="AutoCompleteWeight(this.id)" class="dimensioninput"></div>'
 
 							row.innerHTML +=theElement
 					}
