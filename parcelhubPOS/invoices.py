@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from .invoiceprint import *
 from io import StringIO
-
+import __future__
 CONST_terminalid = 'terminalid'
 @login_required
 def invoice(request):
@@ -560,7 +560,7 @@ def autocompleteweight(request):
             formula = courier.formula.upper();
             formula = formula.replace('H', height ).replace('W', width).replace('L', length);
             weight_json = {}
-            weightvalue = eval(formula)
+            weightvalue = eval(compile(formula, '<string>', 'eval', __future__.division.compiler_flag)) #eval(formula)
             weight_json['weight'] = weightvalue;
             results.append(weight_json)
     data = json.dumps(results)
