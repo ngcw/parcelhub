@@ -215,16 +215,26 @@
 		    	{% endfor %}
 			  }
 			}
+			{% if isall or request.session.terminalid == '-1'%}
 	    	$(window).keydown(function(e) {
     		  switch (e.keyCode) {
-    		    case 120: // f9
-    		    	window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=');
-    		      return;
     		    case 115: //f4
     		    	clearSearch();
     		      return;
     		  }
     		});
+	    	{%else%}
+	    	$(window).keydown(function(e) {
+	    		  switch (e.keyCode) {
+	    		    case 120: // f9
+	    		    	window.open('/parcelhubPOS/invoice/editinvoice/?invoiceid=');
+	    		      return;
+	    		    case 115: //f4
+	    		    	clearSearch();
+	    		      return;
+	    		  }
+	    		});
+	    	{% endif %}
 	    	function myFunction2Customer_Account()
 	    	{
 			  window.location.href = '/parcelhubPOS/customer/';
