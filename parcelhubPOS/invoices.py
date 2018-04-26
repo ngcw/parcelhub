@@ -365,7 +365,7 @@ def getskulist(request):
         except:
             pass
     if weightinput:
-        skubranch_list = skubranch_list.filter(sku__weight_start__lte=weightinput,sku__weight_end__gt=weightinput )
+        skubranch_list = skubranch_list.filter(sku__weight_start__lte=weightinput,sku__weight_end__gte=weightinput )
     if customerid:
         skubranch_list = skubranch_list.filter(customer__id = customerid)
     for skubranch in skubranch_list:
@@ -389,7 +389,7 @@ def getskulist(request):
         except:
             pass
     if weightinput:
-        sku_list = sku_list.filter(weight_start__lt=weightinput,weight_end__gte=weightinput )
+        sku_list = sku_list.filter(weight_start__lte=weightinput,weight_end__gte=weightinput )
     for sku in sku_list:
         sku_json = {}
         sku_json['id'] = sku.sku_code

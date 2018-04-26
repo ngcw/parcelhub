@@ -174,6 +174,7 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['dimension_weight'].widget.attrs\
         .update({
             'onchange': 'AutoCompleteSKU(this.id);completeNumber(this.id)',
+            'oninput':'AutoCompleteSKU(this.id);completeNumber(this.id)',
             'ondblclick': 'editDimensionalWeight(this.id)',
             'class': 'lastInput'
         })
