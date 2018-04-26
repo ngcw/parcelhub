@@ -89,9 +89,10 @@ def dashboard(request):
             request.session[CONST_branchid] = branchid 
         except:
             pass
-        menubar = navbar(request)
+        
         branchlist = branchselection(request)
         terminallist = terminalselection(request)
+        menubar = navbar(request)
         context = {
                     'nav_bar' : sorted(menubar.items()),
                     'branchselection': branchlist,
