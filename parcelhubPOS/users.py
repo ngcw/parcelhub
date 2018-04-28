@@ -275,13 +275,13 @@ def edituserbranchaccess(request, userbranch_id):
         if userbainstance:
             userbainstance.branch_id = submitted_branchid
             userbainstance.access_level = submitted_access_level
-            userbainstance.id = str(user_id) + '_' + str(submitted_branchid)
+            userbainstance.id = str(user_id) + '-' + str(submitted_branchid)
             userbainstance.save()
         else:
             userbainstance = UserBranchAccess( user = userselected,
                                                branch_id = submitted_branchid,
                                                access_level = submitted_access_level )
-            userbainstance.id = str(user_id) + '_' + str(submitted_branchid)
+            userbainstance.id = str(user_id) + '-' + str(submitted_branchid)
             userbainstance.save()
         branch = Branch.objects.get(id= submitted_branchid)
         if title == 'New user access':
