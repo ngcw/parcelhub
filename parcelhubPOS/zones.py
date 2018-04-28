@@ -193,9 +193,9 @@ def editzoneinternational(request, zoneinternationalid):
             vendorid = request.POST['form-0-couriervendor'] 
             courier = CourierVendor.objects.get(id=vendorid)
             if title == 'New international zone':
-                msg = 'Zone for courier "%s" and country "%s" have been created successfully.' % (courier.name, request.POST['form-0-country'] )
+                msg = 'Zone for courier "%s" and country "%s" have been created successfully.' % (courier.id, request.POST['form-0-country'] )
             else:
-                msg = 'Zone for courier "%s" and country "%s" have been updated successfully.' % (courier.name, request.POST['form-0-country'] )
+                msg = 'Zone for courier "%s" and country "%s" have been updated successfully.' % (courier.id, request.POST['form-0-country'] )
             formset.save()
             return HttpResponseRedirect("/parcelhubPOS/zoneinternational/?msg=%s" % msg)
     else:
@@ -217,7 +217,7 @@ def editzoneinternational(request, zoneinternationalid):
 def deletezoneinternational(request, dzoneinternationalid ):
     dzoneinternationalid = request.GET.get('dzoneinternationalid')
     zoneinternational = ZoneInternational.objects.filter(id = dzoneinternationalid )
-    msg = 'Zone for courier "%s" and country "%s" have been deleted successfully.' % (zoneinternational.first().couriervendor.name, zoneinternational.first().country )
+    msg = 'Zone for courier "%s" and country "%s" have been deleted successfully.' % (zoneinternational.first().couriervendor.id, zoneinternational.first().country )
     if zoneinternational:
         zoneinternational.delete()
     return HttpResponseRedirect("/parcelhubPOS/zoneinternational/?msg=%s" % msg)
