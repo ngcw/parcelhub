@@ -145,7 +145,7 @@ def editpayment(request, paymentid):
         paymentqueryset = Payment.objects.get(id=paymentid)
         payment_form = PaymentForm(instance=paymentqueryset)
         payment = paymentqueryset
-    elif request.method == "POST" and 'customerinput' in request.GET:
+    elif request.method == "POST":
         customerid = request.POST['customerinput']
         date_from = request.POST['datefrom']
         date_to = request.POST['dateto']
