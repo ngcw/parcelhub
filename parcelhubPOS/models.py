@@ -8,7 +8,7 @@ class UserExtend(models.Model):
 
 class Branch(models.Model):
     name = models.CharField(max_length=50, verbose_name='*Name' )
-    branch_code = models.CharField(max_length=10, verbose_name='*Branch code')
+    branch_code = models.CharField(max_length=10, verbose_name='*Branch code', unique=True)
     owner = models.CharField(max_length=50, verbose_name='*Owner')
     contact = models.CharField(max_length=25, verbose_name='*Contact')
     email = models.EmailField(max_length=254, verbose_name='*Email')
