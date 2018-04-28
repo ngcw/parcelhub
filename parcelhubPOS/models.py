@@ -14,12 +14,12 @@ class Branch(models.Model):
     email = models.EmailField(max_length=254, verbose_name='*Email')
     address = models.CharField(max_length=254, verbose_name='*Address')
     registrationno = models.CharField(max_length=50, verbose_name='*Registration no')
-    gstno = models.CharField(max_length=50, verbose_name='*GST no')
+    gstno = models.CharField(max_length=50, verbose_name='GST no')
     fax = models.CharField(max_length=25, blank=True, null=True)
     tollfree = models.CharField(max_length=25,verbose_name='Toll-free', blank=True, null=True)
     website = models.CharField(max_length=254, blank=True, null=True)
-    payment_bank = models.CharField(max_length=254)
-    payment_acc = models.CharField(max_length=254)
+    payment_bank = models.CharField(max_length=254, verbose_name='*Payment bank')
+    payment_acc = models.CharField(max_length=254, verbose_name='*Payment acc')
     def __str__(self):
         return self.name
 

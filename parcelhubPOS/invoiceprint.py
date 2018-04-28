@@ -82,10 +82,10 @@ def invoice_pdf(request, invoiceid):
     p.drawString(marginleft, 760, 'Phone: '+invoice.branch.contact)
     tollfree = '-'
     if invoice.branch.tollfree:
-        tollfree = nvoice.branch.tollfree
+        tollfree = invoice.branch.tollfree
     website = '-'
     if invoice.branch.website:
-        website = nvoice.branch.website
+        website = invoice.branch.website
     p.drawString(marginleft, 750, 'Toll Free: ' + tollfree +'            Website: '+ website)
     p.setFont( CONST_fontbold, 24)
     p.drawString(marginleft, 720, 'Tax Invoice')
