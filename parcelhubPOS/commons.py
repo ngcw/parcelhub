@@ -114,7 +114,7 @@ def navbar(request):
                                       ]     
         menudict[CONST_masterdata] = []
         #Super admin and branch admin only feature
-        if loguser.is_superuser or branchaccess.access_level == 'Branch admin':
+        if loguser.is_superuser:
             menudict[CONST_masterdata].append(('Vendor','/parcelhubPOS/vendor'))
             menudict[CONST_masterdata].append(('Tax','/parcelhubPOS/tax') )
             menudict[CONST_masterdata].append(('Zone domestic','/parcelhubPOS/zonedomestic') )
@@ -122,6 +122,14 @@ def navbar(request):
             menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
             menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
             menudict[CONST_masterdata].append(('User','/parcelhubPOS/user'))
+        elif branchaccess.access_level == 'Branch admin':
+            menudict[CONST_masterdata].append(('Vendor','/parcelhubPOS/vendor'))
+            menudict[CONST_masterdata].append(('Tax','/parcelhubPOS/tax') )
+            menudict[CONST_masterdata].append(('Zone domestic','/parcelhubPOS/zonedomestic') )
+            menudict[CONST_masterdata].append(('Zone international','/parcelhubPOS/zoneinternational') )
+            menudict[CONST_masterdata].append(('SKU','/parcelhubPOS/sku'))
+            menudict[CONST_masterdata].append(('SKU pricing','/parcelhubPOS/skubranch'))
+            menudict[CONST_masterdata].append(('User',''))
         else:
             menudict[CONST_masterdata].append(('Vendor',''))
             menudict[CONST_masterdata].append(('Tax','') )

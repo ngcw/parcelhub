@@ -98,89 +98,90 @@ def statementofaccnew(request):
     else:
         customerlist = Customer.objects.filter(branch__id=branchid)
     if request.method == 'POST':
-        customerid = request.POST['customerinput']
-        date_from = request.POST['datefrom']
-        date_to = request.POST['dateto']
-        formdata = {'customerinput':customerid,
-                    'datefrom': date_from,
-                    'dateto': date_to,
-                    }
-        date_to = datetime.strptime(date_to, '%Y-%m-%d')
-        date_to = date_to + timedelta(days=1)
-        
-        if customerid == 'all' or customerid == 'outstanding':
-            if branchid == '-1':
-                oldstatements = StatementOfAccount.objects.all()
-                selectedcustomers = Customer.objects.all()
+        if 'customerinput' in request.POST:
+            customerid = request.POST['customerinput']
+            date_from = request.POST['datefrom']
+            date_to = request.POST['dateto']
+            formdata = {'customerinput':customerid,
+                        'datefrom': date_from,
+                        'dateto': date_to,
+                        }
+            date_to = datetime.strptime(date_to, '%Y-%m-%d')
+            date_to = date_to + timedelta(days=1)
+            
+            if customerid == 'all' or customerid == 'outstanding':
+                if branchid == '-1':
+                    oldstatements = StatementOfAccount.objects.all()
+                    selectedcustomers = Customer.objects.all()
+                else:
+                    oldstatements = StatementOfAccount.objects.filter(branch__id=branchid)
+                    selectedcustomers = Customer.objects.filter(branch__id=branchid)
             else:
                 oldstatements = StatementOfAccount.objects.filter(branch__id=branchid)
-                selectedcustomers = Customer.objects.filter(branch__id=branchid)
-        else:
-            oldstatements = StatementOfAccount.objects.filter(branch__id=branchid)
-            selectedcustomers =  Customer.objects.filter(id=customerid)
-        for statement in oldstatements:
-            statement.delete()
-        for selectedcustomer in selectedcustomers:
-            newcustid = selectedcustomer.id
-            if date_from:
-                invoicelist1 = Invoice.objects.filter(customer__id = newcustid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)  
-                invoicelist2 = Invoice.objects.filter(customer__id = newcustid, createtimestamp__lte=date_from)
-                invoicelist2 = invoicelist2.filter(payment__lt=models.F('total'))
-                invoicelist = (invoicelist1|invoicelist2)
-                paymentlist = Payment.objects.filter(customer=selectedcustomer, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
-            else:
-                invoicelist = Invoice.objects.filter(customer__id = newcustid, createtimestamp__lte=date_to)
-                invoicelist = invoicelist.filter(payment__lt=models.F('total'))
-                paymentlist= None
-            user = User.objects.get(id = request.session.get('userid'))
-            if date_from:
-                statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now(), branch=selectedcustomer.branch)
-            else:
-                statementofacc = StatementOfAccount(customer=selectedcustomer, dateto=date_to, created_by=user, createtimestamp=timezone.now(), branch=selectedcustomer.branch)
-            statementofacc.id = newcustid + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")  
-            statementofacc.save()
-            totalamt = 0.0;
-            paidamt = 0.0;
-            
-            for inv in invoicelist:
-                totalamt = totalamt + float(inv.total)
-                
-                try:
-                    payment = float(inv.payment)
-                except:
-                    payment = 0.0;
-                paidamt = paidamt + max( [payment, 0] )
-                soainv = StatementOfAccountInvoice(soa=statementofacc)
-                soainv.id = statementofacc.id + '_' + inv.invoiceno
-                soainv.date = inv.createtimestamp.date()
-                soainv.reference = inv.invoiceno
-                soainv.description = inv.remarks
+                selectedcustomers =  Customer.objects.filter(id=customerid)
+            for statement in oldstatements:
+                statement.delete()
+            for selectedcustomer in selectedcustomers:
+                newcustid = selectedcustomer.id
                 if date_from:
-                    soainv.debit = inv.total
+                    invoicelist1 = Invoice.objects.filter(customer__id = newcustid, createtimestamp__gte = date_from, createtimestamp__lte=date_to)  
+                    invoicelist2 = Invoice.objects.filter(customer__id = newcustid, createtimestamp__lte=date_from)
+                    invoicelist2 = invoicelist2.filter(payment__lt=models.F('total'))
+                    invoicelist = (invoicelist1|invoicelist2)
+                    paymentlist = Payment.objects.filter(customer=selectedcustomer, createtimestamp__gte = date_from, createtimestamp__lte=date_to)
                 else:
-                    soainv.debit = float(inv.total) - payment
-                soainv.credit = 0
-                soainv.save()
-            outstandingamt = totalamt - paidamt;
-            statementofacc.totalamount = totalamt
-            statementofacc.paidamount = paidamt
-            statementofacc.outstandindamount = outstandingamt
-            statementofacc.save(update_fields=["totalamount", 'paidamount', 'outstandindamount']) 
-            if paymentlist:
-                for pmt in paymentlist:
+                    invoicelist = Invoice.objects.filter(customer__id = newcustid, createtimestamp__lte=date_to)
+                    invoicelist = invoicelist.filter(payment__lt=models.F('total'))
+                    paymentlist= None
+                user = User.objects.get(id = request.session.get('userid'))
+                if date_from:
+                    statementofacc = StatementOfAccount(customer=selectedcustomer, datefrom = date_from, dateto=date_to, created_by=user, createtimestamp=timezone.now(), branch=selectedcustomer.branch)
+                else:
+                    statementofacc = StatementOfAccount(customer=selectedcustomer, dateto=date_to, created_by=user, createtimestamp=timezone.now(), branch=selectedcustomer.branch)
+                statementofacc.id = newcustid + '_' + timezone.now().strftime("%d/%m/%Y %H:%M%p")  
+                statementofacc.save()
+                totalamt = 0.0;
+                paidamt = 0.0;
+                
+                for inv in invoicelist:
+                    totalamt = totalamt + float(inv.total)
+                    
+                    try:
+                        payment = float(inv.payment)
+                    except:
+                        payment = 0.0;
+                    paidamt = paidamt + max( [payment, 0] )
                     soainv = StatementOfAccountInvoice(soa=statementofacc)
-                    soainv.id = statementofacc.id + '_' + pmt.id
-                    soainv.date = pmt.createtimestamp.date()
-                    soainv.reference = pmt.id
-                    soainv.description = pmt.payment_paymenttype.name
-                    soainv.debit = 0
-                    soainv.credit = pmt.total
+                    soainv.id = statementofacc.id + '_' + inv.invoiceno
+                    soainv.date = inv.createtimestamp.date()
+                    soainv.reference = inv.invoiceno
+                    soainv.description = inv.remarks
+                    if date_from:
+                        soainv.debit = inv.total
+                    else:
+                        soainv.debit = float(inv.total) - payment
+                    soainv.credit = 0
                     soainv.save()
-            
-        if customerid == 'outstanding':
-            nonoutstandingsoa = StatementOfAccount.objects.filter(outstandindamount=0)
-            for soa in nonoutstandingsoa:
-                soa.delete()
+                outstandingamt = totalamt - paidamt;
+                statementofacc.totalamount = totalamt
+                statementofacc.paidamount = paidamt
+                statementofacc.outstandindamount = outstandingamt
+                statementofacc.save(update_fields=["totalamount", 'paidamount', 'outstandindamount']) 
+                if paymentlist:
+                    for pmt in paymentlist:
+                        soainv = StatementOfAccountInvoice(soa=statementofacc)
+                        soainv.id = statementofacc.id + '_' + pmt.id
+                        soainv.date = pmt.createtimestamp.date()
+                        soainv.reference = pmt.id
+                        soainv.description = pmt.payment_paymenttype.name
+                        soainv.debit = 0
+                        soainv.credit = pmt.total
+                        soainv.save()
+                
+            if customerid == 'outstanding':
+                nonoutstandingsoa = StatementOfAccount.objects.filter(outstandindamount=0)
+                for soa in nonoutstandingsoa:
+                    soa.delete()
     if branchid == '-1':
         statementofacc_list = StatementOfAccount.objects.all('customer__name')
     else:
