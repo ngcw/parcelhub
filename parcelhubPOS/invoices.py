@@ -624,7 +624,7 @@ def validatetrackingcode(request):
     if 'invoiceid' in request.GET:
         invoiceid = request.GET.get('invoiceid')
         invoicesel = Invoice.objects.get(id=invoiceid)
-    if courier != '' or ( producttype != 'Document' and producttype != 'Parcel' ):
+    if courier != '' or ( producttype == 'Document' or producttype == 'Parcel' ):
         if trackingcode:
             try:
                 invoiceitem = InvoiceItem.objects.filter(tracking_code=trackingcode).exclude(invoice = invoicesel)
