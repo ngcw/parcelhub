@@ -77,7 +77,10 @@ def invoice_pdf(request, invoiceid):
     p.setLineWidth(1)
     p.line(marginleft, 790, 570, 790)
     p.setFont(CONST_font, 8)
-    p.drawString(marginleft, 780, 'Co Reg No: ' + invoice.branch.registrationno +'            GST No: '+ invoice.branch.gstno) 
+    gstno = ''
+    if invoice.branch.gstno:
+        gstno = invoice.branch.gstno
+    p.drawString(marginleft, 780, 'Co Reg No: ' + invoice.branch.registrationno +'            GST No: '+ gstno) 
     p.drawString(marginleft, 770, invoice.branch.address)
     p.drawString(marginleft, 760, 'Phone: '+invoice.branch.contact)
     tollfree = '-'
