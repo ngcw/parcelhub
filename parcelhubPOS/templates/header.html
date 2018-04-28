@@ -305,6 +305,33 @@
 	    	    $('#customerselection').select2({ width: '150px' });
 	    	});
 	    	{% endif %}
+	    	{% if payment_form %}
+
+		      function DeletePayment() { 
+	    	    var dummyinput = [];
+	    	    var mystring = JSON.stringify(dummyinput);
+	    	    $.ajax({
+	                url:"/parcelhubPOS/payment/deletepayment/?dpaymentid={{paymentid}}",
+	                type:"POST",
+	                data:mystring,
+	                dataType: "json",
+	                contentType: "application/json",
+	                success: function(data){
+	                	var dataobj = JSON.parse(data)   		 		
+	                }
+	            });
+	    	  };
+		    document.querySelector('.paymentbutton').addEventListener("click", function(){
+		    	    window.btn_clicked = true;      //set btn_clicked to true
+		    });
+
+		    window.onbeforeunload = function(){
+		        if(!window.btn_clicked){
+		   	    	DeletePayment()
+		   	        return 'You must click "Confirm" to complete the payment. If you leave now your payment will be canceled.';
+		   	    }
+		    };
+		    {% endif %}
 	    	{% if invoice_form %}
 	    	$(window).keydown(function(e) {
 	    		  switch (e.keyCode) {

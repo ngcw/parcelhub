@@ -74,13 +74,13 @@
 	    {%if isview %}
 	    </form>
    		 <div id="paymentbottom">
-		    <a href="/parcelhubPOS/payment?custid=''"><button>Back</button></a>
+		    <a href="/parcelhubPOS/payment?custid=''"><button >Back</button></a>
 		 </div>
 	     
     	{% else %}
     	<div id="paymentbottom">
-		    <input type="submit" name="action" value="Confirm" onClick="return validatePayment()"/> 
-		    <input type="submit" name="action" value="Cancel payment"/>
+		    <input type="submit" name="action" value="Confirm" onClick="return validatePayment()" class="paymentbutton"/> 
+		    <input type="submit" name="action" value="Cancel payment" class="paymentbutton"/>
 		   </div>
 	</form>
     	{% endif %}

@@ -1,11 +1,11 @@
 from django_tables2 import RequestConfig
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory, inlineformset_factory
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .tables import PaymentTable
 from .commons import *
-from .models import Payment, ZoneType, Customer, Invoice, PaymentInvoice, UserBranchAccess, Terminal
+from .models import Payment, ZoneType, Customer, Invoice, PaymentInvoice, UserBranchAccess, Terminal, PaymentType
 from django.http import HttpResponseRedirect
 from django.db import models
 from .forms import PaymentForm, PaymentInvoiceForm
@@ -160,7 +160,8 @@ def editpayment(request, paymentid):
             invoicetopay = invoicetopay.filter(payment__lt=models.F('total'))
         if invoicetopay:
             selectedterminal = Terminal.objects.get(id=terminalid)
-            paymentqueryset = Payment(customer=selectedcustomer, created_by=user, terminal= selectedterminal);
+            paymenttype = PaymentType.objects.all().first()
+            paymentqueryset = Payment(customer=selectedcustomer, created_by=user, terminal= selectedterminal, payment_paymenttype=paymenttype);
             paymentqueryset.id = gen_payment_number(terminalid, selectedcustomer)
             paymentqueryset.save()
             payment_form = PaymentForm(instance=paymentqueryset)
@@ -251,7 +252,7 @@ def editpayment(request, paymentid):
                 }
     return render(request, 'editpayment.html', context)
 
-@login_required
+@csrf_exempt
 def deletepayment(request, dpaymentid ):
     dpaymentid = request.GET.get('dpaymentid')
     payment = Payment.objects.filter(id = dpaymentid )

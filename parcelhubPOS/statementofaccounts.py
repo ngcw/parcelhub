@@ -256,12 +256,21 @@ def statementofacc_pdf(request, statementofacc):
     # header
     branch = statementofacc.customer.branch
     topmargin = 20;
-    headerstring = branch.owner.upper() + "("+ branch.registrationno+") |  (GST No: " + branch.gstno + ")"
+    gstno = '-'
+    if branch.gstno:
+        gstno = branch.gstno
+    headerstring = branch.owner.upper() + "("+ branch.registrationno+") |  (GST No: " + gstno + ")"
     linecount = 12;
     p.drawCentredString(center, totalheight - topmargin, headerstring)
     p.setFont(CONST_font, 9)
     p.drawCentredString(center, totalheight - topmargin - (linecount * 1), branch.address)
-    contactinfo = "Tel: " + branch.contact + " | Fax: " + branch.fax + " | " + branch.website 
+    fax = '-'
+    if branch.fax:
+        fax = branch.fax
+    website = ''
+    if branch.website:
+        website = branch.website
+    contactinfo = "Tel: " + branch.contact + " | Fax: " + fax + " | " + website
     p.drawCentredString(center, totalheight - topmargin- (linecount * 2), contactinfo)
     
     p.setLineWidth(1)
