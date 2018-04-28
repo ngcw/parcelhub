@@ -132,7 +132,10 @@ def gen_invoice_number(request):
     if not last_invoice:
          return branch.branch_code + '000001'
     invoiceno = last_invoice.invoiceno
-    invoice_int = int(invoiceno.split(branch.branch_code)[-1])
+    try:
+        invoice_int = int(invoiceno.split(branch.branch_code)[-1])
+    except:
+        invoice_int = 0
     new_invoice_int = invoice_int + 1
     length_int = len(str(new_invoice_int))
     paddingnumber = max([6,length_int])

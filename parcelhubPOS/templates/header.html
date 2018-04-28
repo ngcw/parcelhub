@@ -253,6 +253,43 @@
     		    	textarea[i].disabled = true;
     		    }
     		}
+	    	{% if payment_form %}
+		    	{% if isview %}
+					disableEdit()
+				{% endif %}
+		      function DeletePayment() { 
+			  	    var dummyinput = [];
+			  	    var mystring = JSON.stringify(dummyinput);
+			  	    $.ajax({
+			              url:"/parcelhubPOS/payment/deletepayment/?dpaymentid={{paymentid}}",
+			              type:"POST",
+			              data:mystring,
+			              async:false,
+			              dataType: "json",
+			              contentType: "application/json",
+			              success: function(data){
+			              	var dataobj = JSON.parse(data)   		 		
+			              }
+			          });
+			  	  };
+		    document.querySelector('.paymentbutton').addEventListener("click", function(){
+		    	    window.btn_clicked = true;      //set btn_clicked to true
+		    });
+		    document.querySelector('.paymentbutton2').addEventListener("click", function(){
+	    	    window.btn_clicked = true;      //set btn_clicked to true
+	    });
+		    window.onbeforeunload = function(){
+		        if(!window.btn_clicked){
+		        	
+		   	        return 'You must click "Confirm" to complete the payment. If you leave now your payment will be canceled.';
+		   	    }
+		    };
+		    window.onunload = function(){
+		    	if(!window.btn_clicked){
+		    		DeletePayment()
+		    	}
+		    }
+		    {% endif %}
 	    	{% if issearchempty %}
 			alert("{{ searchmsg }}")
 	        {% endif %}
@@ -1310,35 +1347,7 @@
        		 		
 	    	};
 	      {% endif %}
-	      {% if payment_form %}
-			{% if isview %}
-			disableEdit()
-			{% endif %}
-	      function DeletePayment() { 
-  	    var dummyinput = [];
-  	    var mystring = JSON.stringify(dummyinput);
-  	    $.ajax({
-              url:"/parcelhubPOS/payment/deletepayment/?dpaymentid={{paymentid}}",
-              type:"POST",
-              data:mystring,
-              dataType: "json",
-              contentType: "application/json",
-              success: function(data){
-              	var dataobj = JSON.parse(data)   		 		
-              }
-          });
-  	  };
-	    document.querySelector('.paymentbutton').addEventListener("click", function(){
-	    	    window.btn_clicked = true;      //set btn_clicked to true
-	    });
-
-	    window.onbeforeunload = function(){
-	        if(!window.btn_clicked){
-	   	    	DeletePayment()
-	   	        return 'You must click "Confirm" to complete the payment. If you leave now your payment will be canceled.';
-	   	    }
-	    };
-	    {% endif %}
+	      
 		  </script>
           {% block jsscript %}{% endblock %}
 
