@@ -122,7 +122,10 @@ def gen_payment_number(terminalid,customerselected):
     if not last_payment:
          return  paymentcode + '000001'
     paymentid = last_payment.id
-    payment_int = int(paymentid.split(paymentcode)[-1])
+    try:
+        payment_int = int(paymentid.split(paymentcode)[-1])
+    except:
+        payment_int = 0
     new_payment_int = payment_int + 1
     length_int = len(str(new_payment_int))
     paddingnumber = max([6,length_int])
