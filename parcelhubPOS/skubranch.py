@@ -110,10 +110,8 @@ def editskubranch(request, skubranchid):
         if 'customerselected' in request.POST:
             try:
                 customeridselected = request.POST['customerselected']
-                customeridselected = int("0" + customeridselected)
                 customerselected = Customer.objects.get(id=customeridselected)
             except:
-                customeridselected = ''
                 customerselected = None
         if 'corporate' in request.POST:
             coverride = request.POST['corporate']
@@ -162,10 +160,8 @@ def editskubranch(request, skubranchid):
                 return HttpResponseRedirect("/parcelhubPOS/skubranch/?msg=%s" % msg)#
     skucodeselected = skuselected.sku_code
     isgstinclusive = skuselected.is_gst_inclusive
-    try:
-        customeridselected = customerselected.id
-    except:
-        customeridselected = ''
+
+    customeridselected = ''
     iscorporate = True;
     iswalkinspecial = True;
     iswalkin = True;
@@ -173,6 +169,7 @@ def editskubranch(request, skubranchid):
     walkinspecialvalue = skuselected.walkin_special_price
     walkinvalue = skuselected.walkin_price
     if customerselected:
+        customeridselected = customerselected.id
         iscorporate = False;
         iswalkinspecial = False;
         iswalkin = False;
@@ -187,7 +184,8 @@ def editskubranch(request, skubranchid):
                 'walkin':[iswalkin, 'walkin',woverride, walkinvalue],
                 'selectedsku' : skucodeselected,
                 'selectedcustomer' : customeridselected,
-                'isgstinclusive' : isgstinclusive
+                'isgstinclusive' : isgstinclusive,
+                'method': request.method,
                  }
     context = {
                 'headerselectiondisabled' : True,
