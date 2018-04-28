@@ -115,9 +115,8 @@ def paymentreceive(request):
                 }
     return render(request, 'paymentreceive.html', context)
 
-def gen_payment_number(customerselected):
+def gen_payment_number(terminalid,customerselected):
     branch = customerselected.branch
-    terminalid = request.session.get(CONST_terminalid)
     last_payment = Payment.objects.filter(terminal__id=terminalid).order_by('id').last()
     paymentcode = branch.branch_code + 'P'
     if not last_payment:
@@ -162,7 +161,7 @@ def editpayment(request, paymentid):
         if invoicetopay:
             selectedterminal = Terminal.objects.get(id=terminalid)
             paymentqueryset = Payment(customer=selectedcustomer, created_by=user, terminal= selectedterminal);
-            paymentqueryset.id = gen_payment_number(selectedcustomer)
+            paymentqueryset.id = gen_payment_number(terminalid, selectedcustomer)
             paymentqueryset.save()
             payment_form = PaymentForm(instance=paymentqueryset)
             for inv in invoicetopay:
