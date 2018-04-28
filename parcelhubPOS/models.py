@@ -18,8 +18,8 @@ class Branch(models.Model):
     fax = models.CharField(max_length=25, blank=True, null=True)
     tollfree = models.CharField(max_length=25,verbose_name='Toll-free', blank=True, null=True)
     website = models.CharField(max_length=254, blank=True, null=True)
-    payment_bank = models.CharField(max_length=254, blank=True, null=True)
-    payment_acc = models.CharField(max_length=254, blank=True, null=True)
+    payment_bank = models.CharField(max_length=254)
+    payment_acc = models.CharField(max_length=254)
     def __str__(self):
         return self.name
 

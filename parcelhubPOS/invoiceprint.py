@@ -80,7 +80,13 @@ def invoice_pdf(request, invoiceid):
     p.drawString(marginleft, 780, 'Co Reg No: ' + invoice.branch.registrationno +'            GST No: '+ invoice.branch.gstno) 
     p.drawString(marginleft, 770, invoice.branch.address)
     p.drawString(marginleft, 760, 'Phone: '+invoice.branch.contact)
-    p.drawString(marginleft, 750, 'Toll Free: ' + invoice.branch.tollfree +'            Website: '+ invoice.branch.website)
+    tollfree = '-'
+    if invoice.branch.tollfree:
+        tollfree = nvoice.branch.tollfree
+    website = '-'
+    if invoice.branch.website:
+        website = nvoice.branch.website
+    p.drawString(marginleft, 750, 'Toll Free: ' + tollfree +'            Website: '+ website)
     p.setFont( CONST_fontbold, 24)
     p.drawString(marginleft, 720, 'Tax Invoice')
     p.setFont(CONST_font, 10)
@@ -217,7 +223,13 @@ def invoice_pdf(request, invoiceid):
     # Payment rules
     p.drawString(35, 100, 'All cheque must be crossed & made payable to')
     p.drawString(35, 85, owner.upper())
-    p.drawString(35, 70, invoice.branch.payment_bank + ' A/C No: '+ invoice.branch.payment_acc)
+    paymentbank = ''
+    if invoice.branch.payment_bank:
+        paymentbank = invoice.branch.payment_bank
+    bankacc = ''
+    if invoice.branch.payment_acc:
+        bankacc = invoice.branch.payment_acc
+    p.drawString(35, 70, paymentbank + ' A/C No: '+ bankacc)
     # Invoice total titles
     end = 570
     p.drawString(310, 153, 'Subtotal')

@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from .tables import BranchTable
 from .commons import *
-from .models import Branch, UserBranchAccess
+from .models import Branch, UserBranchAccess, Terminal
 from .forms import BranchForm
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -57,10 +57,15 @@ def editbranch(request, ebranchid):
         if formset.is_valid():
             branchname = request.POST['name'] 
             if title == 'New branch':
+                terminal = Terminal(name='Drawer A', branch=branchqueryset, )
                 msg = 'Branch "%s" have been created successfully.' % branchname
             else:
                 msg = 'Branch "%s" have been updated successfully.' % branchname
             formset.save()
+            if title == 'New branch':
+                newbranch = Branch.objects.get(name = branchname)
+                terminal = Terminal(name='Drawer A', branch=newbranch, float=0, isactive=False )
+                terminal.save()
             return HttpResponseRedirect("/parcelhubPOS/branch/?msg=%s" % msg)
     else:
         formset = BranchForm(instance=branchqueryset)
