@@ -117,7 +117,8 @@ def paymentreceive(request):
 
 def gen_payment_number(customerselected):
     branch = customerselected.branch
-    last_payment = Payment.objects.filter(customer=customerselected).order_by('id').last()
+    terminalid = request.session.get(CONST_terminalid)
+    last_payment = Payment.objects.filter(terminal__id=terminalid).order_by('id').last()
     paymentcode = branch.branch_code + 'P'
     if not last_payment:
          return  paymentcode + '000001'
