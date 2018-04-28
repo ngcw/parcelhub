@@ -264,7 +264,7 @@ def edituserbranchaccess(request, userbranch_id):
     selectionoption = ["Cashier", "Branch admin"]
     
     if not loguser.is_superuser:
-        branchaccesslist = branchlist.values_list('branch__id', flat=True)
+        branchaccesslist = branchlist.values_list('id', flat=True)
         branchsel_list = Branch.objects.filter(id__in=branchaccesslist)
     # processing post
     if request.method == "POST":
