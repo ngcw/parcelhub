@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^validatetrackingcode/$',views.validatetrackingcode, name='validatetrackingcode'),
     url(r'^validateweightrange/$',views.validateweightrange, name='validateweightrange'),
     url(r'^autocompleteweight/$',views.autocompleteweight, name='autocompleteweight'),
+    url(r'^calculategst/$',views.calculategst, name='calculategst'),
     url(r'^hideshowcustomer/$',views.hideshowcustomer, name='hideshowcustomer'),
     url(r'^setdefaultforproduct/$',views.setdefaultforproduct, name='setdefaultforproduct'),
     url(r'^sku/$', views.SKUlist, name='sku'),

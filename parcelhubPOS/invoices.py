@@ -228,7 +228,7 @@ def editInvoice(request, invoiceid):
             formdatainvoice = invoice_form.cleaned_data
             gsttotal = 0;
             #calculation only
-            discountval = formdatainvoice.get('discount')
+            discountval = float(formdatainvoice.get('discount'))
             
             invoice.discount = discountval
             discountmode = request.POST["discountoption"]
@@ -242,11 +242,14 @@ def editInvoice(request, invoiceid):
                 formdata = form.cleaned_data
                 invoice_item.list = invoice
                 invoice_item.invoice = invoice
-                price = formdata.get('price') 
-                gstvalue = formdata.get('gst') 
-                gsttotal = gsttotal + gstvalue
+                price = float(formdata.get('price') )
+                gstvalue = float(formdata.get('gst') )
+                producttype = formdata.get('producttype')
                 skucode = formdata.get('sku')
                 sku = SKU.objects.filter(sku_code=skucode).first()
+                
+                gsttotal = gsttotal + gstvalue
+                
 
                 subtotal = subtotal + price - gstvalue
                 if discountmode == '%':
@@ -657,5 +660,33 @@ def validateweightrange(request):
         except:
             pass
     results.append(weight_json)
+    data = json.dumps(results)
+    return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def calculategst(request):
+    results = []
+    price = request.GET.get('price');
+    skucode = request.GET.get('sku');
+    gst_json = {}
+    
+    if price and skucode:
+        try:
+            sku = SKU.objects.get(sku_code=skucode)
+            if sku:
+                tax = sku.tax_code.gst
+                producttype = sku.product_type.name
+                if tax:
+                    gstpercentage = float(tax)/100
+                    if producttype != 'Document' and producttype != 'Parcel':
+                        gstvalue = 0
+                        if sku.is_gst_inclusive:
+                            gstvalue = float(price) - (float(price)/(1+gstpercentage))
+                        else:
+                            gstvalue = float(price) * gstpercentage
+                        gst_json['gst'] = gstvalue
+        except:
+            pass
+    results.append(gst_json)
     data = json.dumps(results)
     return JsonResponse(data, safe=False)

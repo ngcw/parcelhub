@@ -290,6 +290,21 @@
 		    	}
 		    }
 		    {% endif %}
+		    function enableBranchCode() {
+	    		document.getElementById('id_branch_code').disabled=false;
+	    		return true;
+	    	}
+		    {% if title == 'New branch' %}
+
+		    	var branchcode = document.getElementById('id_branch_code')
+		    	branchcode.after(' **Branch code cannot be updated after creation')
+		    	branchcode.readOnly  = false;
+		    	branchcode.disabled = false;
+		    {% elif title == 'Edit branch'%}
+			    
+			    var branchcode = document.getElementById('id_branch_code')
+		    	branchcode.after(' **Branch code cannot be updated after creation')
+		    {% endif %}
 	    	{% if issearchempty %}
 			alert("{{ searchmsg }}")
 	        {% endif %}
@@ -773,6 +788,10 @@
 			{
 				$( "#id_form-" + count + "-dimension_weight" ).val( weight.toFixed(3) ).trigger('input')
 			};
+			function PopulateGST( count, gst )
+			{
+				$( "#id_form-" + count + "-gst" ).val( gst.toFixed(3) ).trigger('input')
+			};
 	    	function AutoCompleteWeight( inputid ) { 
 	    		var inputstr = inputid.split("-");
 	    	    var count = inputstr[1]
@@ -807,7 +826,7 @@
 	                }
 	            });
 	    	};
-
+			
 	    	function UpdateTotal() {
     		  	var subtotal = 0.0;
 				var gst = 0.0;
@@ -882,6 +901,37 @@
 	                }
 	            });
 	    	};
+	    	function UpdateGST(inputid)
+			{
+				var inputstr = inputid.split("-");
+	    	    var count = inputstr[1]
+	    	    var skuname = "id_form-" + count + "-sku";
+	    	    var skuele = document.getElementById(skuname)
+	    	    var skuinput = skuele.value;
+	    	    var priceid = "id_form-" + count + "-price";
+	    	    var priceele = document.getElementById(priceid)
+	    	    var priceinput = priceele.value;
+				var calculatedgst = [];
+	    	    var mystring = JSON.stringify(calculatedgst);
+	    	    $.ajax({
+	                url:"/parcelhubPOS/calculategst/?sku="+skuinput+"&price="+priceinput,
+	                type:"POST",
+	                data:mystring,
+	                dataType: "json",
+	                contentType: "application/json",
+	                success: function(data){
+	                	var dataobj = JSON.parse(data)
+	                	
+	                	if( dataobj[0] !== null && dataobj[0] != undefined && dataobj[0]['gst'] != undefined)
+                		{
+	                		PopulateGST( count, 
+         		 					     dataobj[0]['gst']); 
+	                		UpdateTotal()
+                		}
+           		 		
+	                }
+	            });
+			}
 	    	function setFocusToTextBox(){
 	    		var inputid = "id_form-0-tracking_code"
 	    	    document.getElementById(inputid).focus();

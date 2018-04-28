@@ -75,6 +75,13 @@ class BranchForm(forms.ModelForm):
         widgets = {
             'address': Textarea(attrs={'cols': 33, 'rows': 4})
         }
+    def __init__(self, *args, **kwargs):
+        super(BranchForm, self).__init__(*args, **kwargs)
+        self.fields['branch_code'].widget.attrs\
+            .update({
+                'readOnly': 'True',
+                'disabled': 'disabled'
+            }) 
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -198,14 +205,13 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['price'].widget.attrs\
             .update({
                 'class': 'toAdd lastInput',
-                'onchange': 'UpdateTotal()',
+                'oninput': 'UpdateGST(this.id)',
                 'tabindex':'-1'
             })
         self.fields['gst'].widget.attrs\
             .update({
                 'readOnly': 'True',
                 'class' : 'toAddGST',
-                'onchange': 'UpdateTotal()',
                 'tabindex':'-1'
             })
         self.fields['skudescription'].widget.attrs\
