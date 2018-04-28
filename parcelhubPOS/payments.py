@@ -247,6 +247,7 @@ def editpayment(request, paymentid):
                 'title': title,
                 'header': title,
                 'isview': title == 'View payment',
+                'isedit':  title == 'View payment',
                 'totalamt': totalamt,
                 'titleid': 'paymentedittitle'
                 }
