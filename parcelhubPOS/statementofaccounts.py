@@ -313,7 +313,8 @@ def statementofacc_pdf(request, statementofacc):
     debititems = soaitem.filter(debit__gt = 0)
     debitsum = 0
     for item in soaitem:
-        debitsum += item.debit
+        if item.debit:
+            debitsum += item.debit
     p.drawString(totalwidth - 240, soatextheight - (linecount * 2.5 ), 'Total Debit (%d)' % len(debititems))
     debitstring = "{:,.2f}".format(round(debitsum, 2 ))
     debitstringwidth = p.stringWidth(debitstring, CONST_font, 11)
@@ -321,7 +322,8 @@ def statementofacc_pdf(request, statementofacc):
     credititems = soaitem.filter(credit__gt = 0)
     creditsum = 0
     for item in soaitem:
-        creditsum += item.credit
+        if item.credit:
+            creditsum += item.credit
     creditstring = "{:,.2f}".format(round(creditsum, 2 ))
     creditstringwidth = p.stringWidth(creditstring, CONST_font, 11)
     p.drawString(totalwidth - 35 - creditstringwidth, soatextheight - (linecount * 3.5 ), creditstring)
