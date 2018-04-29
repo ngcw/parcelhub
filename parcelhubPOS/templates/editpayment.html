@@ -80,7 +80,7 @@
     	{% else %}
     	<div id="paymentbottom">
 		    <input type="submit" name="action" value="Confirm" onClick="return validatePayment()" class="paymentbutton"/> 
-		    <input type="submit" name="action" value="Cancel payment" class="paymentbutton2"/>
+		    <input type="submit" name="action" value="Cancel payment" class="paymentbutton2" onClick="return confirm('Are you sure you want to cancel payment?')"/>
 		   </div>
 	</form>
     	{% endif %}

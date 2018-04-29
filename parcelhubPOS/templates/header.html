@@ -1312,8 +1312,14 @@
 	    				return false;
 	    			}
 	    		}
-	    		enabledCustomer()
-	    		return true
+	    		var totalamount = document.getElementById('totalamt').innerHTML
+	    		var confirmation = confirm('Confirm payment amount of RM' +totalamount)
+	    		if (confirmation == true)
+	    		{
+	    			enabledCustomer()
+		    		return true
+	    		}
+	    		return false
 	    	}
 	    	function UpdateTotalAndRemaining() {
 				var arr = document.getElementsByClassName('paymentinput');
@@ -1334,8 +1340,13 @@
 		        	var arrpaid = document.getElementById('payment_'+ finalcount)
 		        	var arrremainder = document.getElementById('remainder_'+ finalcount)
 		        	var remaindervalue = (parseFloat(arrtotal.innerHTML) - parseFloat(arrpaid.innerHTML) - value)
+		        	
 		        	var finalremainder = remaindervalue.toFixed(2);
-
+		    	    if ( remaindervalue == 0 )
+		    	    {
+		    	    	finalremainder = '0.00'
+		    	    }
+		    	    	
 		    	    if( finalremainder !== null || finalremainder !== '' )
 		    	    {
 		    	    	arrremainder.innerHTML = finalremainder
