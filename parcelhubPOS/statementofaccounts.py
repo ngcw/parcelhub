@@ -467,7 +467,7 @@ def statementofacc_pdf(request, statementofacc):
         creditstringwidth = p.stringWidth("Credit", CONST_font, 8)
         p.drawString( margin + 425 + creditstringwidth - creditwidth, itemheight - (linecount * rowcount), credit)
         
-        balancevalue = float(item.debit) - float(item.credit)
+        balancevalue = debitvalue - creditvalue
 
         cummulativebalance = cummulativebalance + balancevalue
         balance = "{:,.2f}".format(round(cummulativebalance, 2 ))
