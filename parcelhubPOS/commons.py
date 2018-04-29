@@ -41,7 +41,7 @@ def branchselection(request):
         branchidlist = allbranchaccess.values_list('branch_id', flat=True)
         branches = Branch.objects.filter(id__in=branchidlist)
     selectedbranch = request.session.get(CONST_branchid)
-    if not selectedbranch:
+    if CONST_branchid not in request.session:
         branchaccess = branches.first()
         if branchaccess:
             branchid = branchaccess.id 
@@ -61,22 +61,22 @@ def terminalselection(request):
     else:
         branch = Branch.objects.get(id=selectedbranch)
         terminals = Terminal.objects.filter(branch=branch)
-        if not selectedterminal:
+        if CONST_terminalid not in request.session:
             terminal = terminals.first()
             if terminal:
                 terminalid = terminal.id 
                 request.session[CONST_terminalid] = terminalid 
             else:
                 request.session[CONST_terminalid] = '-1'
-        else:
-            terminal = Terminal.objects.filter(branch=branch,id=selectedterminal)
+        elif selectedterminal != '-1':
+            terminal = Terminal.objects.filter(branch=branch,id=selectedterminal).first()
             if terminal:
-                pass
+                request.session[CONST_terminalid] = terminal.id  
             else:
+                terminal = Terminal.objects.filter(branch=branch).first()
                 if terminal:
-                    terminalid = terminal.id 
-                    request.session[CONST_terminalid] = terminalid 
-                else:
+                    request.session[CONST_terminalid] = terminal.id 
+                else:   
                     request.session[CONST_terminalid] = '-1'
         if request.method == "POST" and 'terminalselection' in request.POST:
             selectedterminal = request.POST.get('terminalselection') 

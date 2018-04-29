@@ -67,29 +67,7 @@ def dashboard(request):
     loggedusers = userselection(request)
     loguser = User.objects.get(id=request.session.get('userid'))
     branchaccess = UserBranchAccess.objects.filter(user=loguser).first()
-    if request.method == "POST" and 'branchselection' in request.POST:
-        branchlist = branchselection(request)
-        terminallist = terminalselection(request)
-        menubar = navbar(request)
-        
-        context = {
-                    'nav_bar' : sorted(menubar.items()),
-                    'branchselection': branchlist,
-                    'terminalselection': terminallist, 
-                    'loggedusers' : loggedusers,
-                    'branchselectionaction': '/parcelhubPOS/dashboard/',
-                    'issuperuser': loguser.is_superuser,
-                    'header': 'Dashboard',
-                    }
-        return render(request, 'dashboard.html', context)#HttpResponseRedirect('/parcelhubPOS/invoice/')#
-    elif branchaccess or loguser.is_superuser:
-        try:
-            branchid = branchaccess.branch.id 
-            user = branchaccess.user
-            request.session[CONST_branchid] = branchid 
-        except:
-            pass
-        
+    if branchaccess:
         branchlist = branchselection(request)
         terminallist = terminalselection(request)
         menubar = navbar(request)
