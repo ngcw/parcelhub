@@ -202,7 +202,6 @@ def editInvoice(request, invoiceid):
         if defaultproduct.default_courier:
             defaultcourier = defaultproduct.default_courier
     invoice_item_formset = InvoiceItemFormSet(queryset=invoiceitemqueryset, initial=[{'producttype':defaultproduct,'zone_type': defaultzonetype, 'courier': defaultcourier}])
-    
     #printing
     if request.method == 'POST':
         if 'action' in request.POST and request.POST['action'] == 'Print delivery order':
@@ -684,7 +683,7 @@ def calculategst(request):
                             gstvalue = float(price) - (float(price)/(1+gstpercentage))
                         else:
                             gstvalue = float(price) * gstpercentage
-                        gst_json['gst'] = gstvalue
+                        gst_json['gst'] = round(gstvalue,2)
         except:
             pass
     results.append(gst_json)

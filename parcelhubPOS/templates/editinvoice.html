@@ -4,7 +4,7 @@
 	
 	<form action="" method="POST" target='_blank' id="editinvoiceform">{% csrf_token %}
 	<div id="invoice_container">
-		<h2 id="invoicetitle">{{ invoicetitle }}</h2>
+		<h2 id="invoicetitle">{{ invoicetitle }}</h2> 
 		{{ invoice_form.non_field_errors }}
 		{% for hidden_field in invoice_form.hidden_fields %}
 		  {{ hidden_field.errors }}
@@ -121,6 +121,7 @@
 		    <h2 class="invoice_fix_item">Invoice Items</h2>
 		    
 		    {{ invoice_item_formset.management_form }}
+		    
 		    <div class ="invoiceitem_container" >
 		    {% for form in invoice_item_formset.forms %}
 	            {% if forloop.first %}
@@ -136,9 +137,11 @@
 		            		
 	                    
 	                {% endfor %}
+	                
 	                <div class="itemform_label"></div>
 	               </div>
 	            {% endif %}
+	           
 	            <div class="itemcontainer">
 	            	<div class="item">
 		            	<div class="counter_input"><label  class="counter">{{forloop.counter}}</label> </div>
@@ -156,7 +159,6 @@
 							{% else %}
 			            		<div class="item_input">{{ field }}</div>
 			            	{% endif %}
-			            		
 			    		{% endfor %}
 			    		{% if isedit %}<div style="" ><a class="delete" href="#" tabindex="-1"><button>Delete</button></a></div>{% endif %}
 		    		</div>
