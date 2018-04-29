@@ -441,7 +441,9 @@ def statementofacc_pdf(request, statementofacc):
         else:
             remarks = ''
         p.drawString( margin + 160, itemheight - (linecount * rowcount), remarks)
-        debitvalue = round(float(item.debit), 2 )
+        debitvalue = 0.00
+        if item.debit:
+            debitvalue = round(float(item.debit), 2 )
         debit = "{:,.2f}".format(debitvalue)
         if debitvalue > 0.00:
             pass
@@ -451,8 +453,9 @@ def statementofacc_pdf(request, statementofacc):
         debitwidth = p.stringWidth(debit, CONST_font, 11)
         debitstringwidth = p.stringWidth("Debit", CONST_font, 8)
         p.drawString( margin + 350 + debitstringwidth - debitwidth, itemheight - (linecount * rowcount), debit)
-
-        creditvalue = round(float(item.credit), 2 )
+        creditvalue = 0.00
+        if item.credit:
+            creditvalue = round(float(item.credit), 2 )
         
         cummulativecredit = cummulativecredit + creditvalue
         credit = "{:,.2f}".format(creditvalue)
