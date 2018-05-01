@@ -698,6 +698,15 @@
 	    	    var customersel = document.getElementById("id_customer");
 	    	    var selectedcust = customersel.options[customersel.selectedIndex].value;
 	    	    var invoicetype = document.getElementById('id_invoicetype').value.trim();
+	    	    var weightid = "id_form-" + count + "-weight";
+	    	    var weightele = document.getElementById(weightid)
+	    	    var weightinput = weightele.value;
+	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
+	    	    var dimweightele = document.getElementById(dimweightid)
+	    	    var dimweightinput = dimweightele.value;
+	    	    var producttypeid = "id_form-" + count + "-producttype";
+	    	    var producttypesel = document.getElementById(producttypeid);
+	    	    var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
 	    	    $.ajax({
 	                url:"/parcelhubPOS/autocompleteskudetail/?customerid="+selectedcust
 	                										+"&sku_code="+value
@@ -731,6 +740,20 @@
 		               								dataobj[i]['price']);
 		               		 		
 		               		 		UpdateTotal()
+		               		 		if( weightinput == '' && dimweightinput == '' && ( selectedproducttype == 'Document' || selectedproducttype == 'Parcel' ) )
+		               		 		{
+		               		 			weightele.style.backgroundColor = 'red'
+		    	                		dimweightele.style.backgroundColor = 'red'
+		    	                		weightele.setAttribute('title', 'weight and dimension weight cannot be both empty');
+		    	                		dimweightele.setAttribute('title', 'weight and dimension weight cannot be both empty');
+		               		 		}
+		               		 		else
+		               		 		{
+		               		 			weightele.style.backgroundColor = ''
+		    	                		dimweightele.style.backgroundColor = ''
+		    	                		weightele.setAttribute('title', '');
+		    	                		dimweightele.setAttribute('title', '');
+		               		 		}
 		              		 	}
 		               		}
 	                	}
