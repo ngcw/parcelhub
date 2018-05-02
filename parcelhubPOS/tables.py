@@ -64,7 +64,7 @@ class BranchTable(tables.Table):
         model = Branch
         attrs = {'class': 'paleblue'
                  }
-        sequence = ('branch_code', 'name', 'owner', 'contact', 'email', 'address', 'registrationno', 'gstno','edit', 'delete')
+        sequence = ('branch_code', 'name', 'owner', 'contact', 'email', 'address', 'registrationno', 'hasgst', 'gstno','edit', 'delete')
         exclude = {'id', 'fax', 'tollfree', 'payment_bank', 'payment_acc', 'website'}
             
 deletelinkuser = '''{% if isedit %}<a href="/parcelhubPOS/user/deleteuser?duser_id={{record.id}}" class="deletebutton" onclick="return confirm('Are you sure you want to delete user {{ user.username}}?')">Delete</a>
