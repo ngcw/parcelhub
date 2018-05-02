@@ -1,6 +1,7 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
+from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics  
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import timedelta 
@@ -44,7 +45,7 @@ def invoice_pdf(request, invoiceid):
     for item in invoiceitem:
         itemcount += 1
         remainingitem -= 1
-        if currentsku != item.sku or currentpage != page:
+        if currentsku != item.skudescription or currentpage != page:
             itemcount += 1
             itemdict = {}
             if currentsku != item.sku:
@@ -52,9 +53,14 @@ def invoice_pdf(request, invoiceid):
                 itemdict['sku'] = item.sku
                 itemdict['tax'] = skuselected.tax_code.id
                 itemdict['price'] = item.price
+                itemdict['qty'] = item.unit
+                if skuselected.product_type.name == 'Services' or skuselected.product_type.name == 'Packaging':
+                    itemdict['shipping'] = 'false'
+                else:
+                    itemdict['shipping'] = 'true'
             if currentpage != page:
                 currentpage = page
-            currentsku = item.sku
+            currentsku = item.skudescription
             itemdict['items'] = []
             itemdict['description'] = item.skudescription 
             invoiceitemdict.append(itemdict)
@@ -175,7 +181,11 @@ def invoice_pdf(request, invoiceid):
                 pricewidth = p.stringWidth(pricestring, CONST_font, 10)
                 p.drawString(450-pricewidth, y, pricestring)
                 # qty string
-                qty = len(item['items']);
+                if item['shipping'] == 'true':
+                    qty = len(item['items']);
+                else:
+                    qty = item['qty'];
+                    itemcount += qty
                 qtywidth = p.stringWidth(str(qty), CONST_font, 10)
                 p.drawString(490-qtywidth, y, str(qty))
                 # total string
@@ -185,14 +195,15 @@ def invoice_pdf(request, invoiceid):
                 count +=1
             # item details
             for trackcode in item['items']:
-                itemcount += 1;
-                
-                dy = topy - (count * 10)
                 if trackcode:
-                    p.drawString(155, dy, 'S/No: ' + trackcode )
-                else:
-                    p.drawString(155, dy, 'S/No: ' + '-' )
-                count += 1
+                    itemcount += 1;
+                    
+                    dy = topy - (count * 10)
+                    if trackcode:
+                        p.drawString(155, dy, 'S/No: ' + trackcode )
+                    else:
+                        p.drawString(155, dy, 'S/No: ' + '-' )
+                    count += 1
             
         
         totalitem = 'No. of items (%d)' % itemcount
@@ -288,21 +299,27 @@ def invoice_thermal(request, invoiceid):
     response = HttpResponse(content_type='application/pdf')
     filename = invoice.invoiceno
     response['Content-Disposition'] = 'attachment; filename="'+filename+'_receipt.pdf"'
-    invoiceitem = InvoiceItem.objects.filter(invoice=invoice).order_by('sku', 'tracking_code')
+    invoiceitem = InvoiceItem.objects.filter(invoice=invoice).order_by('skudescription', 'tracking_code')
     invoiceitemdict = []
     currentsku = ''
     itemdict = {}
     linecount = 0;
     for item in invoiceitem:
         linecount += 1
-        if currentsku != item.sku:
+        if currentsku != item.skudescription:
+            skuselected = SKU.objects.get(sku_code=item.sku)
             linecount += 2
             itemdict = {}
-            currentsku = item.sku
+            currentsku = item.skudescription
             itemdict['items'] = []
             itemdict['sku'] = currentsku
             itemdict['price'] = item.price
             itemdict['description'] = item.skudescription
+            itemdict['qty'] = item.unit
+            if skuselected.product_type.name == 'Services' or skuselected.product_type.name == 'Packaging':
+                itemdict['shipping'] = 'false'
+            else:
+                itemdict['shipping'] = 'true'
             invoiceitemdict.append(itemdict)
         itemdict['items'].append(item.tracking_code)
     buffer = BytesIO()
@@ -311,7 +328,7 @@ def invoice_thermal(request, invoiceid):
     
     
     p = canvas.Canvas(buffer)
-    totalwidth = 302
+    totalwidth = 80 * mm
     marginleft = 15
     topmargin = 40
     center = totalwidth / 2.0
@@ -381,7 +398,7 @@ def invoice_thermal(request, invoiceid):
     p.setFillColorRGB(0, 0, 0 ) 
     p.setFont(CONST_fontrbold, 8)
     p.drawString(marginleft, totallength - topmargin - ( linespace * ( addresslinedrawcount + 12 ) ), 'Description')  
-    p.drawString(marginleft, totallength - topmargin - ( linespace * ( addresslinedrawcount + 13 ) ), 'SKU        Price RM         Qty                 Total RM')
+    p.drawString(marginleft, totallength - topmargin - ( linespace * ( addresslinedrawcount + 13 ) ), 'SKU            Price RM   Qty   Total RM')
     headerliney = totallength - topmargin - ( (linespace * ( addresslinedrawcount + 13 ) ) + 5) 
     p.line( marginleft, headerliney, totalwidth - marginleft, headerliney )
     p.setFont(CONST_fontr, 8)
@@ -393,20 +410,22 @@ def invoice_thermal(request, invoiceid):
         count += 1
         # item details
         for trackcode in item['items']:
-            count += 1
-            dy = topy - (count * linespace)
-            trackcodeval = '-'
             if trackcode:
+                count += 1
+                dy = topy - (count * linespace)
                 trackcodeval = trackcode
-            p.drawString(marginleft, dy, ' S/No. ' + trackcodeval )
+                p.drawString(marginleft, dy, ' S/No. ' + trackcodeval )
         # price string
         pricestring = str(item['price'])
         pricewidth = p.stringWidth(pricestring, CONST_fontr, 9)
-        p.drawString(110-pricewidth, y - linespace, pricestring)
+        p.drawString(130-pricewidth, y - linespace, pricestring)
         # qty string
-        qty = len(item['items']);
+        if item['shipping'] == 'true':
+            qty = len(item['items']);
+        else:
+            qty = item['qty'];
         qtywidth = p.stringWidth(str(qty), CONST_fontr, 9)
-        p.drawString(165-qtywidth, y - linespace , str(qty))
+        p.drawString(155-qtywidth, y - linespace , str(qty))
         # total string
         total = item['price'] * qty
         totalpricewidth = p.stringWidth(str(total), CONST_fontr, 9)
@@ -489,14 +508,14 @@ def invoice_thermal(request, invoiceid):
     
     
     p.setFont(CONST_fontrbold, 8)
-    p.drawString(marginleft, btmmargin + ( (len(gstsummary)+2) * linespace ), "GST Summary:              Amount(RM)             Tax(RM)")   
+    p.drawString(marginleft, btmmargin + ( (len(gstsummary)+2) * linespace ), "GST Summary:     Amount(RM)       Tax(RM)")   
     gstcount = 0;
     for key, value in sorted(gstsummary.items()):
         p.drawCentredString(marginleft + 30, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), key)
         amount = '%.2f' %(value[0])
         amount = '%.2f' %(value[1])
-        p.drawCentredString(marginleft + 150, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), amount)
-        p.drawCentredString(marginleft + 250, btmmargin + ( (len(gstsummary) + 1- gstcount ) * linespace ), amount)
+        p.drawCentredString(marginleft + 110, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), amount)
+        p.drawCentredString(marginleft + 183, btmmargin + ( (len(gstsummary) + 1- gstcount ) * linespace ), amount)
         gstcount = gstcount + 1;
     # thank you 
     p.drawCentredString(center, btmmargin, 'Thank you')

@@ -131,9 +131,10 @@ class InvoiceItemForm(forms.ModelForm):
     #sku = forms.ModelChoiceField(queryset=SKU.objects.all())
     class Meta: 
         model = InvoiceItem
-        fields = ("tracking_code", "producttype", 'zone_type', 'zone', 'weight',"height", 'length', 'width',  "dimension_weight", "courier", 'sku', 'skudescription', 'price','gst')
+        fields = ("tracking_code", "producttype", 'zone_type', 'zone', 'weight',"height", 'length', 'width',  "dimension_weight", "courier", 'sku', 'skudescription', 'price', 'unit', 'totalprice','gst', 'totalgst')
         exclude = ('id',)
-        widgets = {'gst': forms.HiddenInput()}
+        widgets = {'gst': forms.HiddenInput(),
+                   'totalgst': forms.HiddenInput()}
  
     def clean_postcode(self):
         return self.cleaned_data['postcode'] or ''
@@ -162,11 +163,13 @@ class InvoiceItemForm(forms.ModelForm):
             })
         self.fields['zone_type'].widget.attrs\
             .update({
-                'onchange': 'AutoCompleteSKU(this.id);ValidateTrackingCode(this.id)'
+                'onchange': 'AutoCompleteSKU(this.id);ValidateTrackingCode(this.id)',
+                'class': 'zonetypeinput',
             })
         self.fields['zone'].widget.attrs\
             .update({
-                'onchange': 'AutoCompleteSKU(this.id);AutoCompleteZone(this.id);ValidateTrackingCode(this.id)'
+                'onchange': 'AutoCompleteSKU(this.id);AutoCompleteZone(this.id);ValidateTrackingCode(this.id)',
+                'class': 'zoneinput',
             })
         self.fields['producttype'].widget.attrs\
             .update({
@@ -176,14 +179,14 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['weight'].widget.attrs\
         .update({ 
             'onchange': 'AutoCompleteSKU(this.id);completeNumber(this.id)',
-            'class': "validateFieldWeight"
+            'class': "validateFieldWeight smallerinput"
         })
         self.fields['dimension_weight'].widget.attrs\
         .update({
             'onchange': 'AutoCompleteSKU(this.id);completeNumber(this.id)',
             'oninput':'AutoCompleteSKU(this.id);completeNumber(this.id)',
             'ondblclick': 'editDimensionalWeight(this.id)',
-            'class': 'lastInput'
+            'class': 'lastInput smallerinput'
         })
         self.fields['height'].widget.attrs\
             .update({
@@ -204,19 +207,39 @@ class InvoiceItemForm(forms.ModelForm):
 
         self.fields['price'].widget.attrs\
             .update({
-                'class': 'toAdd lastInput',
                 'oninput': 'UpdateGST(this.id)',
                 'tabindex':'-1'
             })
         self.fields['gst'].widget.attrs\
             .update({
                 'readOnly': 'True',
-                'class' : 'toAddGST',
                 'tabindex':'-1'
             })
         self.fields['skudescription'].widget.attrs\
             .update({
                 'class': 'skudescription'
+            })
+        self.fields['unit'].widget.attrs\
+            .update({
+                'class': 'zoneinput lastInput',
+                'oninput': 'UpdateGST(this.id)',
+                'tabindex':'-1',
+                'readOnly': 'True',
+                'disabled': 'True',
+            })
+        self.fields['totalgst'].widget.attrs\
+            .update({
+                'readOnly': 'True',
+                'class' : 'toAddGST',
+                'tabindex':'-1'
+            })
+        self.fields['totalprice'].widget.attrs\
+            .update({
+                'class': 'toAdd',
+                'oninput': 'UpdateGST(this.id)',
+                'tabindex':'-1',
+                'readOnly': 'True',
+                'disabled': 'True',
             })
 class PaymentForm(forms.ModelForm):
     class Meta:

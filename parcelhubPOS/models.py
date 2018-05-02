@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from unittest.util import _MAX_LENGTH
+from django.template.defaultfilters import default
 class UserExtend(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     contact = models.CharField(max_length=25)
@@ -231,6 +232,9 @@ class InvoiceItem(models.Model):
     sku = models.CharField(max_length=100, verbose_name='*SKU')
     gst = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='GST')
     price = models.DecimalField(max_digits=30, decimal_places=2)
+    unit = models.IntegerField(default=1)
+    totalgst = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Total GST')
+    totalprice = models.DecimalField(max_digits=30, decimal_places=2, verbose_name='Total price')
     
 class Payment(models.Model):
     id = models.CharField(max_length=200, primary_key=True, unique=True)  

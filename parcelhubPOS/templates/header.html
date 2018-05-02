@@ -252,6 +252,17 @@
     		    for (var i = 0; i < textarea.length; i += 1) {
     		    	textarea[i].disabled = true;
     		    }
+    		    var preview = document.getElementById('print_preview')
+    		    var printdo = document.getElementById('print_do_up')
+    		    if (preview)
+    		    {
+    		    	preview.disabled = false;
+    		    }
+    		    if (printdo)
+    		    {
+    		    	printdo.disabled = false;
+    		    }
+    		    
     		}
 	    	{% if payment_form %}
 		    	{% if isview %}
@@ -475,6 +486,14 @@
     	    	    	    var currselectiontypesel = document.getElementById(currselectiontypeid);
     	    	    	    currselectiontypesel.value = 'Parcel'
     	                }
+    	                else if(this.id.indexOf("unit") !== -1)
+    	                {
+    	                	var currselectiontypeid = "id_form-" + formCount + "-unit";
+    	    	    	    var currselectiontypesel = document.getElementById(currselectiontypeid);
+    	    	    	    currselectiontypesel.value = 1
+    	    	    	    currselectiontypesel.disabled = true;
+    	    	    	    currselectiontypesel.readOnly = true;
+    	                }
     	                else
    	                	{
    	                		$(this).val("");
@@ -688,6 +707,45 @@
 	                }
 	            });
 	    	};
+	    	function updateTotalGSTAndPrice(inputid){
+				var value = document.getElementById(inputid).value.trim();
+	    		var inputstr = inputid.split("-");
+	    		var count = inputstr[1]
+	    		var gstid = "id_form-" + count + "-gst";
+	    	    var gstele = document.getElementById(gstid)
+	    	    var gstinput = gstele.value;
+	    	    var priceid = "id_form-" + count + "-price";
+	    	    var priceele = document.getElementById(priceid)
+	    	    var priceinput = priceele.value;
+	    	    var unitid = "id_form-" + count + "-unit";
+	    	    var unitele = document.getElementById(unitid)
+	    	    var unitinput = unitele.value;
+	    	    var totalgstid = "id_form-" + count + "-totalgst";
+	    	    var totalgstele = document.getElementById(totalgstid)
+	    	    var totalpriceid = "id_form-" + count + "-totalprice";
+	    	    var totalpriceele = document.getElementById(totalpriceid)
+	    	    var validprice = priceinput != ''
+	    	    var validunit = unitinput != '' && unitinput != '0'
+	    	    if( validunit )
+	    	    {
+	    	    	unitele.style.backgroundColor = ''
+		    	    unitele.setAttribute('title', '');
+	    	    	
+	    	    }
+	    	    else
+	    	    {
+	    	    	unitele.style.backgroundColor = 'red'
+	    	    	unitele.setAttribute('title', 'Unit cannot be empty or 0');
+	    	    }
+	    	    
+	    	    if (validprice && validunit)
+	    	    {
+	    	    	var totalgstvalue = gstinput * unitinput
+	    	    	var totalpricevalue = priceinput * unitinput
+	    	    	$( "#id_form-" + count + "-totalgst" ).val(Math.round(totalgstvalue * 100) / 100)
+	    	    	$( "#id_form-" + count + "-totalprice" ).val(Math.round(totalpricevalue * 100) / 100)
+	    	    }
+	    	}
 	    	function AutoCompleteSKUDetail( inputid ) { 
 	    	    var value = document.getElementById(inputid).value.trim();
 	    	    
@@ -738,7 +796,7 @@
 		               								dataobj[i]['tax'],
 		               								dataobj[i]['gst'],
 		               								dataobj[i]['price']);
-		               		 		
+		               		 		updateTotalGSTAndPrice(inputid)
 		               		 		UpdateTotal()
 		               		 		if( weightinput == '' && dimweightinput == '' && ( selectedproducttype == 'Document' || selectedproducttype == 'Parcel' ) )
 		               		 		{
@@ -801,6 +859,11 @@
 		                		zoneinput.style.backgroundColor = 'red'
 		                		zoneinput.setAttribute('title', 'No zone found');
 		                	}
+	                	}
+	                	else
+	                	{
+	                		zoneinput.style.backgroundColor = ''
+		                	zoneinput.setAttribute('title', '');
 	                	}
 	                	
            		 		
@@ -949,9 +1012,10 @@
                 		{
 	                		PopulateGST( count, 
          		 					     dataobj[0]['gst']); 
-	                		UpdateTotal()
+	                		
                 		}
-           		 		
+	                	updateTotalGSTAndPrice(inputid)
+                		UpdateTotal()
 	                }
 	            });
 			}
@@ -1086,9 +1150,10 @@
 	    		var cansubmitweight = true;
 	    		var cansubmitzone = true;
 	    		var cansubmitsku = true;
+	    		var cansubmitunit = true;
 	    		var arr = document.getElementsByClassName('validateFieldWeight');
 	    		var rowempty = 0;
-			    for(var i=0;i<arr.length && cansubmitweight;i++){
+			    for(var i=0;i<arr.length && cansubmitweight && cansubmitunit && cansubmitzone && cansubmitsku;i++){
 			    	var documentid = arr[i].id
 			    	var inputstr = documentid.split("-");
 		    	    var count = inputstr[1]
@@ -1099,6 +1164,8 @@
 	    	    	var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
 		    	    var zoneid = "id_form-" + count + "-zone";
 		    	    var zoneelement = document.getElementById(zoneid)
+		    	    var unitid = "id_form-" + count + "-unit";
+		    	    var unitelement = document.getElementById(unitid)
 		    	    rowempty = i + 1;
 			        if( arr[i].value.length == 0 && dimweightelement.value.length == 0 && ( selectedproducttype == 'Document' || selectedproducttype == 'Parcel' ) )
 			        {
@@ -1111,6 +1178,10 @@
 		    	    if ( arr[i].style.backgroundColor == 'red' && zoneelement.style.backgroundColor == 'red' )
 		    	    {
 		    	    	cansubmitsku = false;
+		    	    }
+		    	    if( unitelement.style.backgroundColor == 'red' )
+		    	    {
+		    	    	cansubmitunit = false;
 		    	    }
 			    }
 	    		var zonetypevalue = document.getElementById('id_invoicetype').value
@@ -1141,6 +1212,11 @@
 	    	      	alert("There are invalid zone field at row number " + String(rowempty) +".");
 	    	      	return false;
 	    	  	}
+	    	    if( cansubmitunit == false)
+	    	    { 
+	    	      	alert("There are invalid unit field at row number " + String(rowempty) +".");
+	    	      	return false;
+	    	  	}
 	    	    if( zonetypevalue == 'Cash' && parseFloat(payment) < parseFloat(totalvalue))
 	    		{
 	    	    	alert("Payment of RM " + payment + " is insufficient as total is RM " + totalvalue);
@@ -1168,6 +1244,14 @@
 			    })
 			    return def.promise();
 			}
+	    	function enableAllInput()
+	    	{
+	    		var inputs=document.getElementsByTagName('input');
+	    		for(i=0;i<inputs.length;i++){
+	    		    inputs[i].disabled=false;
+	    		    inputs[i].readOnly=false;
+	    		}
+	    	}
 	    	function validateAndNew()
 	    	{
 	    		var validated = validateInvoiceItem()
@@ -1177,6 +1261,7 @@
 	    			if( invoicetype == 'Cash')
 	    			{
 	    				confirmPayment().done(function() {
+	    					enableAllInput()
 	    					{% if isall %}
 	    					{% else %}
 	    					document.getElementById("newInvoicePage").click();
@@ -1190,12 +1275,17 @@
 	    			{
 	    				if ( validated )
 	    				{
-	    					alert("Are you sure you want to commit this invoice?");
-	    					{% if isall %}
-	    					{% else %}
-	    					document.getElementById("newInvoicePage").click();
-	    					{% endif %}
-	    					document.getElementById("editinvoiceform").submit();
+	    					var confirmation = confirm('Are you sure you want to commit this invoice?')
+	    					if (confirmation == true)
+	    					{
+	    						enableAllInput()
+	    						{% if isall %}
+		    					{% else %}
+		    					document.getElementById("newInvoicePage").click();
+		    					{% endif %}
+		    					document.getElementById("editinvoiceform").submit();
+	    					}
+	    					
 	    				}
 	    			}
     				
@@ -1218,8 +1308,8 @@
 	    	    var selectedproducttype = producttypesel.options[producttypesel.selectedIndex].value;
 	    	    var descriptionid = "id_form-" + count + "-skudescription";
 	    	    var skudescription = document.getElementById(descriptionid);
-	    	    var priceid = "id_form-" + count + "-price";
-	    	    var price = document.getElementById(priceid)
+	    	    var unitid = "id_form-" + count + "-unit";
+	    	    var unit = document.getElementById(unitid)
 	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
 	    	    var dimweight = document.getElementById(dimweightid)
 	    	    var courierid = "id_form-" + count + "-courier";
@@ -1228,13 +1318,13 @@
 	    	    {
 	    	    	//skudescription.readOnly = false;
 	    	    	//price.readOnly = false;
-	    	    	if ( price.classList.contains('lastInput') )
+	    	    	if ( unit.classList.contains('lastInput') )
 	    	    	{
 	    	    		
 	    	    	}
 	    	    	else
 	    	    	{
-	    	    		price.classList.add('lastInput');
+	    	    		unit.classList.add('lastInput');
 	    	    	}
 	    	    	if ( dimweight.classList.contains('lastInput') )
 	    	    	{
@@ -1246,9 +1336,9 @@
 	    	    {
 	    	    	//skudescription.readOnly = true;
 	    	    	//price.readOnly = true;
-	    	    	if ( price.classList.contains('lastInput') )
+	    	    	if ( unit.classList.contains('lastInput') )
 	    	    	{
-	    	    		price.classList.remove('lastInput');
+	    	    		unit.classList.remove('lastInput');
 	    	    	}
 	    	    	if ( dimweight.classList.contains('lastInput') )
 	    	    	{
@@ -1258,6 +1348,16 @@
 	    	    	{
 	    	    		dimweight.classList.add('lastInput')
 	    	    	}
+	    	    }
+	    	    if ( selectedproducttype == 'Services' || selectedproducttype == 'Packaging')
+	    	    {
+	    	    	unit.disabled = false
+	    	    	unit.readOnly = false
+	    	    }
+	    	    else
+	    	    {
+	    	    	unit.disabled = true
+	    	    	unit.readOnly = true
 	    	    }
 	    	}
 	    	function showAddPopup(triggeringLink) {

@@ -101,19 +101,24 @@
         	<div>Sub-total:</div><div><label id="subtotal"></label></div>
         </div>
         <div class="hiddenlabels"><div>Rounding:</div><div><label id="rounding"></label></div></div>
-        {% if isedit %}
+        
 	    <div id="invoicesubmit">
+	    {% if isedit %}
 	    	<a href="/parcelhubPOS/invoice/editinvoice/?" id="newInvoicePage" ></a>
 	    	
 		    <input type="button" name="action" value="Confirm" onClick="return validateAndNew()" class="invoiceConfirmNew" id="invoicesubmitbutton"/>
 		    
-		    {% if invoice %}
-			    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
-			    <input type="submit" name="action" value="Preview" id="print_preview" onClick="return validateInvoiceItem()"/>
-			{% endif %}
+		
+		{% endif %}
+		{% if invoice %}
+		    <input type="submit" name="action" value="Print delivery order" id="print_do_up" onClick="return validateInvoiceItem()"/>
+		    <input type="submit" name="action" value="Preview" id="print_preview" onClick="return validateInvoiceItem()"/>
+		{% endif %}
+		 {% if isedit %}
 			<a id="add" class="addanotheritem" href="#"><button>Add another item</button></a>
+		{% endif %}
 		</div>
-	    {% endif %}
+	    
 	</div>
 	    
     <div id="invoiceitemheader">
@@ -131,6 +136,10 @@
 						{% if field.label == "Height(cm)" or field.label == "Length(cm)" or field.label == "Width(cm)"%}
 						{% elif field.label == "*Description" %}
 							<div class="itemform_label_description">{{ field.label_tag }}</div>
+						{% elif field.label == "Zone type" or field.label == "Weight(kg)" or field.label == "Dim wt(kg)"%}
+							<div class="itemform_label_small">{{ field.label_tag }}</div>
+						{% elif field.label == "Zone" or field.label == "Unit" %}
+							<div class="itemform_label_zone">{{ field.label_tag }}</div>
 						{% else %}
 		            		<div class="itemform_label">{{ field.label_tag }}</div>
 		            	{% endif %}
@@ -156,6 +165,10 @@
 								</div>
 							{% elif field.label == "*Description" %}
 								<div class="item_input_description">{{ field }}</div>
+							{% elif field.label == "Zone type" or field.label == "Weight(kg)" or field.label == "Dim wt(kg)"%}
+								<div class="item_input_smaller">{{ field }}</div>
+							{% elif field.label == "Zone" or field.label == "Unit"%}
+								<div class="item_input_zone">{{ field }}</div>
 							{% else %}
 			            		<div class="item_input">{{ field }}</div>
 			            	{% endif %}

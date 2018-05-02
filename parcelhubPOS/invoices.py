@@ -151,7 +151,7 @@ def round_to(n, precision):
 def round_to_05(n):
     return round_to(n, 0.05)
 
-@login_required
+@csrf_exempt
 def editInvoice(request, invoiceid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
@@ -241,8 +241,8 @@ def editInvoice(request, invoiceid):
                 formdata = form.cleaned_data
                 invoice_item.list = invoice
                 invoice_item.invoice = invoice
-                price = float(formdata.get('price') )
-                gstvalue = float(formdata.get('gst') )
+                price = float(formdata.get('totalprice') )
+                gstvalue = float(formdata.get('totalgst') )
                 producttype = formdata.get('producttype')
                 skucode = formdata.get('sku')
                 sku = SKU.objects.filter(sku_code=skucode).first()
@@ -279,7 +279,6 @@ def editInvoice(request, invoiceid):
                 
                 invoice_item.list = invoice
                 invoice_item.invoice = invoice
-                price = formdata.get('price') 
                 nrofitem = InvoiceItem.objects.all()
                 invoice_item.id = invoice.id +'_' + str(len(nrofitem) + 1)
                 invoice_item.save()
