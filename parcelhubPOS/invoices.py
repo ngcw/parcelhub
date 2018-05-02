@@ -317,6 +317,7 @@ def editInvoice(request, invoiceid):
                  'terminalselection': terminallist, 
                  'invoice': invoice,
                  'invoicetitle': title,
+                 'hasgst': sel_branch.hasgst,
                  'isedit' : isedit,
                  'haspayment': haspayment,
                  'isall': branchid == '-1',
@@ -433,6 +434,7 @@ def autocompleteskufield(request):
 @csrf_exempt
 def autocompleteskudetail(request):
     branchid = request.session.get(CONST_branchid)
+    branch = Branch.objects.get(id=branchid)
     skucode =request.GET.get('sku_code')
     invoicetype =request.GET.get('invoicetype')
     skubranch_list = SKUBranch.objects.filter(branch_id = branchid, sku__sku_code = skucode)
@@ -481,7 +483,11 @@ def autocompleteskudetail(request):
                 gst = (skuprice * gstpercentage)
                 pricewithgst = skuprice + gst
             sku_json['price'] = "%.2f" % pricewithgst
-            sku_json['gst'] = "%.2f" % gst
+            
+            if branch.hasgst:
+                sku_json['gst'] = "%.2f" % gst
+            else:
+                sku_json['gst'] = "0.00"
             skucode_list.append(sku.sku_code)
             results.append(sku_json)
         except: 
@@ -516,7 +522,10 @@ def autocompleteskudetail(request):
                 gst = (skuprice * gstpercentage)
                 pricewithgst = skuprice + gst
             sku_json['price'] = "%.2f" % pricewithgst
-            sku_json['gst'] = "%.2f" % gst
+            if branch.hasgst:
+                sku_json['gst'] = "%.2f" % gst
+            else:
+                sku_json['gst'] = "0.00"
             results.append(sku_json)
         except:
             pass
@@ -663,28 +672,32 @@ def validateweightrange(request):
 
 @csrf_exempt
 def calculategst(request):
+    branchid = request.session.get(CONST_branchid)
+    branch = Branch.objects.get(id=branchid)
     results = []
     price = request.GET.get('price');
     skucode = request.GET.get('sku');
     gst_json = {}
-    
-    if price and skucode:
-        try:
-            sku = SKU.objects.get(sku_code=skucode)
-            if sku:
-                tax = sku.tax_code.gst
-                producttype = sku.product_type.name
-                if tax:
-                    gstpercentage = float(tax)/100
-                    if producttype != 'Document' and producttype != 'Parcel':
-                        gstvalue = 0
-                        if sku.is_gst_inclusive:
-                            gstvalue = float(price) - (float(price)/(1+gstpercentage))
-                        else:
-                            gstvalue = float(price) * gstpercentage
-                        gst_json['gst'] = round(gstvalue,2)
-        except:
-            pass
+    if branch.hasgst:
+        if price and skucode:
+            try:
+                sku = SKU.objects.get(sku_code=skucode)
+                if sku:
+                    tax = sku.tax_code.gst
+                    producttype = sku.product_type.name
+                    if tax:
+                        gstpercentage = float(tax)/100
+                        if producttype != 'Document' and producttype != 'Parcel':
+                            gstvalue = 0
+                            if sku.is_gst_inclusive:
+                                gstvalue = float(price) - (float(price)/(1+gstpercentage))
+                            else:
+                                gstvalue = float(price) * gstpercentage
+                            gst_json['gst'] = round(gstvalue,2)
+            except:
+                pass
+    else:
+        gst_json['gst'] = 0
     results.append(gst_json)
     data = json.dumps(results)
     return JsonResponse(data, safe=False)

@@ -16,6 +16,7 @@ class Branch(models.Model):
     address = models.CharField(max_length=254, verbose_name='*Address')
     registrationno = models.CharField(max_length=50, verbose_name='*Registration no')
     gstno = models.CharField(max_length=50, verbose_name='GST no', blank=True, null=True)
+    hasgst = models.BooleanField(verbose_name='Has GST')
     fax = models.CharField(max_length=25, blank=True, null=True)
     tollfree = models.CharField(max_length=25,verbose_name='Toll-free', blank=True, null=True)
     website = models.CharField(max_length=254, blank=True, null=True)

@@ -607,3 +607,7 @@ input:disabled, select:disabled, textarea:disabled
 {
 	text-align: right;
 }
+#hideGST
+{
+	visibility: hidden;
+}

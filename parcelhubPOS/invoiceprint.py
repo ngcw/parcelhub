@@ -18,6 +18,7 @@ from textwrap import wrap
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
 
+CONST_branchid = 'branchid'
 folder = PROJECT_ROOT + STATIC_URL + 'fonts'    
 ttfFile = os.path.join(folder, 'DejaVuSansMono.ttf')     
 pdfmetrics.registerFont(TTFont("DejaVuSansMono", ttfFile)) 
@@ -33,6 +34,8 @@ def invoice_pdf(request, invoiceid):
     response = HttpResponse(content_type='application/pdf')
     filename = invoice.invoiceno
     response['Content-Disposition'] = 'attachment; filename="'+filename+'.pdf"'
+    branchid = request.session.get(CONST_branchid)
+    branch = Branch.objects.get(id=branchid)
     invoiceitem = InvoiceItem.objects.filter(invoice=invoice).order_by('sku', 'tracking_code')
     finaldict = {}
     invoiceitemdict = []
@@ -83,10 +86,14 @@ def invoice_pdf(request, invoiceid):
     p.setLineWidth(1)
     p.line(marginleft, 790, 570, 790)
     p.setFont(CONST_font, 8)
-    gstno = ''
-    if invoice.branch.gstno:
-        gstno = invoice.branch.gstno
-    p.drawString(marginleft, 780, 'Co Reg No: ' + invoice.branch.registrationno +'            GST No: '+ gstno) 
+    
+    if branch.hasgst:
+        gstno = ''
+        if invoice.branch.gstno:
+            gstno = invoice.branch.gstno
+        p.drawString(marginleft, 780, 'Co Reg No: ' + invoice.branch.registrationno +'            GST No: '+ gstno) 
+    else:
+        p.drawString(marginleft, 780, 'Co Reg No: ' + invoice.branch.registrationno )
     p.drawString(marginleft, 770, invoice.branch.address)
     p.drawString(marginleft, 760, 'Phone: '+invoice.branch.contact)
     tollfree = '-'
@@ -97,7 +104,10 @@ def invoice_pdf(request, invoiceid):
         website = invoice.branch.website
     p.drawString(marginleft, 750, 'Toll Free: ' + tollfree +'            Website: '+ website)
     p.setFont( CONST_fontbold, 24)
-    p.drawString(marginleft, 720, 'Tax Invoice')
+    if branch.hasgst:
+        p.drawString(marginleft, 720, 'Tax Invoice')
+    else:
+        p.drawString(marginleft, 720, 'Invoice')
     p.setFont(CONST_font, 10)
     p.setFillColorRGB(0.5, 0.5, 0.5 )
     p.setStrokeColorRGB(0.5, 0.5, 0.5 )
@@ -174,8 +184,10 @@ def invoice_pdf(request, invoiceid):
                 p.drawString(30, y, item['sku'])
                 p.drawString(145, y, item['description'])
                 # tax string
-                taxwidth = p.stringWidth(item['tax'], CONST_font, 10)
-                p.drawString(370-taxwidth, y, item['tax'])
+                if branch.hasgst: #GST logic
+                    taxwidth = p.stringWidth(item['tax'], CONST_font, 10)
+                    p.drawString(370-taxwidth, y, item['tax'])
+                    
                 # price string
                 pricestring = str(item['price'])
                 pricewidth = p.stringWidth(pricestring, CONST_font, 10)
@@ -256,10 +268,11 @@ def invoice_pdf(request, invoiceid):
         discount = "-%.2f" % invoice.discountvalue
     discountwidth = p.stringWidth(discount, CONST_font, 10)
     p.drawString(end - discountwidth, 138, discount)
-    p.drawString(310, 123, 'GST')
-    gst = "%.2f" % invoice.gst
-    gstwidth = p.stringWidth(gst, CONST_font, 10)
-    p.drawString(end - gstwidth, 123, gst)
+    if branch.hasgst: #GST logic
+        p.drawString(310, 123, 'GST')
+        gst = "%.2f" % invoice.gst
+        gstwidth = p.stringWidth(gst, CONST_font, 10)
+        p.drawString(end - gstwidth, 123, gst)
     p.drawString(310, 108, 'Rounding')
     roundingvalue = float(invoice.total) - (float(invoice.subtotal) - float(invoice.discountvalue) + float(invoice.gst))
     rounding = "%.2f" % roundingvalue
@@ -267,7 +280,10 @@ def invoice_pdf(request, invoiceid):
         rounding = "0.00"
     roundingwidth = p.stringWidth(rounding, CONST_font, 10)
     p.drawString(end - roundingwidth, 108, rounding)
-    p.drawString(310, 55, 'TOTAL inc GST')
+    if branch.hasgst: #GST logic
+        p.drawString(310, 55, 'TOTAL inc GST')
+    else:
+        p.drawString(310, 55, 'TOTAL')
     total = "%.2f" % invoice.total
     totalwidth = p.stringWidth(total, CONST_font, 10)
     p.drawString(end - totalwidth, 55, total)
@@ -299,6 +315,8 @@ def invoice_thermal(request, invoiceid):
     response = HttpResponse(content_type='application/pdf')
     filename = invoice.invoiceno
     response['Content-Disposition'] = 'attachment; filename="'+filename+'_receipt.pdf"'
+    branchid = request.session.get(CONST_branchid)
+    branch = Branch.objects.get(id=branchid)
     invoiceitem = InvoiceItem.objects.filter(invoice=invoice).order_by('skudescription', 'tracking_code')
     invoiceitemdict = []
     currentsku = ''
@@ -357,7 +375,10 @@ def invoice_thermal(request, invoiceid):
     linespace = 11
     topsize = (19 + addressline) * linespace
     middlesize = linecount * linespace
-    btmsize = ( 17 + (len(gstsummary) + 1) ) * linespace
+    if branch.hasgst: #GST logic
+        btmsize = ( 17 + (len(gstsummary) + 1) ) * linespace
+    else:
+        btmsize = 17  * linespace
     totallength = topsize + middlesize + btmsize
     
     p.setPageSize((totalwidth, totallength))
@@ -370,8 +391,9 @@ def invoice_thermal(request, invoiceid):
     p.setFont(CONST_fontr, 8)
     regnotext = 'Co Reg No: ' + invoice.branch.registrationno
     p.drawCentredString(center, totallength - topmargin - linespace, regnotext ) 
-    gsttext = 'GST No: '+ invoice.branch.gstno
-    p.drawCentredString(center, totallength - topmargin - ( linespace * 2 ), gsttext ) 
+    if branch.hasgst: #GST logic
+        gsttext = 'GST No: '+ invoice.branch.gstno
+        p.drawCentredString(center, totallength - topmargin - ( linespace * 2 ), gsttext ) 
     addresslinedrawcount = 2;
     for line in wrap(addresstxt, addressallowedwith ):
         addresslinedrawcount += 1;
@@ -383,8 +405,10 @@ def invoice_thermal(request, invoiceid):
     p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 2 ) ), tollfreetxt )
     websitetxt = 'Website: '+ invoice.branch.website
     p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 3 ) ),websitetxt)
-    
-    p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Tax Invoice')
+    if branch.hasgst: #GST logic
+        p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Tax Invoice')
+    else:
+        p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Invoice')
 
     # Invoice no text
     p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 6 ) ), 'Invoice no  : ' + invoice.invoiceno)
@@ -438,26 +462,29 @@ def invoice_thermal(request, invoiceid):
     subtotaly = footerliney - (linespace  )
     p.setFont(CONST_fontrbold, 8)
     p.drawString( marginleft + 40, subtotaly , 'Sub Total')
-    
-    # GST total title
-    gsttitletxt = 'GST'
-    try:
-        tax = Tax.objects.get(gst__gt = Decimal('0.00'))
-        if tax:
-            gstvalue = tax.gst
-            gstvaluetxt =  "%.0f" % gstvalue
-            gsttitletxt = 'GST' + '@' + gstvaluetxt + '%'
-    except:
-        pass
-    gsty = footerliney - (linespace * 2)
-    p.drawString( marginleft + 40, gsty, gsttitletxt)
+    if branch.hasgst: #GST logic
+        # GST total title
+        gsttitletxt = 'GST'
+        try:
+            tax = Tax.objects.get(gst__gt = Decimal('0.00'))
+            if tax:
+                gstvalue = tax.gst
+                gstvaluetxt =  "%.0f" % gstvalue
+                gsttitletxt = 'GST' + '@' + gstvaluetxt + '%'
+        except:
+            pass
+        gsty = footerliney - (linespace * 2)
+        p.drawString( marginleft + 40, gsty, gsttitletxt)
     # Discount title
     discounty = footerliney - (linespace * 3 )
     p.setFont(CONST_fontrbold, 8)
     p.drawString( marginleft + 40, discounty , 'Discount')
     # total title
     totaly = footerliney - (linespace * 4)
-    p.drawString( marginleft + 40, totaly , 'Total inc GST')
+    if branch.hasgst: #GST logic
+        p.drawString( marginleft + 40, totaly , 'Total inc GST')
+    else:
+        p.drawString( marginleft + 40, totaly , 'Total')
     # Payment details
     paymenttitley = footerliney - ((linespace * 7) )
     p.drawString( marginleft, paymenttitley, 'Payment Details  -  ' + invoice.payment_type.name)
@@ -479,11 +506,12 @@ def invoice_thermal(request, invoiceid):
     discountwidth = p.stringWidth(discounttxt, CONST_fontr, 9)
     p.drawString( totalwidth - marginleft - discountwidth, discounty, discounttxt )
     p.drawString( totalwidth - currencymargin, discounty, 'RM' )
-    # GST
-    gsttxt = str(invoice.gst)
-    gstwidth = p.stringWidth(gsttxt, CONST_fontr, 9)
-    p.drawString( totalwidth - marginleft - gstwidth, gsty, gsttxt )
-    p.drawString( totalwidth - currencymargin, gsty, 'RM' )
+    if branch.hasgst: #GST logic
+        # GST
+        gsttxt = str(invoice.gst)
+        gstwidth = p.stringWidth(gsttxt, CONST_fontr, 9)
+        p.drawString( totalwidth - marginleft - gstwidth, gsty, gsttxt )
+        p.drawString( totalwidth - currencymargin, gsty, 'RM' )
     # Total
     totaltxt = str(invoice.total)
     finaltotalwidth = p.stringWidth(totaltxt, CONST_fontr, 9)
@@ -506,17 +534,17 @@ def invoice_thermal(request, invoiceid):
     headerboxy = btmmargin + ( linespace + 5)
     p.rect(marginleft,footerliney - ((linespace * 10)+5), (totalwidth - marginleft * 2), linespace * 3, stroke=True, fill=False)  
     
-    
-    p.setFont(CONST_fontrbold, 8)
-    p.drawString(marginleft, btmmargin + ( (len(gstsummary)+2) * linespace ), "GST Summary:     Amount(RM)       Tax(RM)")   
-    gstcount = 0;
-    for key, value in sorted(gstsummary.items()):
-        p.drawCentredString(marginleft + 30, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), key)
-        amount = '%.2f' %(value[0])
-        amount = '%.2f' %(value[1])
-        p.drawCentredString(marginleft + 110, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), amount)
-        p.drawCentredString(marginleft + 183, btmmargin + ( (len(gstsummary) + 1- gstcount ) * linespace ), amount)
-        gstcount = gstcount + 1;
+    if branch.hasgst: #GST logic
+        p.setFont(CONST_fontrbold, 8)
+        p.drawString(marginleft, btmmargin + ( (len(gstsummary)+2) * linespace ), "GST Summary:     Amount(RM)       Tax(RM)")   
+        gstcount = 0;
+        for key, value in sorted(gstsummary.items()):
+            p.drawCentredString(marginleft + 30, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), key)
+            amount = '%.2f' %(value[0])
+            amount = '%.2f' %(value[1])
+            p.drawCentredString(marginleft + 110, btmmargin + ( (len(gstsummary) + 1 - gstcount ) * linespace ), amount)
+            p.drawCentredString(marginleft + 183, btmmargin + ( (len(gstsummary) + 1- gstcount ) * linespace ), amount)
+            gstcount = gstcount + 1;
     # thank you 
     p.drawCentredString(center, btmmargin, 'Thank you')
     p.showPage()

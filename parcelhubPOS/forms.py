@@ -71,7 +71,7 @@ class SKUForm(forms.ModelForm):
 class BranchForm(forms.ModelForm):
     class Meta:
         model = Branch
-        fields = ( "name", "branch_code",'owner', 'contact', 'email', 'address', 'registrationno', 'gstno', 'payment_bank', 'payment_acc','fax', 'tollfree', 'website')
+        fields = ( "name", "branch_code",'owner', 'contact', 'email', 'address', 'registrationno', 'hasgst','gstno', 'payment_bank', 'payment_acc','fax', 'tollfree', 'website')
         widgets = {
             'address': Textarea(attrs={'cols': 33, 'rows': 4})
         }
