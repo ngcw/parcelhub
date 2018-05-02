@@ -82,6 +82,10 @@ class BranchForm(forms.ModelForm):
                 'readOnly': 'True',
                 'disabled': 'disabled'
             }) 
+        self.fields['hasgst'].widget.attrs\
+            .update({
+                'id': 'hasgstcheckbox',
+            })
 class DateInput(forms.DateInput):
     input_type = 'date'
 
