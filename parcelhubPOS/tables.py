@@ -99,8 +99,8 @@ class UserTable2(tables.Table):
     class Meta:
         model = User
         attrs = {'class': 'paleblue'}
-        fields = ('branch', 'username', 'first_name', 'last_name', 'email', 'last_login', 'date_joined'  )
-        sequence = ('branch','username', 'first_name', 'last_name', 'email', 'contact' ,'last_login', 'date_joined','edit', 'grant_access','delete')
+        fields = ('username', 'first_name', 'last_name', 'email', 'last_login', 'date_joined'  )
+        sequence = ('username', 'first_name', 'last_name', 'email', 'contact' ,'last_login', 'date_joined','edit', 'grant_access','delete')
         empty_text = "There are no User matching the search criteria..."
                 
 edituserbranchaccess = '''{% if isedit %}<a href="/parcelhubPOS/user/userbranchaccess/edituba?userbranch_id={{record.id }}_{{ record.user.id }}">Edit</a>
