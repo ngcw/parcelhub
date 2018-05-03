@@ -30,11 +30,23 @@ def userlist(request):
             isedit = branchaccess.access_level != 'Cashier'
         except:
             isedit = True
-    currentuser = User.objects.get(id=request.session['userid'])
+    admin_user = User.objects.filter(id=request.session['userid'])
+    currentuser = admin_user.first()
+    userwithaccesslist = UserBranchAccess.objects.order_by('id').values_list('user_id').distinct()
+    user_list_withoutaccess = User.objects.filter(is_superuser = False).exclude(id__in=userwithaccesslist)
+    
     if currentuser.is_superuser:
-        user_list = User.objects.all();
+        if branchid == '-1':
+            user_list = User.objects.all();
+        else:
+            userinbranch = UserBranchAccess.objects.filter(branch__id=branchid).values_list('user_id').distinct()
+            user_list_inbranch = User.objects.filter(id__in=userinbranch);
+            user_list = user_list_inbranch | admin_user | user_list_withoutaccess
     else:
-        user_list = User.objects.filter(is_superuser = False)
+        useraccessinbranch = UserBranchAccess.objects.filter(branch__id=branchid).values_list('user_id').distinct()
+        user_list_withaccess = User.objects.filter(is_superuser = False, id__in=useraccessinbranch)
+        
+        user_list = user_list_withaccess | user_list_withoutaccess
     formdata = {'firstname':'',
                 'lastname':'',
                 'username':'',
