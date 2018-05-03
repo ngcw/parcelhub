@@ -778,6 +778,8 @@
 	                	var dataobj = JSON.parse(data)
 	                	if( value == '')
 	                    {
+	                		skuinput.style.backgroundColor = 'red'
+		                	skuinput.setAttribute('title', 'SKU cannot be empty');
 	                    	$( "#id_form-" + count + "-zone" ).val( '' )
 	                    	$( "#id_form-" + count + "-weight" ).val( '' )
 	                    	$( "#id_form-" + count + "-dimension_weight" ).val( '' )
