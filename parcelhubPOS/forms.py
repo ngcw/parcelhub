@@ -158,7 +158,7 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['sku'].widget.attrs\
             .update({
                 'class': 'sku-autocomplete',
-                'onchange' : 'AutoCompleteSKUDetail(this.id);AutoCompleteSKU(this.id)',
+                'onchange' : 'AutoCompleteSKUDetail(this.id)',
                 'onblur' : 'AutoCompleteSKUDetail(this.id)',
             })
         self.fields['courier'].widget.attrs\

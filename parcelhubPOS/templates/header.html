@@ -747,7 +747,8 @@
 	    	    }
 	    	}
 	    	function AutoCompleteSKUDetail( inputid ) { 
-	    	    var value = document.getElementById(inputid).value.trim();
+	    		var skuinput = document.getElementById(inputid)
+	    	    var value = skuinput.value.trim();
 	    	    
 	    		var inputstr = inputid.split("-");
 	    	    var count = inputstr[1]
@@ -783,6 +784,8 @@
 	                    }
 	                	else
 	                	{
+	                		skuinput.style.backgroundColor = ''
+	                		skuinput.setAttribute('title', '');
 		                	for (var i = 0; i < dataobj.length; i++){
 		               			// look for the entry with a matching `code` value
 		               		 	if (dataobj[i]['skucode'] == value ){
