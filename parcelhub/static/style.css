@@ -611,7 +611,7 @@ input:disabled, select:disabled, textarea:disabled
 {
 	visibility: hidden;
 }
-#branchinputtble #hasgstcheckbox
+#hasgstcheckbox
 {
 	width: 10px;
 }
