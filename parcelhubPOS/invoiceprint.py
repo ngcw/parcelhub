@@ -104,10 +104,8 @@ def invoice_pdf(request, invoiceid):
         website = invoice.branch.website
     p.drawString(marginleft, 750, 'Toll Free: ' + tollfree +'            Website: '+ website)
     p.setFont( CONST_fontbold, 24)
-    if branch.hasgst:
-        p.drawString(marginleft, 720, 'Tax Invoice')
-    else:
-        p.drawString(marginleft, 720, 'Invoice')
+
+    p.drawString(marginleft, 720, 'Receipt')
     p.setFont(CONST_font, 10)
     p.setFillColorRGB(0.5, 0.5, 0.5 )
     p.setStrokeColorRGB(0.5, 0.5, 0.5 )
