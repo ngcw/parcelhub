@@ -107,7 +107,7 @@ def invoice_pdf(request, invoiceid):
     if branch.hasgst: #GST logic
         p.drawString(marginleft, 720, 'Tax Invoice')
     else:
-        p.drawString(marginleft, 720, 'Receipt')
+        p.drawString(marginleft, 720, 'Invoice')
     p.setFont(CONST_font, 10)
     p.setFillColorRGB(0.5, 0.5, 0.5 )
     p.setStrokeColorRGB(0.5, 0.5, 0.5 )
@@ -410,7 +410,7 @@ def invoice_thermal(request, invoiceid):
     if branch.hasgst: #GST logic
         p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Tax Invoice')
     else:
-        p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Invoice')
+        p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Receipt')
 
     # Invoice no text
     p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 6 ) ), 'Invoice no  : ' + invoice.invoiceno)
