@@ -401,10 +401,12 @@ def invoice_thermal(request, invoiceid):
         
     contacttxt = 'Phone: '+invoice.branch.contact
     p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 1 )  ), contacttxt)
-    tollfreetxt = 'Toll Free: ' + invoice.branch.tollfree
-    p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 2 ) ), tollfreetxt )
-    websitetxt = 'Website: '+ invoice.branch.website
-    p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 3 ) ),websitetxt)
+    if invoice.branch.tollfree:
+        tollfreetxt = 'Toll Free: ' + invoice.branch.tollfree
+        p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 2 ) ), tollfreetxt )
+    if invoice.branch.website:
+        websitetxt = 'Website: '+ invoice.branch.website
+        p.drawCentredString(center, totallength - topmargin - ( linespace * ( addresslinedrawcount + 3 ) ),websitetxt)
     if branch.hasgst: #GST logic
         p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Tax Invoice')
     else:
