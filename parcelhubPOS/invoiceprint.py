@@ -87,7 +87,7 @@ def invoice_pdf(request, invoiceid):
     p.line(marginleft, 790, 570, 790)
     p.setFont(CONST_font, 8)
     
-    if branch.hasgst:
+    if branch.hasgst: #GST logic
         gstno = ''
         if invoice.branch.gstno:
             gstno = invoice.branch.gstno
@@ -104,8 +104,10 @@ def invoice_pdf(request, invoiceid):
         website = invoice.branch.website
     p.drawString(marginleft, 750, 'Toll Free: ' + tollfree +'            Website: '+ website)
     p.setFont( CONST_fontbold, 24)
-
-    p.drawString(marginleft, 720, 'Receipt')
+    if branch.hasgst: #GST logic
+        p.drawString(marginleft, 720, 'Tax Invoice')
+    else:
+        p.drawString(marginleft, 720, 'Receipt')
     p.setFont(CONST_font, 10)
     p.setFillColorRGB(0.5, 0.5, 0.5 )
     p.setStrokeColorRGB(0.5, 0.5, 0.5 )
