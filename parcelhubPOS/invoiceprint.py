@@ -413,7 +413,10 @@ def invoice_thermal(request, invoiceid):
         p.drawCentredString(center, totallength - topmargin - (( linespace * ( addresslinedrawcount + 4 ) ) + 3 ), 'Receipt')
 
     # Invoice no text
-    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 6 ) ), 'Invoice no  : ' + invoice.invoiceno)
+    if branch.hasgst: #GST logic
+        p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 6 ) ), 'Invoice no  : ' + invoice.invoiceno)
+    else:
+        p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 6 ) ), 'Receipt no  : ' + invoice.invoiceno)
     username = invoice.created_by.last_name + ' ' +invoice.created_by.first_name
     p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 7 ) ),'Served by   : ' + username)
     # Date text
