@@ -212,7 +212,6 @@ class InvoiceItemForm(forms.ModelForm):
         self.fields['price'].widget.attrs\
             .update({
                 'oninput': 'UpdateGST(this.id)',
-                'tabindex':'-1'
             })
         self.fields['gst'].widget.attrs\
             .update({
@@ -227,7 +226,6 @@ class InvoiceItemForm(forms.ModelForm):
             .update({
                 'class': 'zoneinput lastInput',
                 'oninput': 'UpdateGST(this.id)',
-                'tabindex':'-1',
                 'readOnly': 'True',
                 'disabled': 'True',
             })
