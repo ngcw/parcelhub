@@ -421,7 +421,7 @@ def invoice_thermal(request, invoiceid):
     p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 7 ) ),'Served by   : ' + username)
     # Date text
     p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 8 ) ),'Date        : ' + invoice.createtimestamp.strftime("%d/%m/%Y %I:%M%p"))
-    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 9 ) ),'Sold to     : Cash' )
+    p.drawString(marginleft,totallength - topmargin - ( linespace * ( addresslinedrawcount + 9 ) ),'Sold to     : ' + invoice.invoicetype.name)
     
     # Invoice items 
     p.setFillColorRGB(0, 0, 0 ) 
