@@ -1222,7 +1222,7 @@
 	    	      	alert("There are invalid unit field at row number " + String(rowempty) +".");
 	    	      	return false;
 	    	  	}
-	    	    if( zonetypevalue == 'Cash' && parseFloat(payment) < parseFloat(totalvalue))
+	    	    if( (zonetypevalue == 'Cash' ||  zonetypevalue == 'Credit card') && parseFloat(payment) < parseFloat(totalvalue))
 	    		{
 	    	    	alert("Payment of RM " + payment + " is insufficient as total is RM " + totalvalue);
 	    	      	return false;
@@ -1263,7 +1263,7 @@
 	    		if( validated )
     			{
 	    			var invoicetype = document.getElementById('id_invoicetype').value.trim();
-	    			if( invoicetype == 'Cash')
+	    			if( invoicetype == 'Cash' || invoicetype == 'Credit card')
 	    			{
 	    				confirmPayment().done(function() {
 	    					enableAllInput()

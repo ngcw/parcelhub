@@ -391,7 +391,7 @@ def invoice_thermal(request, invoiceid):
     p.setFont(CONST_fontr, 8)
     regnotext = 'Co Reg No: ' + invoice.branch.registrationno
     p.drawCentredString(center, totallength - topmargin - linespace, regnotext ) 
-    if branch.hasgst: #GST logic
+    if branch.hasgst and branch.gstno: #GST logic
         gsttext = 'GST No: '+ invoice.branch.gstno
         p.drawCentredString(center, totallength - topmargin - ( linespace * 2 ), gsttext ) 
     addresslinedrawcount = 2;

@@ -208,7 +208,7 @@ def editInvoice(request, invoiceid):
             doprint = deliveryorder_pdf(request, invoice.id)
             return HttpResponse(doprint, content_type='application/pdf')
         elif 'action' in request.POST and request.POST['action'] == 'Preview':
-            if invoice.invoicetype.name == 'Cash':
+            if invoice.invoicetype.name == 'Cash' or invoice.invoicetype.name == 'Credit card':
                 invoiceprint = invoice_thermal(request, invoice.id)
             else:
                 invoiceprint = invoice_pdf(request, invoice.id) 
@@ -292,7 +292,7 @@ def editInvoice(request, invoiceid):
             elif 'action' in request.POST and request.POST['action'] == 'Preview':
                 pass
             else:
-                if invoice.invoicetype.name == 'Cash':
+                if invoice.invoicetype.name == 'Cash' or invoice.invoicetype.name == 'Credit card':
                     invoiceprint = invoice_thermal(request, invoice.id)
                 else:
                     invoiceprint = invoice_pdf(request, invoice.id) 
@@ -306,7 +306,7 @@ def editInvoice(request, invoiceid):
         isnotlocked = invoicequeryset.createtimestamp.date() >= globalparam.invoice_lockin_date
     iscashedit = False;
     if invoicequeryset:
-        iscashedit = invoicequeryset.invoicetype.name == 'Cash'
+        iscashedit = invoicequeryset.invoicetype.name == 'Cash' or invoicequeryset.invoicetype.name == 'Credit card'
     isedit = isnotlocked and not haspayment and not iscashedit
     context = {'invoice_form': invoice_form,
                  'invoice_item_formset': invoice_item_formset,
@@ -443,7 +443,7 @@ def autocompleteskudetail(request):
     iswalkinspecial = False;
     iscorporate = False;
     customerid = request.GET.get('customerid') ;
-    if invoicetype != 'Cash' and customerid:
+    if invoicetype != 'Cash' and invoicetype != 'Credit card' and customerid:
         try:
             customersel = Customer.objects.get(id=customerid)
             if customersel:
@@ -453,7 +453,7 @@ def autocompleteskudetail(request):
         except:
             pass
     skubranch = skubranch_list.first()
-    if invoicetype != 'Cash' and skubranch:
+    if invoicetype != 'Cash' and invoicetype != 'Credit card' and skubranch:
         try:
             sku_json = {}
             sku = skubranch.sku
