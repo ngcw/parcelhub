@@ -198,10 +198,18 @@ def cashup_pdf(request, cashupreport):
     p.setLineWidth(1)
     lineheight = totalheight - topmargin- (linecount * 0.5)
     p.line(margin, lineheight, totalwidth-margin, lineheight)
-    
-    line2string = 'B/N: ' + branch.registrationno + ' GST No:' + branch.gstno + ' ' + branch.address
+    if branch.hasgst and branch.gstno:
+        line2string = 'B/N: ' + branch.registrationno + ' GST No:' + branch.gstno + ' ' + branch.address
+    else:
+        line2string = branch.address
     p.drawCentredString(center, totalheight - topmargin - (linecount * 1.2), line2string)
-    contactinfo = "Tel: " + branch.contact + " Fax: " + branch.fax
+    branchcontact = '-'
+    branchfax = ''
+    if branch.contact:
+        branchcontact = branch.contact
+    if branch.fax:
+        branchfax = branch.fax
+    contactinfo = "Tel: " + branchcontact + " Fax: " + branchfax
     p.drawCentredString(center, totalheight - topmargin- (linecount * 2), contactinfo)
     
     p.setFont(CONST_fontbold, 14)
