@@ -204,7 +204,7 @@ def cashup_pdf(request, cashupreport):
         line2string = branch.address
     p.drawCentredString(center, totalheight - topmargin - (linecount * 1.2), line2string)
     branchcontact = '-'
-    branchfax = ''
+    branchfax = '-'
     if branch.contact:
         branchcontact = branch.contact
     if branch.fax:
