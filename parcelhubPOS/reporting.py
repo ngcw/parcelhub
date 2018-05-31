@@ -149,7 +149,7 @@ def viewcashupreport(request):
                 if invoicepaymenttype or paymentpaymenttype:
                     totalpayment = 0
                     if invoicepaymenttype:
-                        totalpayment = totalpayment + invoicepaymenttype.aggregate(Sum('payment')).get('payment__sum', 0.00)
+                        totalpayment = totalpayment + invoicepaymenttype.aggregate(Sum('total')).get('total__sum', 0.00)
                     if paymentpaymenttype:
                         totalpayment = totalpayment +  paymentpaymenttype.aggregate(Sum('total')).get('total__sum', 0.00)
                     totalcount = invoicepaymenttype.count() + paymentpaymenttype.count()
