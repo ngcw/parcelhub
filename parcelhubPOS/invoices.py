@@ -88,7 +88,10 @@ def retrieveInvoice(request):
         submitted_customer = request.GET.get('customer')
         if submitted_customer:
             formdata['customer'] = submitted_customer;
-            invoice_list = invoice_list.filter( customer__name__icontains=submitted_customer)
+            if submitted_customer == 'Cash':
+                invoice_list = invoice_list.filter( customer__isnull=True)
+            else:
+                invoice_list = invoice_list.filter( customer__name__icontains=submitted_customer)
         
     if branchid == "-1":
         final_invoice_table = InvoiceTable2(invoice_list.order_by('-createtimestamp'))
