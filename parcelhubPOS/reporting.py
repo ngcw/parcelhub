@@ -123,7 +123,7 @@ def viewcashupreport(request):
                     latestinvoice = lpaymentinvoiceid
             except:
                 pass
-            totalpaymentinvoice = invoicelist.aggregate(Sum('payment')).get('payment__sum', 0.00)
+            totalpaymentinvoice = invoicelist.aggregate(Sum('total')).get('total__sum', 0.00)
             totalpaymentpayment = paymentlist.aggregate(Sum('total')).get('total__sum', 0.00)
             
             totalamt = 0; 
