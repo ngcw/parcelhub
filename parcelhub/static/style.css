@@ -1,7 +1,7 @@
-body
+html, body
 {
 	width: 100%;
-	height: 100%;
+	height: 99%;
 	background-color: #c0c0c0;
 	padding-right:5px;
 	padding:0px;
@@ -193,6 +193,8 @@ input:disabled, select:disabled, textarea:disabled
 	display: block;
 	margin-top: 10px;
 	padding-top:65px;
+	width: 100%;
+	height: 94%;
 }
 .searchform
 {
@@ -614,4 +616,21 @@ input:disabled, select:disabled, textarea:disabled
 #branchinputtble #hasgstcheckbox
 {
 	width: 10px;
+}
+.split {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+}
+
+/* Control the left side */
+.left {
+  left: 0;
+}
+
+/* Control the right side */
+.right {
+  right: 0;
 }

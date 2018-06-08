@@ -377,6 +377,7 @@
 	    		      return;
 	    		  }
 	    		});	
+	    	
 	    	{% if isedit %}
 	    	$(document).ready(function() {
 	    	    $('#id_customer').select2({ width: '150px' });
@@ -1042,8 +1043,9 @@
 	    		  {% else %}
 	    		  startTime();
 	    		  {% endif %}
-	    		  
 	    		};
+
+		        
     		function SetDefaultZoneTypeAndCourier(inputid)
     		{
     			var inputstr = inputid.split("-");
@@ -1317,6 +1319,8 @@
 	    	    var unit = document.getElementById(unitid)
 	    	    var dimweightid = "id_form-" + count + "-dimension_weight";
 	    	    var dimweight = document.getElementById(dimweightid)
+	    	    var priceid = "id_form-" + count + "-price";
+	    	    var price = document.getElementById(priceid)
 	    	    var courierid = "id_form-" + count + "-courier";
 	    	    var couriersel = document.getElementById(courierid);
 	    	    if ( selectedproducttype !== 'Document' && selectedproducttype !== 'Parcel')
@@ -1335,15 +1339,23 @@
 	    	    	{
 	    	    		dimweight.classList.remove('lastInput')
 	    	    	}
+	    	    	if ( price.classList.contains('lastInput') )
+	    	    	{
+	    	    		price.classList.remove('lastInput')
+	    	    	}
 	    	    	AutoCompleteSKU(inputid)
 	    	    }
-	    	    else
+	    	    else if( selectedproducttype == 'Services' || selectedproducttype == 'Packaging')
 	    	    {
 	    	    	//skudescription.readOnly = true;
 	    	    	//price.readOnly = true;
 	    	    	if ( unit.classList.contains('lastInput') )
 	    	    	{
 	    	    		unit.classList.remove('lastInput');
+	    	    	}
+	    	    	if ( price.classList.contains('lastInput') )
+	    	    	{
+	    	    		price.classList.remove('lastInput')
 	    	    	}
 	    	    	if ( dimweight.classList.contains('lastInput') )
 	    	    	{
@@ -1352,6 +1364,25 @@
 	    	    	else
 	    	    	{
 	    	    		dimweight.classList.add('lastInput')
+	    	    	}
+	    	    }
+	    	    else
+	    	    {
+	    	    	if ( unit.classList.contains('lastInput') )
+	    	    	{
+	    	    		unit.classList.remove('lastInput');
+	    	    	}
+	    	    	if ( dimweight.classList.contains('lastInput') )
+	    	    	{
+	    	    		dimweight.classList.remove('lastInput')
+	    	    	}
+	    	    	if ( price.classList.contains('lastInput') )
+	    	    	{
+	    	    		
+	    	    	}
+	    	    	else
+	    	    	{
+	    	    		price.classList.add('lastInput')
 	    	    	}
 	    	    }
 	    	    if ( selectedproducttype == 'Services' || selectedproducttype == 'Packaging')

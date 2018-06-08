@@ -1,7 +1,6 @@
 {% extends "header.html" %}
 
 {% block content %}
-	
 	<form action="" method="POST" target='_blank' id="editinvoiceform">{% csrf_token %}
 	<div id="invoice_container">
 		<h2 id="invoicetitle">{{ invoicetitle }}</h2> 
