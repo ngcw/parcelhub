@@ -252,11 +252,11 @@ def editInvoice(request, invoiceid):
                 
                 gsttotal = gsttotal + gstvalue
                 
-
-                subtotal = subtotal + price - gstvalue
+                itemtotal = price - gstvalue
+                subtotal = subtotal + itemtoal
                 if discountmode == '%':
                     if sku:
-                        discount = discount + ( ( discountval / 100 ) * (subtotal ) )
+                        discount = discount + ( ( discountval / 100 ) * ( itemtotal ) )
             if not invoice_form.instance.id:
                 invoice.invoiceno = gen_invoice_number(request)
                 invoice.createtimestamp = timezone.now()
