@@ -253,7 +253,7 @@ def editInvoice(request, invoiceid):
                 gsttotal = gsttotal + gstvalue
                 
                 itemtotal = price - gstvalue
-                subtotal = subtotal + itemtoal
+                subtotal = subtotal + itemtotal
                 if discountmode == '%':
                     if sku:
                         discount = discount + ( ( discountval / 100 ) * ( itemtotal ) )
