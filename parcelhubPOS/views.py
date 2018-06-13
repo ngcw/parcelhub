@@ -118,9 +118,3 @@ def globalparameter(request):
                 'statusmsg' : request.GET.get('msg'),
                 }
     return render(request, 'globalparameter.html', context)
-
-class AuthRequiredMiddleware(object):
-    def process_request(self, request):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect("/parcelhubPOS/") # or http response
-        return None
