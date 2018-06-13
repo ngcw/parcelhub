@@ -88,7 +88,7 @@ def retrieveInvoice(request):
         submitted_customer = request.GET.get('customer')
         if submitted_customer:
             formdata['customer'] = submitted_customer;
-            if submitted_customer == 'Cash':
+            if submitted_customer.strip().upper() == 'CASH':
                 invoice_list = invoice_list.filter( customer__isnull=True)
             else:
                 invoice_list = invoice_list.filter( customer__name__icontains=submitted_customer)
@@ -230,7 +230,10 @@ def editInvoice(request, invoiceid):
             formdatainvoice = invoice_form.cleaned_data
             gsttotal = 0;
             #calculation only
-            discountval = float(formdatainvoice.get('discount'))
+            discountinput = formdatainvoice.get('discount')
+            discountval = 0;
+            if discountinput:
+                discountval = float(discountinput)
             
             invoice.discount = discountval
             discountmode = request.POST["discountoption"]
