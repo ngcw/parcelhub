@@ -1,5 +1,5 @@
 from .models import User, Branch, UserBranchAccess, Terminal
-from django.http.response import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth import login
@@ -13,6 +13,7 @@ CONST_soa = '4Statement Of Account'
 CONST_masterdata = '5Information'
 CONST_reporting = '6Report'
 CONST_system = '7System'
+
 def userselection(request):
     sessiondict = []
     if 'loggedusers' in request.session:
@@ -32,7 +33,7 @@ def userselection(request):
     allloggedusers = User.objects.filter(id__in=request.session['loggedusers'])
     return allloggedusers
 
-def branchselection(request):
+def branchselection(request):      
     loguser = User.objects.get(id=request.session.get('userid'))
     if loguser.is_superuser:
         branches = Branch.objects.all()
@@ -53,6 +54,7 @@ def branchselection(request):
     return branches
     
 def terminalselection(request):
+
     selectedbranch = request.session.get(CONST_branchid)
     selectedterminal = request.session.get(CONST_terminalid)
     if selectedbranch == '-1':
@@ -86,6 +88,7 @@ def terminalselection(request):
     return terminals
 
 def navbar(request):
+
     loguser = User.objects.get(id=request.session.get('userid'))
     branchid = request.session.get(CONST_branchid)
     terminalid = request.session.get(CONST_terminalid)

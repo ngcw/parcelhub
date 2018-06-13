@@ -155,6 +155,7 @@ def round_to_05(n):
     return round_to(n, 0.05)
 
 @csrf_exempt
+@login_required
 def editInvoice(request, invoiceid):
     loggedusers = userselection(request)
     branchselectlist = branchselection(request)
