@@ -164,7 +164,6 @@ class Customer(models.Model):
 
     class Meta:
         ordering = ['branch', 'name']
-        unique_together = (('branch', 'identificationno'),)
 class SKUBranch(models.Model):
     id = models.CharField(max_length=100, primary_key=True, unique=True)  
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE, verbose_name='*SKU')
