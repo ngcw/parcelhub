@@ -104,6 +104,8 @@ def editcustomer(request, customerid):
             else:
                 msg = 'Customer "%s" have been updated successfully.' % customername
             customerinstance = formset.save(commit=False)
+            customercount = Customer.objects.all().count()
+            customerinstance.id = str(branchid) + '_' + str(customercount)
             customerinstance.save()
 
             return HttpResponseRedirect("/parcelhubPOS/customer/?msg=%s" % msg)#customerlist(request)
