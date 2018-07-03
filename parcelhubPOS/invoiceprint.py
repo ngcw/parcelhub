@@ -615,10 +615,22 @@ def deliveryorder_pdf(request, invoiceid):
     p.setLineWidth(1)
     p.line(marginleft, top - (linesize), 570, 790)
     p.setFont(CONST_font, 8)
-    p.drawString(marginleft, top - (linesize * 2), 'Co Reg No: ' + invoice.branch.registrationno +'            GST No: '+ invoice.branch.gstno) 
+    resgistrationno = '-'
+    if invoice.branch.registrationno:
+        resgistrationno = invoice.branch.registrationno
+    gstno = '-'
+    if invoice.branch.gstno:
+        gstno = invoice.branch.gstno
+    p.drawString(marginleft, top - (linesize * 2), 'Co Reg No: ' + resgistrationno +'            GST No: '+ gstno) 
     p.drawString(marginleft, top - (linesize * 3), invoice.branch.address)
     p.drawString(marginleft, top - (linesize * 4), 'Phone: '+invoice.branch.contact)
-    p.drawString(marginleft, top - (linesize * 5), 'Toll Free: ' + invoice.branch.tollfree +'            Website: '+ invoice.branch.website)
+    tollfree = '-'
+    website = '-'
+    if invoice.branch.tollfree:
+        tollfree = invoice.branch.tollfree
+    if invoice.branch.website:
+        website = invoice.branch.website
+    p.drawString(marginleft, top - (linesize * 5), 'Toll Free: ' + tollfree +'            Website: '+ website)
     p.setFont( CONST_fontbold, 24)
     p.drawString(marginleft+30, top - (linesize * 11), 'Delivery Note')
     p.setFont(CONST_fontbold, 10)
