@@ -339,8 +339,10 @@ def CustomerCreatePopup(request):
 
     if form.is_valid():
         customerinstance = form.save(commit=False)
-        customercount = Customer.objects.all().count()
-        customerinstance.id = str(branchid) + '_' + str(customercount)
+        maxcountlist = Customer.objects.all().values_list('id', flat=True)
+        maxcountlistfinal = [int(i.split('_')[1]) for i in maxcountlist]
+        maxcount = max(maxcountlistfinal) + 1
+        customerinstance.id = str(branchid) + '_' + str(maxcount)
         instance = form.save()
 
         ## Change the value of the "#id_author". This is the element id in the form
