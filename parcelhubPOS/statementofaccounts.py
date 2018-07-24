@@ -344,7 +344,7 @@ def statementofacc_pdf(request, statementofacc):
     p.drawString( margin + 400, lineheight - (linecount * 1), "Terms")
     p.drawString( margin + 520, lineheight - (linecount * 1), "Date")
     p.setFont(CONST_fontbold, 11)
-    custacc = customer.branch.branch_code + customer.identificationno
+    custacc = customer.branch.branch_code + customer.id
     p.drawString( margin, lineheight - (linecount * 2), custacc)
     
     username = statementofacc.created_by.last_name + ' ' +statementofacc.created_by.first_name
@@ -437,7 +437,7 @@ def statementofacc_pdf(request, statementofacc):
         p.drawString( margin, itemheight - (linecount * rowcount), item.date.strftime("%d/%m/%Y"))
         p.drawString( margin + 70, itemheight - (linecount * rowcount), item.reference)
         if item.description:
-            remarks = item.description
+            remarks = item.description[:30] +'...' 
         else:
             remarks = ''
         p.drawString( margin + 160, itemheight - (linecount * rowcount), remarks)

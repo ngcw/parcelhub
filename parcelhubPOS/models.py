@@ -198,7 +198,7 @@ class Invoice(models.Model):
     invoiceno = models.CharField(max_length=25, verbose_name='Invoice No.')
     invoicetype =models.ForeignKey(InvoiceType, verbose_name='*Type')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
-    remarks = models.CharField(max_length=254,blank=True, null=True)
+    remarks = models.CharField(max_length=30,blank=True, null=True)
     subtotal = models.DecimalField(max_digits=30, decimal_places=2)
     discount = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True)
     discountvalue = models.DecimalField(max_digits=30, decimal_places=2, blank=True, null=True, verbose_name='Discount (RM)')
