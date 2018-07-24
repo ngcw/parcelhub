@@ -65,7 +65,7 @@ def invoice_pdf(request, invoiceid):
                 currentpage = page
             currentsku = item.skudescription
             itemdict['items'] = []
-            itemdict['description'] = item.skudescription[:30] +'...' 
+            itemdict['description'] = item.skudescription[:30] 
             invoiceitemdict.append(itemdict)
         itemdict['items'].append(item.tracking_code) 
         if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount == 53) or itemcount == 72 or remainingitem == 0:

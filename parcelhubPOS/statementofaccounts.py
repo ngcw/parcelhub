@@ -437,7 +437,7 @@ def statementofacc_pdf(request, statementofacc):
         p.drawString( margin, itemheight - (linecount * rowcount), item.date.strftime("%d/%m/%Y"))
         p.drawString( margin + 70, itemheight - (linecount * rowcount), item.reference)
         if item.description:
-            remarks = item.description[:30] +'...' 
+            remarks = item.description[:30] 
         else:
             remarks = ''
         p.drawString( margin + 160, itemheight - (linecount * rowcount), remarks)
