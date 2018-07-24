@@ -52,6 +52,7 @@ def invoice_pdf(request, invoiceid):
             itemcount += 1
             itemdict = {}
             if currentsku != item.sku:
+                itemcount += 1
                 skuselected = SKU.objects.get(sku_code=item.sku)
                 itemdict['sku'] = item.sku
                 itemdict['tax'] = skuselected.tax_code.id
@@ -68,8 +69,8 @@ def invoice_pdf(request, invoiceid):
             itemdict['description'] = item.skudescription[:30] 
             invoiceitemdict.append(itemdict)
         itemdict['items'].append(item.tracking_code) 
-        if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount == 53) or itemcount == 72 or remainingitem == 0:
-            finaldict[page]=invoiceitemdict
+        if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount == 54) or itemcount == 72 or remainingitem == 0:
+            finaldict[page]=(invoiceitemdict, itemcount)
             invoiceitemdict = []
             page += 1;
             itemcount = 0;
@@ -138,13 +139,13 @@ def invoice_pdf(request, invoiceid):
     for each in finaldict:
         pageitemdict = finaldict[each]
         p.setFont(CONST_fontbold, 10)
-        if (pagenum == 1 and invoiceitem.count() <= 40 ):
+        if (pagenum == 1 and pageitemdict[1] == 40 ):
             headery = 613
             headerboxy = 610
             boxy = 200
             boxheight = 405
             y = 595
-        elif (pagenum == 1 and invoiceitem.count() > 53 ):
+        elif (pagenum == 1 and pageitemdict[1] <= 54 ):
             headery = 613
             headerboxy = 610
             boxy = 50
@@ -178,7 +179,7 @@ def invoice_pdf(request, invoiceid):
         count = 0;
         itemcount = 0;
         topy = y;
-        for item in pageitemdict:
+        for item in pageitemdict[0]:
             y = topy - (count * 10) 
             if 'sku' in item:
                 p.drawString(30, y, item['sku'])
