@@ -27,7 +27,10 @@ pdfmetrics.registerFont(TTFont("DejaVuSansMono-Bold", ttfFilebold))
 # Constants
 CONST_font = 'Helvetica'
 CONST_fontbold = CONST_font + '-Bold'
-
+def chunks(s, n):
+    """Produce `n`-character chunks from `s`."""
+    for start in range(0, len(s), n):
+        yield s[start:start+n]
 def invoice_pdf(request, invoiceid):
     # Create the HttpResponse object with the appropriate PDF headers.
     invoice = Invoice.objects.get(id=invoiceid)
@@ -69,7 +72,12 @@ def invoice_pdf(request, invoiceid):
             itemdict['description'] = item.skudescription[:30] 
             invoiceitemdict.append(itemdict)
         itemdict['items'].append(item.tracking_code) 
-        if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount == 54) or itemcount == 72 or remainingitem == 0:
+        #chunkcount = 0;
+        #for chunk in chunks(item.tracking_code, 27):
+        #    if chunkcount != 0:
+        #        itemcount += 1;
+        #    chunkcount+= 1
+        if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount >= 54) or itemcount == 72 or remainingitem == 0:
             finaldict[page]=(invoiceitemdict, itemcount)
             invoiceitemdict = []
             page += 1;
@@ -139,13 +147,13 @@ def invoice_pdf(request, invoiceid):
     for each in finaldict:
         pageitemdict = finaldict[each]
         p.setFont(CONST_fontbold, 10)
-        if (pagenum == 1 and pageitemdict[1] == 40 ):
+        if (pagenum == 1 and pageitemdict[1] <= 40 ):
             headery = 613
             headerboxy = 610
             boxy = 200
             boxheight = 405
             y = 595
-        elif (pagenum == 1 and pageitemdict[1] <= 54 ):
+        elif (pagenum == 1 and pageitemdict[1] >= 54 ):
             headery = 613
             headerboxy = 610
             boxy = 50
@@ -214,9 +222,10 @@ def invoice_pdf(request, invoiceid):
                     dy = topy - (count * 10)
                     if trackcode:
                         p.drawString(155, dy, 'S/No: ' + trackcode )
+                        
                     else:
                         p.drawString(155, dy, 'S/No: ' + '-' )
-                    count += 1
+                        count += 1
             
         
         totalitem = 'No. of items (%d)' % itemcount
