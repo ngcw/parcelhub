@@ -225,7 +225,7 @@ def invoice_pdf(request, invoiceid):
                         
                     else:
                         p.drawString(155, dy, 'S/No: ' + '-' )
-                        count += 1
+                count += 1
             
         
         totalitem = 'No. of items (%d)' % itemcount
