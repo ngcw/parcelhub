@@ -55,7 +55,6 @@ def invoice_pdf(request, invoiceid):
             itemcount += 1
             itemdict = {}
             if currentsku != item.sku:
-                itemcount += 1
                 skuselected = SKU.objects.get(sku_code=item.sku)
                 itemdict['sku'] = item.sku
                 itemdict['tax'] = skuselected.tax_code.id
@@ -237,7 +236,8 @@ def invoice_pdf(request, invoiceid):
             p.showPage()
             pagenum += 1
     
-    
+    if pagenum == 1 and finaldict[0][1] > 40:
+        p.showPage()
     # Bottom titles and details
     p.setFont(CONST_fontbold, 10)
     p.setFillColorRGB(0.5, 0.5, 0.5 )
