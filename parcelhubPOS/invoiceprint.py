@@ -55,7 +55,6 @@ def invoice_pdf(request, invoiceid):
             itemcount += 1
             itemdict = {}
             if currentsku != item.sku:
-                itemcount += 1
                 skuselected = SKU.objects.get(sku_code=item.sku)
                 itemdict['sku'] = item.sku
                 itemdict['tax'] = skuselected.tax_code.id
