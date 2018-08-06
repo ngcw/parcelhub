@@ -236,7 +236,7 @@ def invoice_pdf(request, invoiceid):
             p.showPage()
             pagenum += 1
     
-    if pagenum == 1 and finaldict[0][1] > 40:
+    if pagenum == 1 and finaldict[pagenum][1] > 40:
         p.showPage()
     # Bottom titles and details
     p.setFont(CONST_fontbold, 10)
