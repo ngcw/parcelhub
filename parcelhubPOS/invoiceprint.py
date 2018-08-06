@@ -77,7 +77,7 @@ def invoice_pdf(request, invoiceid):
         #    if chunkcount != 0:
         #        itemcount += 1;
         #    chunkcount+= 1
-        if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount >= 54) or itemcount == 72 or remainingitem == 0:
+        if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount > 40) or itemcount == 72 or remainingitem == 0:
             finaldict[page]=(invoiceitemdict, itemcount)
             invoiceitemdict = []
             page += 1;
@@ -147,7 +147,7 @@ def invoice_pdf(request, invoiceid):
     for each in finaldict:
         pageitemdict = finaldict[each]
         p.setFont(CONST_fontbold, 10)
-        if (pagenum == 1 and pageitemdict[1] <= 54 ):
+        if (pagenum == 1 and pageitemdict[1] <= 40 ):
             headery = 613
             headerboxy = 610
             boxy = 200
