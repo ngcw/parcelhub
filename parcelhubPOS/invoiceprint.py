@@ -147,13 +147,13 @@ def invoice_pdf(request, invoiceid):
     for each in finaldict:
         pageitemdict = finaldict[each]
         p.setFont(CONST_fontbold, 10)
-        if (pagenum == 1 and pageitemdict[1] < 54 ):
+        if (pagenum == 1 and pageitemdict[1] <= 40 ):
             headery = 613
             headerboxy = 610
             boxy = 200
             boxheight = 405
             y = 595
-        elif (pagenum == 1 and pageitemdict[1] >= 54 ):
+        elif (pagenum == 1 and pageitemdict[1] >= 40 ):
             headery = 613
             headerboxy = 610
             boxy = 50
