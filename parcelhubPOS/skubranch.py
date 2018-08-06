@@ -207,7 +207,10 @@ def editskubranch(request, skubranchid):
 def deleteskubranch(request, dskubranchid ):
     dskubranchid = request.GET.get('dskubranchid')
     skubranch = SKUBranch.objects.filter(id = dskubranchid )
-    msg = 'SKU override for "%s" and customer "%s" have been deleted successfully.' % (skubranch.first().sku.sku_code, skubranch.first().customer.name )
+    try:
+        msg = 'SKU override for "%s" and customer "%s" have been deleted successfully.' % (skubranch.first().sku.sku_code, skubranch.first().customer.name )
+    except: 
+        msg = 'SKU override for "%s" have been deleted successfully.' % (skubranch.first().sku.sku_code)
     if skubranch:
         skubranch.delete()
     return HttpResponseRedirect("/parcelhubPOS/skubranch/?msg=%s" % msg)
