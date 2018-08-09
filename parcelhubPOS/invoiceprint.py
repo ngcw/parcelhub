@@ -79,9 +79,10 @@ def invoice_pdf(request, invoiceid):
         if (page == 1 and itemcount == 40 and remainingitem == 0) or (page == 1 and itemcount >= 54) or itemcount == 72 or remainingitem == 0:
             finaldict[page]=(invoiceitemdict, itemcount)
             invoiceitemdict = []
-            page += 1;
             if page == 1 and itemcount > 40 and itemcount < 54 and remainingitem == 0:
                 finaldict[2]=(invoiceitemdict, 0)
+            page += 1;
+            
             itemcount = 0;
     buffer = BytesIO()
     
