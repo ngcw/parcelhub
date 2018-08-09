@@ -80,6 +80,8 @@ def invoice_pdf(request, invoiceid):
             finaldict[page]=(invoiceitemdict, itemcount)
             invoiceitemdict = []
             page += 1;
+            if pagenum == 1 and itemcount > 40 and itemcount < 54 and remainingitem == 0:
+                finaldict[2]=(invoiceitemdict, 0)
             itemcount = 0;
     buffer = BytesIO()
     
@@ -236,8 +238,7 @@ def invoice_pdf(request, invoiceid):
             p.showPage()
             pagenum += 1
     
-    if pagenum == 1 and finaldict[pagenum][1] > 40:
-        p.showPage()
+    
     # Bottom titles and details
     p.setFont(CONST_fontbold, 10)
     p.setFillColorRGB(0.5, 0.5, 0.5 )
