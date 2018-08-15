@@ -143,7 +143,7 @@ USE_L10N = False
 USE_TZ = False
 SHORT_DATETIME_FORMAT = 'd/m/Y P'
 DATETIME_FORMAT = 'd/m/Y P'
-
+DATE_FORMAT = 'd/m/Y'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
